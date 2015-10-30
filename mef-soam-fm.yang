@@ -5,11 +5,10 @@ module mef-soam-fm {
 
   import mef-cfm {
     prefix cfm;
-    revision-date 2012-04-16;
+    revision-date 2015-09-29;
   }
   import ietf-yang-types {
     prefix yang;
-    revision-date 2010-09-24;
   }
 
   organization "Metro Ethernet Forum";
@@ -45,6 +44,10 @@ module mef-soam-fm {
           based networks', July 2011";
 
 
+  revision "2015-09-29" {
+    description
+      "Cisco fixes @@@";
+  }
   revision "2012-04-16" {
     description
       "Initial revision";
@@ -870,7 +873,7 @@ module mef-soam-fm {
     }
   }
 
-  augment "/cfm:maintenance-domain/cfm:maintenance-association/cfm:maintenance-association-end-point/cfm:loopback" {
+  augment "/cfm:transmit-loopback/cfm:input" {
     description
       "This set of data definitions extends on-demand Ethernet OAM Fault
        Management Loopback function (ETH-LB) as defined in Y.1731 and
@@ -1003,19 +1006,6 @@ module mef-soam-fm {
         "[MEF7.1] 9.3.2.1, [MEF31] MEF-SOAM-FM-MIB.mefSoamLbCfgTestTlvPattern";
     }
     
-    leaf crc-errors-in {
-      type yang:counter32;
-      config false;
-
-      description
-        "This attribute contains the count of the total number of LBR messages
-         received with CRC errors. This is only applicable when the
-         ETH-LB includes the test TLV with a test pattern of null-crc-32
-         or pbrs-crc-32.";
-      reference
-        "[MEF7.1] 9.3.2.2";
-    }
-
     leaf timeout {
       type yang:gauge32 {
         range "1..10000";
@@ -1029,10 +1019,30 @@ module mef-soam-fm {
       reference
         "[MEF31] MEF-SOAM-FM-MIB.mefSoamLbCfgTimeout";
     }
+  }
+
+  augment "/cfm:maintenance-domain/cfm:maintenance-association/cfm:maintenance-association-end-point/cfm:loopback" {
+    description
+      "This set of data definitions extends on-demand Ethernet OAM Fault
+       Management Loopback function (ETH-LB) as defined in Y.1731 and
+       802.1q and defined in MEF-CFM";
+    reference
+      "[MEF7.1] 9.3.2";
+    leaf crc-errors-in {
+      type yang:counter32;
+      config false;
+
+      description
+        "This attribute contains the count of the total number of LBR messages
+         received with CRC errors. This is only applicable when the
+         ETH-LB includes the test TLV with a test pattern of null-crc-32
+         or pbrs-crc-32.";
+      reference
+        "[MEF7.1] 9.3.2.2";
+    }
 
     list responses {
       key "transaction-id receive-order";
-      unique "transaction-id receive-order";
       config false;
 
       description
@@ -1450,27 +1460,10 @@ module mef-soam-fm {
        will be updated throughout the session upon successful creation.";
 
     input {
-      leaf maintenance-domain-id {
-        type string;
-
+      uses cfm:MEP-REFERENCE {
         description
-          "The ID of a Maintenance Domain of the MEP on which a test session will
-           be started";
-      }
-
-      leaf maintenance-association-id {
-        type string;
-
-        description
-          "The ID of a Maintenance Association of the MEP on which a test session
-           will be started";
-      }
-
-      leaf mep-id {
-        type cfm:mep-id-type;
-
-        description
-          "The ID of a MEP on which a test session will be started";
+          "A reference to the specific MEP on which a test session will be
+           started.";
       }
       uses test-signal-parameters-group;
     }
@@ -1481,28 +1474,10 @@ module mef-soam-fm {
       "Administratively abort a test-signal session on a specific MEP";
 
     input {
-      leaf maintenance-domain-id {
-        type string;
-
+      uses cfm:MEP-REFERENCE {
         description
-          "The ID of a Maintenance Domain of the MEP on which a test session will
-           be aborted";
-      }
-
-      leaf maintenance-association-id {
-        type string;
-
-        description
-          "The ID of a Maintenance Association of the MEP on which a test session
-           will be aborted";
-      }
-
-      leaf mep-id {
-        type cfm:mep-id-type;
-
-        description
-          "The ID of the MEP on which the ETH Test session should
-           be aborted";
+          "A reference to the specific MEP on which the ETH Test session should
+           be aborted.";
       }
     }
   }
@@ -1526,25 +1501,7 @@ module mef-soam-fm {
     reference
       "[MEF31] MEF-SOAM-FM-MIB.mefSoamMepDefectAlarm";
 
-    leaf maintenance-domain-id {
-      type string;
-
-      description
-        "The ID of a Maintenance Domain of the MEP on which the persistent
-         defect is present";
-    }
-
-    leaf maintenance-association-id {
-      type string;
-
-      description
-        "The ID of a Maintenance Association of the MEP on which the persistent
-         defect is present";
-    }
-
-    leaf mep-id {
-      type cfm:mep-id-type;
-
+    uses cfm:MEP-REFERENCE {
       description
         "A reference to the specific MEP on which the persistent defect is
          present";
@@ -1631,28 +1588,10 @@ module mef-soam-fm {
     reference
       "[MEF31] MEF-SOAM-FM-MIB.mefSoamMepOperStatusAlarm";
 
-    leaf maintenance-domain-id {
-      type string;
-
+    uses cfm:MEP-REFERENCE {
       description
-        "The ID of a Maintenance Domain of the MEP on which the operational state
+        "A reference to the specific MEP on which the operational-state
          changed";
-    }
-
-    leaf maintenance-association-id {
-      type string;
-
-      description
-        "The ID of a Maintenance Association of the MEP on which the operational
-         state changed";
-    }
-
-
-    leaf mep-id {
-      type cfm:mep-id-type;
-
-      description
-        "The ID of the MEP on which the operational-state changed";
     }
 
     leaf operational-state {
@@ -1672,27 +1611,9 @@ module mef-soam-fm {
     reference
       "[MEF31] MEF-SOAM-FM-MIB.mefSoamLckAlarm";
 
-    leaf maintenance-domain-id {
-      type string;
-
+    uses cfm:MEP-REFERENCE {
       description
-        "The ID of a Maintenance Domain of the MEP on which the lock alarm is
-         present";
-    }
-
-    leaf maintenance-association-id {
-      type string;
-
-      description
-        "The ID of a Maintenance Association of the MEP on which the lock alarm
-         is present";
-    }
-
-    leaf mep-id {
-      type cfm:mep-id-type;
-
-      description
-        "The ID of the MEP on which the lock alarm is present.";
+        "A reference to the specific MEP on which the lock alarm is present.";
     }
 
     leaf receive-status {
@@ -1721,27 +1642,9 @@ module mef-soam-fm {
     reference
       "[MEF31] MEF-SOAM-FM-MIB.mefSoamAisAlarm";
 
-    leaf maintenance-domain-id {
-      type string;
-
+    uses cfm:MEP-REFERENCE {
       description
-        "The ID of a Maintenance Domain of the MEP on which the AIS alarm is
-         present";
-    }
-
-    leaf maintenance-association-id {
-      type string;
-
-      description
-        "The ID of a Maintenance Association of the MEP on which the AIS alarm
-         is present";
-    }
-
-    leaf mep-id {
-      type cfm:mep-id-type;
-
-      description
-        "The ID of the MEP on which the AIS alarm is present.";
+        "A reference to the specific MEP on which the AIS alarm is present.";
     }
 
     leaf receive-status {

@@ -5,11 +5,13 @@ module mef-cfm {
 
   import ietf-yang-types {
     prefix yang;
-    revision-date 2010-09-24;
   }
   import ietf-inet-types {
     prefix inet;
-    revision-date 2010-09-24;
+    revision-date 2013-07-15;
+  }
+  import ietf-interfaces {
+    prefix if;
   }
 
   organization "Metro Ethernet Forum";
@@ -47,6 +49,10 @@ module mef-cfm {
       [Y.1731] refers to ITU-T Y.1731 'OAM functions and mechanisms for Ethernet 
           based networks', July 2011";
 
+  revision "2015-09-29" {
+    description
+      "Cisco fixes @@@";
+  }
   revision "2012-04-16" {
     description
       "Initial revision";
@@ -260,7 +266,11 @@ module mef-cfm {
                        received and that 3.5 times of at least one of those
                        CCMs transmission interval has not yet expired.";
       }
-}
+      enum none {
+          description "Only used in 'lowest-fault-priority-defect';
+                       indicates that no alarms should be generated";
+      }
+    }
 
     description
       "An enumerated value indicating the highest priority defect.";
@@ -1026,6 +1036,227 @@ module mef-cfm {
     }    
   }
 
+  grouping linktrace-reply {
+    leaf reply-order {
+      type uint32;
+
+      description
+        "An index to distinguish among multiple LTRs with the same LTR
+         transaction-id field value. reply-order are
+         assigned sequentially from 1, in the order that the
+         Linktrace Initiator received the LTR";
+      reference "[802.1q] 12.14.7.5.2:c";
+    }
+
+    leaf reply-ttl {
+      type uint32;
+
+      description
+        "The integer Reply TTL field value returned in the LTR.";
+      reference
+        "[802.1q] 12.14.7.5.3:b";
+    }
+
+    leaf forwarded {
+      type boolean;
+
+      description
+        "A Boolean value stating whether an LTM was forwarded by 
+         the responding MP.";
+      reference
+        "[802.1q] 12.14.7.5.3:c";
+    }
+
+    leaf terminal-mep {
+      type boolean; 
+
+      description
+        "A Boolean value stating whether the forwarded LTM reached 
+         a MEP for its MA.";
+      reference
+        "[802.1q] 12.14.7.5.3:d";
+    }
+
+    leaf last-egress-identifier {
+      type binary {
+        length 8;
+      }
+
+      description
+        "An octet string holding the Last Egress Identifier field 
+         returned in the LTR Egress Identifier TLV of the LTR.";
+      reference
+        "[802.1q] 12.14.7.5.3:e";
+    }
+
+    leaf next-egress-identifier {
+      type binary {
+        length 8;
+      }
+
+      description
+        "An octet string holding the Next Egress Identifier field
+         returned in the LTR Egress Identifier TLV of the LTR";
+      reference
+        "[802.1q] 12.14.7.5.3:f";
+    }
+
+    leaf ltr-relay {
+      type enumeration {
+        enum hit {
+            description "Indicates the LTM reached an MP whose MAC
+                         address matches the target MAC address.";
+            value 1;
+        }
+        enum filtering-database {
+            description "Indicates the Egress Port was determined by
+                         consulting the Filtering Database.";
+            value 2;
+        }
+        enum mip-ccm-database {
+            description "Indicates the Egress Port was determined by
+                         consulting the MIP CCM Database.";
+            value 3;
+        }
+      }
+
+      description
+        "An enumerated value indicating the value returned in the
+         Relay Action field.";
+      reference
+        "[802.1q] 12.14.7.5.3:g, Table 21-27
+         IEEE8021-CFM-MIB.Dot1agCfmRelayActionFieldValue";
+    }
+
+    uses sender-id-tlv-group;
+
+    leaf ingress-action {
+      type enumeration {
+        enum ok {
+            description "Indicates the target data frame would be
+                         passed through to the MAC Relay Entity.";
+            value 1;
+        }
+        enum down {
+            description "Indicates the Bridge Ports MAC Operational
+                         parameter is false.";
+            value 2;
+        }
+        enum blocked {
+            description "Indicates the target data frame would not
+                         be forwarded if received on this Port due
+                         to active topology enforement.";
+            value 3;
+        }
+        enum vid {
+            description "Indicates the ingress port is not in the 
+                         member set of the LTMs VID, and ingress
+                         filtering is enabled, so the target data
+                         frame would be filtered by ingress filtering.";
+            value 4;
+        }
+      }
+
+      description
+        "An enumerated value indicating the value returned in the 
+         Ingress Action field. This leaf is not present if no value
+         is returned in the LTR.";
+      reference
+        "[802.1q] 12.14.7.5.3:k, Table 21-30
+         IEEE8021-CFM-MIB.Dot1agCfmIngressActionFieldValue";
+    }
+
+    leaf ingress-mac {
+      type yang:mac-address;
+
+      description
+        "The MAC address returned in the Ingress MAC Address field.
+         This leaf is not present if no value is returned in the LTR.";
+      reference
+        "[802.1q] 12.14.7.5.3:l";
+    }
+
+    container ingress-port-id {
+      uses port-id-tlv-group;
+
+      description
+        "The Ingress Port ID field and the corresponding port ID value.
+         This leaf is not present if no value is returned in the LTR.";
+      reference
+        "[802.1q] 12.14.7.5.3:m";
+    }
+      
+    leaf egress-action {
+      type enumeration {
+        enum ok {
+            description "Indicates the targeted data frame would be
+                         forwarded.";
+            value 1;
+        }
+        enum down {
+            description "Indicates the Egress Port can be identified,
+                         but that Bridge Ports MAC Operational
+                         parameter is false.";
+            value 2;
+        }
+        enum blocked {
+            description "Indicates the Egress Port can be identified,
+                         but the data frame would not pass through the
+                         the Egress Port due to active topology 
+                         management, i.e., the Bridge Port is not in the
+                         Forwarding state.";
+            value 3;
+        }
+        enum vid {
+            description "Indicates the Egress Port can be identified,
+                         but the Bridge Port is not in the LTMs VIDs
+                         member set, so would be filtered by egress 
+                         filtering.";
+            value 4;
+        }
+      }
+ 
+      description
+        "An enumerated value indicating the value returned in the 
+         Egress Action field. This leaf is not present if no value
+         is returned in the LTR.";
+      reference
+        "[802.1q] 12.14.7.5.3:o, Table 21-32
+         IEEE8021-CFM-MIB.Dot1agCfmIngressActionFieldValue";
+    }            
+
+    leaf egress-mac {
+      type yang:mac-address;
+
+      description
+        "The MAC address returned in the Egress MAC Address field.
+         This leaf is not present if no value is returned in the LTR.";
+      reference
+        "[802.1q] 12.14.7.5.3:p";
+    }
+
+    container egress-port-id {
+      uses port-id-tlv-group;
+
+      description
+        "The Egress Port ID field and the corresponding port ID value.
+         This leaf is not present if no value is returned in the LTR.";
+      reference
+        "[802.1q] 12.14.7.5.3:p, 12.14.7.5.3:q";
+    }
+
+    leaf organization-specific-tlv {
+      type binary {
+        length "0|4 .. 1500";
+      }
+      description
+        "The OUI and contents of any Organization-Specific TLVs. This
+         leaf is not present if no value is returned in the LTR.";
+      reference
+        "[802.1q] 12.14.7.5.3:s";
+    }
+  }
+
   //
   // Data definitions related to CFM
   //
@@ -1400,11 +1631,15 @@ module mef-cfm {
            IEEE8021-CFM-MIB.Dot1agCfmCcmInterval";
       }
 
-      leaf-list remote-meps {
-        type mep-id-type;
+      list remote-mep {
+        key mep-id;
+
+        leaf mep-id {
+          type mep-id-type;
+        }
 
         description
-          "A list of the MEPIDs of the MEPs in the MA.";
+          "A list of the MEPs in the MA.";
         reference
           "[802.1q] 12.14.6.1.3:g";
       }
@@ -1429,14 +1664,17 @@ module mef-cfm {
         }
 
         leaf interface {
-          type string;
+          type if:interface-ref;
           mandatory true;
 
           description
-            "An interface, either a Bridge Port or an aggregated IEEE 802.3 port
-             within a Bridge Port, to which the MEP is attached. Each interface in
-             the system is uniquely identified by an interface-name. The structure
-             and content of the name is outside the scope of this specification.";
+            "A reference to an interface in the ietf-interfaces list,
+             to which the MEP is attached. This may be a Bridge Port
+             or an aggregated IEEE 802.3 port within a Bridge Port,
+             or a sub-interface thereof. Each interface in the system
+             is uniquely identified by an interface-name. The
+             structure and content of the name is outside the scope
+             of this specification.";
           reference
             "[802.1q] 12.14.7.1.3:b";
         }
@@ -1556,11 +1794,12 @@ module mef-cfm {
 
           leaf lowest-fault-priority-defect {
             type fault-alarm-defect-type;
+            default remote-mac-error;
 
             description
               "The lowest priority defect that is allowed to generate a Fault
-               Alarm. The non-existence of this leaf means that no
-               defects are to be reported";
+               Alarm. A value of 'none' means that no defects are to
+               be reported";
             reference
               "[802.1q] 12.14.7.1.3:k";
           }
@@ -1755,213 +1994,7 @@ module mef-cfm {
                 description
                   "The list of LTRs associated with a specific Linktrace 
                    transaction.";
-                leaf reply-order {
-                  type uint32;
-
-                  description
-                    "An index to distinguish among multiple LTRs with the same LTR
-                     transaction-id field value. reply-order are
-                     assigned sequentially from 1, in the order that the
-                     Linktrace Initiator received the LTR";
-                  reference "[802.1q] 12.14.7.5.2:c";
-                }
-
-                leaf reply-ttl {
-                  type uint32;
-
-                  description
-                    "The integer Reply TTL field value returned in the LTR.";
-                  reference
-                    "[802.1q] 12.14.7.5.3:b";
-                }
-
-                leaf forwarded {
-                  type boolean;
-
-                  description
-                    "A Boolean value stating whether an LTM was forwarded by 
-                     the responding MP.";
-                  reference
-                    "[802.1q] 12.14.7.5.3:c";
-                }
-
-                leaf terminal-mep {
-                  type boolean; 
-
-                  description
-                    "A Boolean value stating whether the forwarded LTM reached 
-                     a MEP for its MA.";
-                  reference
-                    "[802.1q] 12.14.7.5.3:d";
-                }
-
-                leaf last-egress-identifier {
-                  type binary {
-                    length 8;
-                  }
-
-                  description
-                    "An octet string holding the Last Egress Identifier field 
-                     returned in the LTR Egress Identifier TLV of the LTR.";
-                  reference
-                    "[802.1q] 12.14.7.5.3:e";
-                }
-
-                leaf next-egress-identifier {
-                  type binary {
-                    length 8;
-                  }
-
-                  description
-                    "An octet string holding the Next Egress Identifier field
-                     returned in the LTR Egress Identifier TLV of the LTR";
-                  reference
-                    "[802.1q] 12.14.7.5.3:f";
-                }
-
-                leaf ltr-relay {
-                  type enumeration {
-                    enum hit {
-                        description "Indicates the LTM reached an MP whose MAC
-                                     address matches the target MAC address.";
-                    }
-                    enum filtering-database {
-                        description "Indicates the Egress Port was determined by
-                                     consulting the Filtering Database.";
-                    }
-                    enum mip-ccm-database {
-                        description "Indicates the Egress Port was determined by
-                                     consulting the MIP CCM Database.";
-                    }
-                  }
-
-                  description
-                    "An enumerated value indicating the value returned in the
-                     Relay Action field.";
-                  reference
-                    "[802.1q] 12.14.7.5.3:g, Table 21-27
-                     IEEE8021-CFM-MIB.Dot1agCfmRelayActionFieldValue";
-                }
-
-                uses sender-id-tlv-group;
-
-                leaf ingress-action {
-                  type enumeration {
-                    enum ok {
-                        description "Indicates the target data frame would be
-                                     passed through to the MAC Relay Entity.";
-                    }
-                    enum down {
-                        description "Indicates the Bridge Ports MAC Operational
-                                     parameter is false.";
-                    }
-                    enum blocked {
-                        description "Indicates the target data frame would not
-                                     be forwarded if received on this Port due
-                                     to active topology enforement.";
-                    }
-                    enum vid {
-                        description "Indicates the ingress port is not in the 
-                                     member set of the LTMs VID, and ingress
-                                     filtering is enabled, so the target data
-                                     frame would be filtered by ingress filtering.";
-                    }
-                  }
-
-                  description
-                    "An enumerated value indicating the value returned in the 
-                     Ingress Action field. This leaf is not present if no value
-                     is returned in the LTR.";
-                  reference
-                    "[802.1q] 12.14.7.5.3:k, Table 21-30
-                     IEEE8021-CFM-MIB.Dot1agCfmIngressActionFieldValue";
-                }
-
-                leaf ingress-mac {
-                  type yang:mac-address;
-
-                  description
-                    "The MAC address returned in the Ingress MAC Address field.
-                     This leaf is not present if no value is returned in the LTR.";
-                  reference
-                    "[802.1q] 12.14.7.5.3:l";
-                }
-
-                container ingress-port-id {
-                  uses port-id-tlv-group;
-
-                  description
-                    "The Ingress Port ID field and the corresponding port ID value.
-                     This leaf is not present if no value is returned in the LTR.";
-                  reference
-                    "[802.1q] 12.14.7.5.3:m";
-                }
-                  
-                leaf egress-action {
-                  type enumeration {
-                    enum ok {
-                        description "Indicates the targeted data frame would be
-                                     forwarded.";
-                    }
-                    enum down {
-                        description "Indicates the Egress Port can be identified,
-                                     but that Bridge Ports MAC Operational
-                                     parameter is false.";
-                    }
-                    enum blocked {
-                        description "Indicates the Egress Port can be identified,
-                                     but the data frame would not pass through the
-                                     the Egress Port due to active topology 
-                                     management, i.e., the Bridge Port is not in the
-                                     Forwarding state.";
-                    }
-                    enum vid {
-                        description "Indicates the Egress Port can be identified,
-                                     but the Bridge Port is not in the LTMs VIDs
-                                     member set, so would be filtered by egress 
-                                     filtering.";
-                    }
-                  }
- 
-                  description
-                    "An enumerated value indicating the value returned in the 
-                     Egress Action field. This leaf is not present if no value
-                     is returned in the LTR.";
-                  reference
-                    "[802.1q] 12.14.7.5.3:o, Table 21-32
-                     IEEE8021-CFM-MIB.Dot1agCfmIngressActionFieldValue";
-                }            
-
-                leaf egress-mac {
-                  type yang:mac-address;
-
-                  description
-                    "The MAC address returned in the Egress MAC Address field.
-                     This leaf is not present if no value is returned in the LTR.";
-                  reference
-                    "[802.1q] 12.14.7.5.3:p";
-                }
-
-                container egress-port-id {
-                  uses port-id-tlv-group;
-
-                  description
-                    "The Egress Port ID field and the corresponding port ID value.
-                     This leaf is not present if no value is returned in the LTR.";
-                  reference
-                    "[802.1q] 12.14.7.5.3:p, 12.14.7.5.3:q";
-                }
-
-                leaf organization-specific-tlv {
-                  type binary {
-                    length "0|4 .. 1500";
-                  }
-                  description
-                    "The OUI and contents of any Organization-Specific TLVs. This
-                     leaf is not present if no value is returned in the LTR.";
-                  reference
-                    "[802.1q] 12.14.7.5.3:s";
-                }
+                uses linktrace-reply;
               }
             }
           }
@@ -2064,6 +2097,44 @@ module mef-cfm {
   // RPCs related to CFM
   //
 
+  grouping MEP-REFERENCE {
+    container local-mep {
+      leaf md-id {
+        type leafref {
+          path "/mef-cfm:maintenance-domain/mef-cfm:id";
+        }
+
+        description
+          "The ID of a configured Maintenance Domain";
+      }
+      leaf ma-id {
+        type leafref {
+          path "/mef-cfm:maintenance-domain" +
+               "[mef-cfm:id = current()/../md-id]/" +
+               "mef-cfm:maintenance-association/mef-cfm:id";
+        }
+    
+        description
+          "The ID of a configured Maintenance Association in the
+           above MD";
+      }
+      leaf mep-id {
+        type leafref {
+          path "/mef-cfm:maintenance-domain" +
+               "[mef-cfm:id = current()/../md-id]/" +
+               "mef-cfm:maintenance-association" +
+               "[mef-cfm:id = current()/../ma-id]/" +
+               "mef-cfm:maintenance-association-end-point/" +
+               "mef-cfm:mep-identifier";
+        }
+        mandatory true;
+    
+        description
+          "The ID of a configured MEP in the above MA.";
+      }
+    }
+  }
+
   rpc transmit-loopback {
     description
       "Start a loopback session on a specific MEP
@@ -2075,27 +2146,9 @@ module mef-cfm {
       "[802.1q] 12.14.7.3";
   
     input {
-      leaf maintenance-domain-id {
-        type string;
-
+      uses MEP-REFERENCE {
         description
-          "The ID of a Maintenance Domain of the MEP on which a loopback session will
-           be started";
-      }
-
-      leaf maintenance-association-id {
-        type string;
-
-        description
-          "The ID of a Maintenance Association of the MEP on which a loopback session 
-           will be started";
-      }
-
-      leaf mep-id {
-        type mep-id-type;
-
-        description
-          "The ID of the MEP on which a loopback session will be started";
+          "The MEP on which a loopback session will be started";
       }
       uses loopback-parameters-group;
     }
@@ -2108,27 +2161,9 @@ module mef-cfm {
       "[MEF30] 8.2, R28";
 
     input { 
-      leaf maintenance-domain-id {
-        type string;
-
+      uses MEP-REFERENCE {
         description
-          "The ID of a Maintenance Domain of the MEP on which a loopback session 
-           should be administratively aborted";
-      }
-
-      leaf maintenance-association-id {
-        type string;
-
-        description
-          "The ID of a Maintenance Association of the MEP on which a loopback session
-           should be administratively aborted";
-      }
-
-      leaf mep-id {
-        type mep-id-type;
-
-        description
-          "The ID of the MEP on which the loopback session should be
+          "The MEP on which the loopback session should be
            administratively aborted";
       }
     }
@@ -2146,27 +2181,9 @@ module mef-cfm {
       "[802.1q] 12.14.7.4";
 
     input {
-      leaf maintenance-domain-id {
-        type string;
-
+      uses MEP-REFERENCE {
         description
-          "The ID of a Maintenance Domain of the MEP on which a linktrace session will
-           be started";
-      }
-
-      leaf maintenance-association-id {
-        type string;
-
-        description
-          "The ID of a Maintenance Association of the MEP on which a linktrace session
-           will be started";
-      }
-
-      leaf mep-id {
-        type mep-id-type;
-
-        description
-          "The ID of the MEP on which a linktrace session will be started.";
+          "The MEP on which a linktrace session will be started.";
       }
       uses linktrace-parameters-group;
     }
@@ -2196,27 +2213,9 @@ module mef-cfm {
       description
         "Data definitions related to a persistent defect on a specific MEP.";
 
-      leaf maintenance-domain-id {
-        type string;
-
+      uses MEP-REFERENCE {
         description
-          "The ID of a Maintenance Domain of the MEP on which a persistent defect
-           has been detected";
-      }
-
-      leaf maintenance-association-id {
-        type string;
-
-        description
-          "The ID of a Maintenance Association of the MEP on which a persistent
-           defect has been detected";
-      }
-
-      leaf mep-id {
-        type mep-id-type;
-
-        description
-          "The ID of a MEP on which a persistent defect has been detected";
+          "The MEP on which a persistent defect has been detected";
       }
       leaf active-defects {
         type fault-alarm-defect-bits-type;

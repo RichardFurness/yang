@@ -4,12 +4,11 @@ module mef-soam-pm {
 
   import mef-cfm {
     prefix cfm;
-    revision-date 2012-04-16;
+    revision-date 2015-09-29;
   }
 
   import ietf-yang-types {
     prefix yang;
-    revision-date 2010-09-24;
   }
 
   organization "Metro Ethernet Forum";
@@ -43,6 +42,10 @@ module mef-soam-pm {
                [Y.1731] refers to ITU-T Y.1731 'OAM functions and mechanisms
                    for Ethernet based networks', July 2011";
 
+  revision "2015-09-29" {
+    description
+      "Cisco fixes @@@";
+  }
   revision 2012-04-16 {
     description
       "Initial revision";
@@ -365,6 +368,42 @@ module mef-soam-pm {
     }
   }
 
+  identity lm-type {
+    description
+      "Base identity for the set of Loss Measurement 'types'.";
+  }
+  identity lmm {
+    base lm-type;
+    description
+      "LMM SOAM PDU generated and received LMR responses tracked.";
+  }
+  identity slm {
+    base lm-type;
+    description
+      "SLM SOAM PDU generated and received SLR responses tracked.";
+  }
+  identity ccm {
+    base lm-type;
+    description
+      "CCM SOAM PDU generated and received CCM PDUs tracked.";
+  }
+
+  identity data-tlv-pattern {
+    description
+      "Base identity for the data patterns that can be used in a
+       data TLV";
+  }
+  identity zeroes {
+    base data-tlv-pattern;
+    description
+      "Indicates the Data TLV contains all zeros.";
+  }
+  identity ones {
+    base data-tlv-pattern;
+    description
+      "Indicates the Data TLV contains all ones.";
+  }
+
   grouping loss-measurement-configuration-group {
     description
       "This grouping includes configuration objects for the Frame Loss
@@ -373,19 +412,8 @@ module mef-soam-pm {
       "MEF-SOAM-PM-MIB.mefSoamLmCfgTable, [Y.1731] and [MEF SOAM PM IA]";
 
     leaf measurement-type {
-      type enumeration {
-        enum lmm {
-          description
-            "LMM SOAM PDU generated and received LMR responses tracked.";
-        }
-        enum slm {
-          description
-            "SLM SOAM PDU generated and received SLR responses tracked.";
-        }
-        enum ccm {
-          description
-            "CCM SOAM PDU generated and received CCM PDUs tracked.";
-        }
+      type identityref {
+        base lm-type;
       }
       default slm;
 
@@ -520,15 +548,8 @@ module mef-soam-pm {
     }
 
     leaf data-pattern {
-      type enumeration {
-        enum zeroes {
-          description
-            "Indicates the Data TLV contains all zeros.";
-        }
-        enum ones {
-          description
-            "Indicates the Data TLV contains all ones.";
-        }
+      type identityref {
+        base data-tlv-pattern;
       }
       default zeroes;
 
@@ -1532,6 +1553,28 @@ module mef-soam-pm {
     }
   }
 
+  identity dm-type {
+    description
+      "Base identity for the set of Delay Measurement 'types'.";
+  }
+  identity dmm {
+    base dm-type;
+    description
+      "DMM SOAM PDU generated, DMR responses received (one-way or
+       two-way measurements).";
+  }
+  identity dm1-transmitted {
+    base dm-type;
+    description
+      "1DM SOAM PDU generated (one-way measurements are made by the
+       receiver).";
+  }
+  identity dm1-received {
+    base dm-type;
+    description
+      "1DM SOAM PDU received and tracked (one-way measurements).";
+  }
+
   grouping delay-measurement-configuration-group {
     description
       "This grouping includes configuration objects for the Delay Measurement
@@ -1540,21 +1583,8 @@ module mef-soam-pm {
       "MEF-SOAM-PM-MIB.mefSoamDmCfgTable, [Y.1731], and [MEF SOAM PM IA].";
 
     leaf measurement-type {
-      type enumeration {
-        enum dmm {
-          description
-            "DMM SOAM PDU generated, DMR responses received (one-way or two-way
-             measurements).";
-        }
-        enum dm1-transmitted {
-          description
-            "1DM SOAM PDU generated (one-way measurements are made by the
-             receiver).";
-        }
-        enum dm1-received {
-          description
-            "1DM SOAM PDU received and tracked (one-way measurements).";
-        }
+      type identityref {
+        base dm-type;
       }
       mandatory true;
 
@@ -1689,13 +1719,8 @@ module mef-soam-pm {
     }
 
     leaf data-pattern {
-      type enumeration {
-        enum zeroes {
-          description "Indicates the Data TLV contains all zeros.";
-        }
-        enum ones {
-          description "Indicates the Data TLV contains all ones.";
-        }
+      type identityref {
+        base data-tlv-pattern;
       }
       default zeroes;
 
@@ -1765,6 +1790,20 @@ module mef-soam-pm {
                  
          At least 32 completed measurement intervals are to be
          stored. 96 measurement intervals are recommended to be stored.";
+    }
+
+    leaf source-mac-address {
+      type yang:mac-address;
+
+      description 
+        "The Source MAC Address Field of the received SOAM DM session PDUs.
+                     
+         If measurement-type is dm1-received this object indicates
+         the source address of the dm1-transmitted DM session.
+                     
+         This object is only valid for measurement-type set to
+         dm1-received. It is ignored for measurement-type set to dmm
+         or dm1-transmitted.";
     }
 
     leaf align-measurement-intervals {
@@ -3143,20 +3182,6 @@ module mef-soam-pm {
         uses remote-mep-group;
         uses measurement-timing-group;
 
-        leaf source-mac-address {
-          type yang:mac-address;
-
-          description 
-            "The Source MAC Address Field of the received SOAM DM session PDUs.
-                         
-             If measurement-type is dm1-received this object indicates
-             the source address of the dm1-transmitted DM session.
-                         
-             This object is only valid for measurement-type set to
-             dm1-received. It is ignored for measurement-type set to dmm
-             or dm1-transmitted.";
-        }
-
         leaf frame-delay-two-way {
           type yang:gauge32;
           units microseconds;
@@ -3326,6 +3351,10 @@ module mef-soam-pm {
        session identifier will be returned in the output parameter.";
 
     input {
+      uses cfm:MEP-REFERENCE {
+        description
+          "The MEP on which the session will be started";
+      }
       uses loss-measurement-configuration-group;
       uses remote-mep-group;
       uses measurement-timing-group;
@@ -3350,29 +3379,9 @@ module mef-soam-pm {
        proactive ETH-LM.";
 
     input {
-      leaf maintenance-domain-id {
-        type string;
-
+      uses cfm:MEP-REFERENCE {
         description
-          "The ID of a Maintenance Domain of the MEP on which the measurement
-           session should be aborted";
-      }
-
-      leaf maintenance-association-id {
-        type string;
-
-        description
-          "The ID of a Maintenance Association of the MEP on which the measurement
-           session should be aborted";
-      }
-
-
-      leaf mep-id {
-        type cfm:mep-id-type;
-        mandatory true;
-            
-        description
-          "The ID of the MEP on which a measurement session should be aborted";
+          "The MEP on which the session should be stopped";
       }
 
       leaf session-id {
@@ -3392,29 +3401,9 @@ module mef-soam-pm {
        data is deleted.";
 
     input {
-      leaf maintenance-domain-id {
-        type string;
-
+      uses cfm:MEP-REFERENCE {
         description
-          "The ID of a Maintenance Domain of the MEP on which the loss
-           measurement history should be cleared";
-      }
-
-      leaf maintenance-association-id {
-        type string;
-
-        description
-          "The ID of a Maintenance Association of the MEP on which the loss
-           measurement history should be cleared";
-      }
-
-      leaf mep-id {
-        type cfm:mep-id-type;
-        mandatory true;
-
-        description
-          "The ID of the MEP on which the loss measurement history should be
-           cleared.";
+          "The MEP on which the loss history stats should be cleared";
       }
 
       leaf session-id {
@@ -3438,6 +3427,10 @@ module mef-soam-pm {
        session identifier will be returned in the output parameter.";
 
     input {
+      uses cfm:MEP-REFERENCE {
+        description
+          "The MEP on which the session will be started";
+      }
       uses delay-measurement-configuration-group;
       uses remote-mep-group;
       uses measurement-timing-group;
@@ -3460,27 +3453,9 @@ module mef-soam-pm {
       "Abort a pre-scheduled instances of performance monitoring";
 
     input {
-      leaf maintenance-domain-id {
-        type string;
-
+      uses cfm:MEP-REFERENCE {
         description
-          "The ID of a Maintenance Domain of the MEP on which a measurement
-           session should be aborted";
-      }
-
-      leaf maintenance-association-id {
-        type string;
-
-        description
-          "The ID of a Maintenance Association of the MEP on which a measurement
-           session should be aborted";
-      }
-      leaf mep-id {
-        type cfm:mep-id-type;
-        mandatory true;
-          
-        description
-          "The ID of the MEP on which a measurement session should be aborted";
+          "The MEP on which the session should be stopped";
       }
 
       leaf session-id {
@@ -3499,28 +3474,9 @@ module mef-soam-pm {
        session. All instance data is deleted.";
 
     input {
-      leaf maintenance-domain-id {
-        type string;
-
+      uses cfm:MEP-REFERENCE {
         description
-          "The ID of a Maintenance Domain of the MEP on which the loss
-           measurement history should be cleared";
-      }
-
-      leaf maintenance-association-id {
-        type string;
-
-        description
-          "The ID of a Maintenance Association of the MEP on which the
-           loss measurement history should be cleared";
-      }
-      leaf mep-id {
-        type cfm:mep-id-type;
-        mandatory true;
-          
-        description
-          "The ID of the MEP on which the loss measurement history should be
-           cleared.";
+          "The MEP on which delay history stats should be cleared";
       }
 
       leaf session-id {
@@ -3547,26 +3503,7 @@ module mef-soam-pm {
     reference
       "MEF-SOAM-PM-MIB.mefSoamAvailabilityChangeAlarm";
 
-    leaf maintenance-domain-id {
-      type string;
-
-      description
-        "The ID of a Maintenance Domain of the MEP on which the availability
-         change alarm is present";
-    }
-
-    leaf maintenance-association-id {
-      type string;
-
-      description
-        "The ID of a Maintenance Association of the MEP on which the availability
-         change alarm is present";
-    }
-
-    leaf mep-id {
-      type cfm:mep-id-type;
-      mandatory true;
-          
+    uses cfm:MEP-REFERENCE {
       description
         "A reference to the specific MEP on which the availability change alarm
          is present";
@@ -3653,26 +3590,7 @@ module mef-soam-pm {
     reference
       "MEF-SOAM-PM-MIB.mefSoamLmSessionStartStopAlarm";
 
-    leaf maintenance-domain-id {
-      type string;
-
-      description
-        "The ID of a Maintenance Domain of the MEP on which the loss session
-         state change alarm is present";
-    }
-
-    leaf maintenance-association-id {
-      type string;
-
-      description
-        "The ID of a Maintenance Association of the MEP on which the loss
-         session state change alarm is present";
-    }
-
-    leaf mep-id {
-      type cfm:mep-id-type;
-      mandatory true;
-
+    uses cfm:MEP-REFERENCE {
       description
         "A reference to the specific MEP on which the loss session state
          change alarm occurred.";
@@ -3703,26 +3621,7 @@ module mef-soam-pm {
     reference
       "MEF-SOAM-PM-MIB.mefSoamDmSessionStartStopAlarm";
 
-    leaf maintenance-domain-id {
-      type string;
-
-      description
-        "The ID of a Maintenance Domain of the MEP on which the delay
-         session state change alarm is present";
-    }
-
-    leaf maintenance-association-id {
-      type string;
-
-      description
-        "The ID of a Maintenance Association of the MEP on which the delay
-         session state change alarm is present";
-    }
-
-    leaf mep-id {
-      type cfm:mep-id-type;
-      mandatory true;
-
+    uses cfm:MEP-REFERENCE {
       description
         "A reference to the specific MEP on which the delay session state
          change alarm occurred.";
@@ -3814,25 +3713,7 @@ module mef-soam-pm {
       "MEF-SOAM-PM-MIB.mefSoamPmThresholdCrossingAlarm";
 
 
-    leaf maintenance-domain-id {
-      type string;
-
-      description
-        "The ID of a Maintenance Domain of the MEP on which the threshold
-         crossing alarm occurred";
-    }
-
-    leaf maintenance-association-id {
-      type string;
-
-      description
-        "The ID of a Maintenance Association of the MEP on which the threshold
-         crossing alarm occurred";
-    }
-    leaf mep-id {
-      type cfm:mep-id-type;
-      mandatory true;
-
+    uses cfm:MEP-REFERENCE {
       description
         "A reference to the specific MEP on which the threshold crossing alarm
          occurred.";
