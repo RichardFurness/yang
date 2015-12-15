@@ -1,0 +1,413 @@
+// Contents of "cisco-soam-fm-augments"
+module cisco-soam-fm-augments {
+  namespace "urn:cisco:params:xml:ns:yang:cisco-soam-fm-augments";
+  prefix "cisco-soam-fm-augments";
+  
+  import ietf-yang-types {
+    prefix yang;
+  }
+  import ietf-interfaces {
+    prefix if;
+  }
+  import mef-cfm {
+    prefix cfm;
+    revision-date 2015-09-29;
+  }
+  import mef-soam-fm {
+    prefix soam-fm;
+    revision-date 2015-09-29;
+  }
+
+  organization
+    "Cisco Systems, Inc.
+     Customer Service
+
+     Postal: 170 W Tasman Drive
+     San Jose, CA 95134
+
+     Tel: +1 1800 553-NETS
+     
+     E-mail: cs-yang@cisco.com";
+
+  contact
+    "Richard Furness - rfurness@cisco.com";
+  
+  description 
+    "This YANG module augments the MEF Service OAM FM module with Cisco-specific
+     extensions";
+  
+  revision 2015-09-29 {
+    description "Initial revision";
+  }
+  
+  /*
+   * Configuration errors
+   */
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" {
+    leaf-list configuration-errors {
+      type string;
+      description
+        "List of configuration errors present for this domain and
+         service."; 
+    }
+  }
+
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point" { 
+    leaf-list configuration-errors {
+      type string;
+      description
+        "List of configuration errors present for this MEP."; 
+    }
+  }
+  
+  /*
+   * Interface/BD stuff
+   */
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" {
+    leaf forwarding-domain-group {
+      /*
+       * @@@ ideally this would be a leaf-ref, but there's no model for these
+       * yet...
+       */
+      type string;
+      description
+        "Reference to a Cisco-style forwarding domain group (e.g. a Bridge
+         Domain or cross-connect group). This supercedes the contents of the
+         'component-list' defined in the MEF model.";
+    }
+
+    leaf forwarding-domain {
+      /*
+       * @@@ ideally this would be a leaf-ref, but there's no model for these
+       * yet...
+       */
+      type string;
+      description
+        "Reference to a Cisco-style forwarding domain (e.g. a Bridge Domain or
+         cross-connect). This supercedes the contents of the 'component-list'
+         defined in the MEF model.";
+    }
+    
+    leaf mip-ccm-learning {
+      type boolean;
+      default false;
+      description
+        "Enable punting of CCMs on MIPs. This should only be used in services
+         with a relatively long CCM interval (at least 100ms).";
+    }
+  }
+
+  /*
+   * MEP direction should be a service-level property
+   * Also, support cross-connect service types
+   */
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" {
+    leaf service-type {
+      type enumeration {
+        enum bridge-domain {
+          description
+            "Use a Bridge Domain - all MEPs will be Up MEPs
+             and MIPs are permitted";
+        }
+        enum p2p-cross-connect {
+          description
+            "Use a P2P Cross Connect - all MEPs will be Up
+             MEPs and MIPs are permitted";
+        }
+        enum mp2mp-cross-connect {
+          description
+            "Use a MP2MP Cross Connect - all MEPs will be Up
+             MEPs and MIPs are permitted";
+        }
+        enum down-meps {
+          description
+            "Down MEPs - no MIPs permitted";
+        }
+      }
+
+      description
+        "A value indicating the direction in which the MEP faces on
+         the interface.";
+
+      reference
+        "[802.1q] 12.14.7.1.3:c";
+    }
+
+    leaf cross-connect-name {
+      type string;
+      description
+        "For services of type [p2p|mp2mp]-cross-connect, this
+         specifies the name of the cross-connect.";
+    }
+    leaf mp2mp-ce-id {
+      type uint32 {
+        range "1..16384";
+      }
+      description
+        "For services of type mp2mp-cross-connect, this specifies the
+         Local Customer Edge Identifier (CE-ID)";
+    }
+    leaf mp2mp-remote-ce-id {
+      type uint32 {
+        range "1..16384";
+      }
+      description
+        "For services of type mp2mp-cross-connect, this specifies the
+         Remote Customer Edge Identifier (CE-ID)";
+    }
+  }
+
+  /*
+   * Per-MEG fault alarm config
+   */
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" {
+    leaf lowest-fault-priority-defect {
+      type cfm:fault-alarm-defect-type;
+      default remote-mac-error;
+
+      description
+        "The lowest priority defect that is allowed to generate a Fault
+         Alarm. A value of 'none' means that no defects are to
+         be reported.
+         On Cisco devices this can only be configured at the MA level; an
+         attempt to set the per-MEP leaf of the same name (in mef-cfm) will
+         be rejected.";
+      reference
+        "[802.1q] 12.14.7.1.3:k";
+    }
+  }
+  
+  /*
+   * AIS:
+   * - MA-level config
+   * - Interface-level config (for server MEP support)
+   */
+  grouping ais-config {
+    leaf enabled {
+      type boolean;
+      default false;
+
+      description
+        "This attribute specifies whether ETH-AIS transmission is enabled. The
+         value 'true' indicates ETH-AIS transmission is enabled. The
+         value 'false' indicates ETH-AIS transmission is disabled.";
+      reference
+        "[MEF7.1] 9.3.4.1, [MEF30] 8.4";
+    }
+
+    leaf interval {
+      type soam-fm:interval-type-ais-lck-type;
+      default one-second;
+
+      description
+        "This attribute specifies the ETH-AIS transmission period.";
+      reference
+        "[MEF7.1] 9.3.4.1";
+    }
+
+    leaf priority {
+      type cfm:priority-type;
+     
+      description
+        "This attribute specifies the priority of frames with ETH-AIS
+         information. If ETH-AIS is supported, the default value for
+         the CoS for AIS frame MUST be the value which yields the
+         lowest frame loss performance for this EVC.";
+      reference
+        "[MEF7.1] 9.3.4.1";
+    }
+  }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" {
+    container alarm-indication-signal {
+      description
+        "AIS configuration applying to all MEPs in the service.";
+      uses ais-config;
+    }
+  }
+  augment "/if:interfaces/if:interface" {
+    container cfm {
+      description
+        "Ethernet CFM-related configuration items.";
+      container ais-server-mep {
+        description
+          "Enables AIS transmission from the interface in the Up direction. This
+           configuration has no effect if there are any Down MEPs configured
+           on the interface.";
+        uses ais-config; 
+      }
+    }
+  }
+  
+  /*
+   * MAC address of cross-check MEPs
+   */
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:remote-mep" {
+    leaf mac-address {
+      description
+        "The MAC address of the remote MEP";
+      type yang:mac-address;
+    }
+  }
+
+  /*
+   * Loopback
+   */
+  augment "/cfm:transmit-loopback/cfm:input" {
+    leaf interface {
+      type if:interface-ref;
+      //mandatory true;
+      description
+        "Interface name as defined by ietf-interfaces.";
+    }
+  }
+  
+  /*
+   * Link-trace (inc. adding support for exploratory LT)
+   */
+  grouping LT-PARAMETERS {
+    leaf explore {
+      description
+        "TRUE to initiate an exploratory traceroute, FALSE to initiate a
+         standard traceroute.  For exploratory traceroute, the target must be
+         the broadcast MAC address";
+      type boolean;
+      default false;
+    }
+
+    leaf starting-address {
+      description
+        "The MAC address to start exploring from. This may only be specified
+         if 'explore' is TRUE.";
+      type yang:mac-address;
+    }
+
+    leaf elt-reply-filter {
+      description
+        "Specifies which ports responses should be handled from for
+         exploratory link-trace.";
+      type enumeration {
+        enum default {
+          description "Responses should only be handled from ports where the
+                       ELT is forwarded.";
+        }
+        enum all-ports {
+          description "Responses should be handled from all ports.";
+        }
+      }
+      default default;
+    }
+  }
+  augment "/cfm:transmit-linktrace/cfm:input" {
+    leaf interface {
+      type if:interface-ref;
+      /*
+       * Not allowed to augment mandatory node!
+       */
+      //mandatory true;
+      description
+        "Interface name as defined by ietf-interfaces.";
+    }
+
+    leaf priority {
+      type cfm:priority-type;
+
+      description
+        "The priority parameter (CoS) for LTM/ELMs. If not specified, will use
+         the value configured for the MEP.";
+    }
+
+    uses LT-PARAMETERS;
+  }
+
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/cfm:linktrace" +
+          "/cfm:linktrace-database/cfm:linktrace" {
+    uses LT-PARAMETERS;
+
+    list elt-reply {
+      key reply-order;
+
+      description
+        "The list of ELRs associated with a specific Exploratory
+         Linktrace transaction. Note that this list re-uses leaves
+         defined for regular link-trace replies and as such their
+         documentation should be read with ELM/ELR substituted for
+         LTM/LTR.";
+      uses cfm:linktrace-reply;
+
+      leaf elr-relay {
+        type enumeration {
+          enum hit {
+              description "Indicates the ELM reached an MP whose MAC
+                           address matches the target MAC address.";
+              value 1;
+          }
+          enum filtering-database {
+              description "Indicates the Egress Port was determined by
+                           consulting the Filtering Database.";
+              value 2;
+          }
+          enum flood {
+              description "Indicates the ELM was flood-forwarded.";
+              value 3;
+          }
+          enum drop {
+              description "Indicates the ELM was dropped.";
+              value 4;
+          }
+        }
+
+        description
+          "An enumerated value indicating the value returned in the
+           Relay Action field. Note that the ltr-replay leaf in the 
+           linktrace-reply grouping will not be populated for
+           exploratory linktrace.";
+      }
+
+      leaf elr-egress-action {
+        type enumeration {
+          enum ok {
+              description "Indicates the targeted data frame would be
+                           forwarded.";
+              value 1;
+          }
+          enum down {
+              description "Indicates the Egress Port can be identified,
+                           but that Bridge Ports MAC Operational
+                           parameter is false.";
+              value 2;
+          }
+          enum blocked {
+              description "Indicates the Egress Port can be identified,
+                           but the data frame would not pass through the
+                           the Egress Port due to active topology 
+                           management, i.e., the Bridge Port is not in the
+                           Forwarding state.";
+              value 3;
+          }
+          enum vid {
+              description "Indicates the Egress Port can be identified,
+                           but the Bridge Port is not in the ELMs VIDs
+                           member set, so would be filtered by egress 
+                           filtering.";
+              value 4;
+          }
+          enum mac {
+              description "Indicates the Egress Port can be identified,
+                           but the ELM would be filtered by MAC pruning.";
+              value 255;
+          }
+        }
+ 
+        description
+          "An enumerated value indicating the value returned in the 
+           Egress Action field. This leaf is not present if no value
+           is returned in the ELR. Note that the egress-action leaf
+           in the linktrace-reply grouping will not be populated for
+           exploratory linktrace.";
+      }            
+    }
+  }
+}

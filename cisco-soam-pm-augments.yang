@@ -1,0 +1,747 @@
+// Contents of "cisco-soam-pm-augments"
+module cisco-soam-pm-augments {
+  namespace "urn:cisco:params:xml:ns:yang:cisco-soam-pm-augments";
+  prefix "cisco-soam-pm-augments";
+  
+  import ietf-yang-types {
+    prefix yang;
+  }
+  import mef-cfm {
+    prefix cfm;
+    revision-date 2015-09-29;
+  }
+  import mef-soam-pm {
+    prefix soam-pm;
+    revision-date 2015-09-29;
+  }
+  
+  organization
+    "Cisco Systems, Inc.
+     Customer Service
+
+     Postal: 170 W Tasman Drive
+     San Jose, CA 95134
+
+     Tel: +1 1800 553-NETS
+     
+     E-mail: cs-yang@cisco.com";
+
+  contact
+    "Richard Furness - rfurness@cisco.com";
+  
+  description 
+    "This YANG module augments the MEF Service OAM PM module with Cisco-specific
+     extensions";
+  
+  revision 2015-09-29 {
+    description "Initial revision";
+  }
+
+  /*
+   * Per-metric bucket sizes and bin counts/widths (including LM)
+   */
+  grouping per-metric-config-group {
+    leaf probes-per-bucket {
+      description
+        "This value acts as a multiplier to increase the Measurement Interval
+         duration to a multiple of the duration defined by 'repetition-period'
+         in the MEF model. This has no impact on the scheduling of the SOAM
+         PDUs, but simply causes PM statistics to be aggregated over a longer
+         period of time.";
+      type uint32;
+      default 1;
+    }
+    leaf bin-count {
+      type uint32 {
+        range "0..100";
+      }
+
+      description 
+        "This object specifies the number of measurement bins per Measurement
+         Interval for this particular metric. This overrides the per-'metric
+         class' configuration from the MEF model (if any). A value of zero
+         signifies that no aggregation should be performed (and hence the
+         un-aggregated results should be reported instead).
+                 
+         If no per-'metric class' bin configuration is present, the default
+         is 1 bin.";
+    }
+    leaf bin-width {
+      type uint32 {
+        range "1..10000";
+      }
+
+      description 
+        "This object specifies the width of each bin for this particular
+         metric. This overrides the per-'metric class' configuration from the
+         MEF model (if any).
+                 
+         For Delay and IFDV, the units are milliseconds.
+         For Synthetic Loss, the units are percentage points (and the maximum
+         value is 100).
+         For Data Loss, the units are tenths of a percent (and the maximum
+         value is 1000)";
+    }
+  }
+
+  /*
+   * Burst config
+   */
+  typedef burst-interval-units {
+    type enumeration {
+      enum Houts {
+        description
+          "Send bursts within a probe with an interval unit of hours.";
+      }
+      enum Minutes {
+        description
+          "Send bursts within a probe with an interval unit of minutes.";
+      }
+      enum Seconds {
+        description "Send bursts within a probe with an interval unit of
+                     seconds.";
+      }
+      enum Once {
+        description "Send one burst per probe.";
+      }
+    }
+
+    description
+      "Enumeration of units of time to apply to the burst interval value.";
+  }
+
+  grouping burst-config-group {
+    leaf burst-interval {
+      description
+        "Interval between bursts. This must be specified if, and only if,
+         the burst-enabled is True and burst-interval-unit is not 'once'.";
+      type uint32 {
+        range "1 .. 3600";
+      }
+    }
+    leaf burst-interval-unit {
+      description
+        "Time unit associated with the burst-interval.  This must be specified
+         if, and only if, burst-enabled is True.";
+      type burst-interval-units;
+    }
+    leaf burst-packet-count {
+      description
+        "The number of packets in each burst.  This must be specified if, and
+         only if, burst-enabled is True.";
+      type uint32 {
+        range "2 .. 1200";
+      }
+    }
+    leaf burst-enabled {
+      description
+        "Whether or not packets should be sent in bursts. If True, both
+         burst-packet-count and burst-interval-unit must be specified.";
+      type boolean;
+    }
+  }
+
+  /*
+   * Schedule config
+   */
+  typedef probe-duration-units {
+    type enumeration {
+      enum seconds {
+        description
+          "Schedule probes to run with a duration unit of
+          seconds";
+      }
+      enum minutes {
+        description
+          "Schedule probes to run with a duration unit of
+          minutes";
+      }
+      enum hours {
+        description
+          "Schedule probes to run with a duration unit of
+          hours";
+      }
+      enum day {
+        description
+          "Schedule probes to run for a duration of 1 day";
+      }
+      enum week {
+        description
+          "Schedule probes to run for a duration of 1 week";
+      }
+    }
+    description "Probe duration units enum";
+  }
+
+  typedef probe-interval-units {
+    type enumeration {
+      enum minutes {
+        description
+          "Schedule probes to run with an interval unit of
+           minutes";
+      }
+      enum hours {
+        description
+          "Schedule probes to run with an interval unit of
+           hours";
+      }
+      enum day {
+        description "Schedule probes to run every day";
+      }
+      enum week {
+        description "Schedule probes to run every week";
+      }
+    }
+    description "Probe interval units enum";
+  }
+
+  typedef probe-interval-day {
+    type enumeration {
+      enum monday {
+        description "Schedule every Monday";
+      }
+      enum tuesday {
+        description "Schedule every Tuesday";
+      }
+      enum wednesday {
+        description "Schedule every Wednesday";
+      }
+      enum thursday {
+        description "Schedule every Thursday";
+      }
+      enum friday {
+        description "Schedule every Friday";
+      }
+      enum saturday {
+        description "Schedule every Saturday";
+      }
+      enum sunday {
+        description "Schedule every Sunday";
+      }
+    }
+    description "Probe interval day enum";
+  }
+
+  grouping schedule-config {
+    leaf probe-interval {
+      type uint32 {
+        range "1..90";
+      }
+      description
+        "Interval between probes.  This must be specified if, and
+         only if, probe-interval-unit is not 'Week' or 'Day'.";
+    }
+    leaf probe-interval-day {
+      type probe-interval-day;
+      description
+        "Day of week on which to schedule probes. This must be
+         specified if, and only if, probe-interval-unit is 'Week'.";
+    }
+    leaf probe-interval-unit {
+      type probe-interval-units;
+      description
+        "Time unit associated with the probe-interval. The value must
+         not be 'Once'.  If 'Week' or 'Day' is specified, probes are
+         scheduled weekly or daily respectively.";
+    }
+    leaf start-time-hour {
+      type uint32 {
+        range "0..23";
+      }
+      description
+        "Time after midnight (in UTC) to send the first packet each
+         day.";
+    }
+    leaf start-time-minute {
+      type uint32 {
+        range "0..59";
+      }
+      description
+        "Time after midnight (in UTC) to send the first packet each
+         day. This must be specified if, and only if, start-time-hour
+         is specified.";
+    }
+    leaf start-time-second {
+      type uint32 {
+        range "0..59";
+      }
+      description
+        "Time after midnight (in UTC) to send the first packet each
+         day. This must only be specified if start-time-hour is
+         specified, and must not be specified if probe-interval-unit
+         is 'Week' or 'Day'.";
+    }
+    leaf probe-duration {
+      type uint32;
+      description
+        "Duration of each probe.  This must be specified if, and only
+         if, probe-duration-unit is specified.";
+    }
+    leaf probe-duration-unit {
+      type probe-duration-units;
+      description
+        "Time unit associated with the probe-duration.";
+    }
+  }
+  
+  /*
+   * Arbitrary hex values for Data TLV
+   */
+  identity hex-4-bytes {
+    base soam-pm:data-tlv-pattern;
+    description
+      "Indicates the Data TLV contains a 4-byte pattern repeated
+       as necessary to the end of the TLV.";
+  }
+  grouping data-tlv-config-group {
+    leaf data-pattern-hex {
+      type uint32;
+      description
+        "If data-pattern is 'hex-4-bytes', this leaf contains a
+         4-byte arbitrary data pattern, represented as the 32-bit
+         unsigned integer that would take this form when in
+         big-endian format. The data TLV is filled with as many
+         repetitions of this pattern as are required to pad the
+         packet to the specified size.";
+      must "../data-pattern = 'hex-4-bytes'";
+    }
+  }
+  
+  /*
+   * LM config that needs to be used by profiles as well as per
+   * interface cases
+   */
+  grouping lm-config-group {
+    container forward-loss {
+      uses per-metric-config-group;
+    }
+    container backward-loss {
+      uses per-metric-config-group;
+    }
+
+    uses burst-config-group;
+    uses data-tlv-config-group;
+    uses schedule-config;
+  }
+
+  /*
+   * DM config that needs to be used by profiles as well as per
+   * interface cases
+   */
+  grouping dm-config-group {
+    container forward-delay {
+      uses per-metric-config-group;
+    }
+    container backward-delay {
+      uses per-metric-config-group;
+    }
+    container round-trip-delay {
+      uses per-metric-config-group;
+    }
+    container forward-ifdv {
+      uses per-metric-config-group;
+    }
+    container backward-ifdv {
+      uses per-metric-config-group;
+    }
+    container round-trip-ifdv {
+      uses per-metric-config-group;
+    }
+
+    uses burst-config-group;
+    uses data-tlv-config-group;
+    uses schedule-config;
+  }
+
+  /*
+   * PM Profiles
+   */
+  container pm-profiles {
+    description
+      "Profiles allow PM configuration to be shared between multiple PM
+       sessions";
+    list lm-profile {
+      description
+        "Contains profiles for Loss Measurement session configuration";
+      key name;
+      leaf name {
+        description
+          "The name of the LM profile";
+        type string;
+      }
+      uses soam-pm:loss-measurement-configuration-group;
+      uses lm-config-group;
+    }
+    list dm-profile {
+      description
+        "Contains profiles for Delay Measurement session configuration";
+      key name;
+      leaf name {
+        description
+          "The name of the DM profile";
+        type string;
+      }
+      uses soam-pm:delay-measurement-configuration-group;
+      uses dm-config-group;
+    }
+  }
+
+  /*
+   * Augmentat the create-session RPCs to add Cisco-specific options
+   */
+  augment "/soam-pm:create-loss-measurement/soam-pm:input" {
+    uses lm-config-group;
+  }
+  augment "/soam-pm:create-delay-measurement/soam-pm:input" {
+    uses dm-config-group;
+  }
+
+  /*
+   * LM profile reference that needs to be augmented into the LM session tables
+   */
+  grouping lm-profile-ref {
+    leaf pm-profile {
+      description
+        "Reference to a LM configuration profile to use for this session.";
+      type leafref {
+        path "/pm-profiles/lm-profile/name";
+      }
+    }
+  }
+
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/soam-pm:loss-measurements" +
+          "/soam-pm:loss-measurement" {
+    uses lm-profile-ref;
+  }
+  
+
+  /*
+   * New DM measurement type (packet type)
+   */
+  identity lbm {
+    base soam-pm:dm-type;
+    description
+      "Use loopback PDUs (LBM/LBR).";
+  }
+
+  /*
+   * DM profile reference that needs to be augmented into the DM session tables
+   */
+  grouping dm-profile-ref {
+    leaf pm-profile {
+      description
+        "Reference to a DM configuration profile to use for this session.";
+      type leafref {
+        path "/pm-profiles/dm-profile/name";
+      }
+    }
+  }
+
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/soam-pm:delay-measurements" +
+          "/soam-pm:delay-measurement" {
+    uses dm-profile-ref;
+  }
+  
+  /*
+   * Finally we must define separate PM session configuration tables to support
+   * the Cisco model where proactive PM sessions can be created via
+   * configuration rather than RPC.
+   * 
+   * Note: we can't reuse the SOAM-PM defined remote-mep-group here for our
+   * list key as Yang doesn't support the use of leaves within a choice as
+   * list keys. Hence we define our own where both MAC address and MEP ID
+   * are always present.
+   */
+  grouping remote-mep-group {
+    description
+      "This grouping includes objects which identify a remote MEP. One or
+       other of mac-address or mep-id must be specified.";
+    leaf mac-address {
+      type yang:mac-address;
+
+      description
+        "The Target MAC Address Field to be transmitted: A unicast
+         destination MAC address. If the target is identified by MEP ID, the
+         MAC address should be set to 0000.0000.0000";
+    }
+    leaf mep-id {
+      type string;
+
+      description 
+        "The Maintenance Association End Point Identifier of another MEP in
+         the same Maintenance Association to which the SOAM Loss or Delay
+         Measurement frame is to be sent. If the target is identified by MAC
+         address, the MEP ID should be set to 0";
+    }
+  }
+
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/soam-pm:loss-measurements" {
+    list proactive-session-config {
+      key "mac-address mep-id pm-profile";
+      description
+        "A list of the configured proactive Loss Measurement PM Sessions.
+         The sessions are uniquely identified by the combination of target
+         and profile.";
+
+      uses remote-mep-group;
+      uses lm-profile-ref;
+    }
+  }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/soam-pm:delay-measurements" {
+    list proactive-session-config {
+      key "mac-address mep-id pm-profile";
+      description
+        "A list of the configured proactive Delay Measurement PM Sessions.
+         The sessions are uniquely identified by the combination of target
+         and profile.";
+
+      uses remote-mep-group;
+      uses dm-profile-ref;
+    }
+  }
+
+
+  /*
+   * Oper: Bin stats for LM
+   */
+  typedef lm-measurement-bin-type {
+    type enumeration {
+      enum forward-flr {
+        description
+          "Indicates a measurement bin for one-way Frame Loss Ratio in the
+           forward direction.";
+      }
+      enum backward-flr {
+        description 
+          "Indicates a measurement bin for one-way Frame Loss Ratio in the
+           backward direction.";
+      }
+    }
+
+    description
+      "This enumeration data type indicates whether a Loss Measurement bin
+       is for forward or backward FLR.";
+  }
+
+  grouping loss-measurement-bins-content-group {
+    description
+      "This grouping contains result measurement bin objects for a SOAM Loss
+       Measurement session.";
+
+    leaf type {
+      type lm-measurement-bin-type;
+
+      description
+        "This object specifies whether a Loss Measurement bin is for forward
+         or backward FLR.";
+    }
+
+    leaf number {
+      type uint32;
+
+      description 
+        "This object specifies the bin number for the configured boundary.  The
+         first bin has bin number 1.";
+    }
+
+    leaf lower-bound-percent {
+      type yang:gauge32;
+      units percent;
+
+      description 
+        "This object specifies the lower boundary for a measurement bin. The
+         upper boundary is defined by the next bin value or infinite for
+         the last bin defined.  The measurement boundary for each
+         measurement bin is to be larger than the measurement boundary
+         of the preceding measurement bin.
+         This object is only valid for SLM operations.";
+    }
+
+    leaf lower-bound-tenth-percent {
+      type yang:gauge32;
+      units tenth-percent;
+
+      description 
+        "This object specifies the lower boundary for a measurement bin. The
+         upper boundary is defined by the next bin value or infinite for
+         the last bin defined.  The measurement boundary for each
+         measurement bin is to be larger than the measurement boundary
+         of the preceding measurement bin.
+         This object is only valid for LMM operations.";
+    }
+
+    leaf counter {
+      type yang:gauge32;
+
+      description 
+        "This object contains the count of the number of completed measurements
+         initiated in this Measurement Interval whose value falls within
+         the range specified for this bin (that is, greater than or
+         equal to the measurement boundary for the bin, and (unless the
+         bin is the last bin) less than the measurement boundary for the
+         following bin.";
+    }
+  }
+
+  grouping loss-measurement-bins-group {
+    description
+      "This grouping contains the common structure for LM bin stats";
+
+    container bins {
+      description
+        "This container defines the bins content LM sessions.";
+      
+      list flr {
+        key "type number";
+        uses loss-measurement-bins-content-group;
+
+        description
+          "Data definitions related to LM bins content.";
+      }
+    }
+  }
+
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/soam-pm:loss-measurements" +
+          "/soam-pm:loss-measurement/soam-pm:current-measurement-stats" {
+    uses loss-measurement-bins-group;
+  }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/soam-pm:loss-measurements" +
+          "/soam-pm:loss-measurement/soam-pm:history-measurement-stats" {
+    uses loss-measurement-bins-group;
+  }
+
+
+  /*
+   * Oper: Unaggregated results
+   */
+  grouping samples-group {
+    list samples {
+      description
+        "A list of every sample recorded for this metric during this
+         measurement inverval";
+
+      leaf sent-at {
+        type uint32;
+        mandatory true;
+        description
+          "The time (in milliseconds relative to the start time of the
+           measurement interval) that the sample was sent at";
+      }
+
+      leaf sent {
+        type boolean;
+        mandatory true;
+        description
+          "Whether the sample packet was successfully sent";
+      }
+
+      leaf timed-out {
+        type boolean;
+        mandatory true;
+        description
+          "Whether the sample packet timed out";
+      }
+
+      leaf corrupt {
+        type boolean;
+        mandatory true;
+        description
+          "Whether the sample packet was corrupt";
+      }
+
+      leaf out-of-order {
+        type boolean;
+        mandatory true;
+        description
+          "Whether the sample packet was received out-of-order";
+      }
+
+      leaf result {
+        type int32;
+        description
+          "The result (in microseconds or millionths of a percent) of the
+           sample, if available";
+      }
+    }
+  }
+  grouping lm-samples-group {
+    uses samples-group {
+      augment "samples" {
+        leaf no-data {
+          type boolean;
+          mandatory true;
+          description
+            "Whether a measurement could not be made because no data packets
+             were sent in the sample period. Only applicable for LMM
+             measurements";
+        }
+        leaf frames-sent {
+          type uint32;
+          description
+            "For FLR measurements, the number of frames sent, if available";
+        }
+
+        leaf frames-lost {
+          type uint32;
+          description
+            "For FLR measurements, the number of frames lost, if available";
+        }
+      }
+    }
+  }
+  grouping unaggregated-results-lm-group {
+    container frame-loss-forward-samples {
+      uses lm-samples-group;
+    }
+    container frame-loss-backward-samples {
+      uses lm-samples-group;
+    }
+  }
+  grouping unaggregated-results-dm-group {
+    container frame-delay-two-way-samples {
+      uses samples-group;
+    }
+    container frame-delay-forward-samples {
+      uses samples-group;
+    }
+    container frame-delay-backward-samples {
+      uses samples-group;
+    }
+    container ifdv-two-way-samples {
+      uses samples-group;
+    }
+    container ifdv-forward-samples {
+      uses samples-group;
+    }
+    container ifdv-backward-samples {
+      uses samples-group;
+    }
+  }
+  
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/soam-pm:loss-measurements" +
+          "/soam-pm:loss-measurement/soam-pm:current-measurement-stats" {
+    uses unaggregated-results-lm-group;
+  }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/soam-pm:loss-measurements" +
+          "/soam-pm:loss-measurement/soam-pm:history-measurement-stats" {
+    uses unaggregated-results-lm-group;
+  }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/soam-pm:delay-measurements" +
+          "/soam-pm:delay-measurement/soam-pm:current-stats" {
+    uses unaggregated-results-dm-group;
+  }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/soam-pm:delay-measurements" +
+          "/soam-pm:delay-measurement/soam-pm:history-stats" {
+    uses unaggregated-results-dm-group;
+  }
+}
