@@ -6,11 +6,11 @@ module cisco-soam-pm-augments {
   import ietf-yang-types {
     prefix yang;
   }
-  import mef-cfm {
+  import cisco-cfm {
     prefix cfm;
     revision-date 2015-09-29;
   }
-  import mef-soam-pm {
+  import cisco-soam-pm {
     prefix soam-pm;
     revision-date 2015-09-29;
   }
@@ -30,7 +30,7 @@ module cisco-soam-pm-augments {
     "Richard Furness - rfurness@cisco.com";
   
   description 
-    "This YANG module augments the MEF Service OAM PM module with Cisco-specific
+    "This YANG module augments the Service OAM PM module with Cisco-specific
      extensions";
   
   revision 2015-09-29 {
@@ -45,7 +45,7 @@ module cisco-soam-pm-augments {
       description
         "This value acts as a multiplier to increase the Measurement Interval
          duration to a multiple of the duration defined by 'repetition-period'
-         in the MEF model. This has no impact on the scheduling of the SOAM
+         in the base model. This has no impact on the scheduling of the SOAM
          PDUs, but simply causes PM statistics to be aggregated over a longer
          period of time.";
       type uint32;
@@ -59,7 +59,7 @@ module cisco-soam-pm-augments {
       description 
         "This object specifies the number of measurement bins per Measurement
          Interval for this particular metric. This overrides the per-'metric
-         class' configuration from the MEF model (if any). A value of zero
+         class' configuration from the base model (if any). A value of zero
          signifies that no aggregation should be performed (and hence the
          un-aggregated results should be reported instead).
                  
@@ -74,7 +74,7 @@ module cisco-soam-pm-augments {
       description 
         "This object specifies the width of each bin for this particular
          metric. This overrides the per-'metric class' configuration from the
-         MEF model (if any).
+         base model (if any).
                  
          For Delay and IFDV, the units are milliseconds.
          For Synthetic Loss, the units are percentage points (and the maximum

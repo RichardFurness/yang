@@ -2,7 +2,7 @@ module cisco-soam-pm {
   namespace "urn:cisco:params:xml:ns:yang:cisco-soam-pm";
   prefix cisco-soam-pm;
 
-  import mef-cfm {
+  import cisco-cfm {
     prefix cfm;
     revision-date 2015-09-29;
   }

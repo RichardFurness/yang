@@ -9,11 +9,11 @@ module cisco-soam-fm-augments {
   import ietf-interfaces {
     prefix if;
   }
-  import mef-cfm {
+  import cisco-cfm {
     prefix cfm;
     revision-date 2015-09-29;
   }
-  import mef-soam-fm {
+  import cisco-soam-fm {
     prefix soam-fm;
     revision-date 2015-09-29;
   }
@@ -33,7 +33,7 @@ module cisco-soam-fm-augments {
     "Richard Furness - rfurness@cisco.com";
   
   description 
-    "This YANG module augments the MEF Service OAM FM module with Cisco-specific
+    "This YANG module augments the Service OAM FM module with Cisco-specific
      extensions";
   
   revision 2015-09-29 {
@@ -74,7 +74,7 @@ module cisco-soam-fm-augments {
       description
         "Reference to a Cisco-style forwarding domain group (e.g. a Bridge
          Domain or cross-connect group). This supercedes the contents of the
-         'component-list' defined in the MEF model.";
+         'component-list' defined in the base model.";
     }
 
     leaf forwarding-domain {
@@ -86,7 +86,7 @@ module cisco-soam-fm-augments {
       description
         "Reference to a Cisco-style forwarding domain (e.g. a Bridge Domain or
          cross-connect). This supercedes the contents of the 'component-list'
-         defined in the MEF model.";
+         defined in the base model.";
     }
     
     leaf mip-ccm-learning {
@@ -171,7 +171,7 @@ module cisco-soam-fm-augments {
          Alarm. A value of 'none' means that no defects are to
          be reported.
          On Cisco devices this can only be configured at the MA level; an
-         attempt to set the per-MEP leaf of the same name (in mef-cfm) will
+         attempt to set the per-MEP leaf of the same name (in cisco-cfm) will
          be rejected.";
       reference
         "[802.1q] 12.14.7.1.3:k";
