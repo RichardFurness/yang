@@ -1,7 +1,6 @@
-module mef-cfm {
-    
-  namespace "http://metroethernetforum.org/ns/yang/mef-cfm";
-  prefix "mef-cfm";
+module cisco-cfm {
+  namespace "urn:cisco:params:xml:ns:yang:cisco-cfm";
+  prefix "cisco-cfm";
 
   import ietf-yang-types {
     prefix yang;
@@ -14,21 +13,29 @@ module mef-cfm {
     prefix if;
   }
 
-  organization "Metro Ethernet Forum";
+  organization
+    "Cisco Systems, Inc.
+     Customer Service
+
+     Postal: 170 W Tasman Drive
+     San Jose, CA 95134
+
+     Tel: +1 1800 553-NETS
+     
+     E-mail: cs-yang@cisco.com";
+
   contact
-    "Web URL: http://metroethernetforum.org/
-     E-mail:  mibs@metroethernetforum.org
-     Postal:  Metro Ethernet Forum
-              6033 W. Century Boulevard, Suite 830
-              Los Angeles, CA 90045
-              U.S.A.
-     Phone:   +1 310-642-2800
-     Fax:     +1 310-642-2808";
+    "Richard Furness - rfurness@cisco.com";
 
   description 
     "This YANG module contains the management data definitions for the
      management of Ethernet Services Operations, Administration and
      Maintenance for Connectivity Fault Management.
+
+     This module is derived from the mef-cfm module defined in MEF 38.
+     However there are a number of differences from the mef-cfm model,
+     including bug fixes and structural changes. The key differences are:
+     - @@@
 
      Reference Overview:
       A number of base documents have been used to create the CFM YANG. The
@@ -51,13 +58,7 @@ module mef-cfm {
 
   revision "2015-09-29" {
     description
-      "Cisco fixes @@@";
-  }
-  revision "2012-04-16" {
-    description
       "Initial revision";
-    reference
-      "Service OAM Fault Management YANG Modules (MEF XX), April 2012";
   }
 
   //
@@ -996,7 +997,7 @@ module mef-cfm {
 
     leaf maintenance-domain {
       type leafref {
-        path "/mef-cfm:maintenance-domain/mef-cfm:id";
+        path "/cisco-cfm:maintenance-domain/cisco-cfm:id";
       }
       description
         "A reference to a specific Maintenance Domain.";
@@ -1012,7 +1013,7 @@ module mef-cfm {
 
     leaf maintenance-association {
       type leafref {
-        path "/mef-cfm:maintenance-domain[mef-cfm:id=current()/../maintenance-domain]/mef-cfm:maintenance-association/mef-cfm:id";
+        path "/cisco-cfm:maintenance-domain[cisco-cfm:id=current()/../maintenance-domain]/cisco-cfm:maintenance-association/cisco-cfm:id";
       }
      description
         "A reference to a specific Maintenance Association.";
@@ -1029,7 +1030,7 @@ module mef-cfm {
 
     leaf maintenance-association-end-point {
       type leafref {
-        path "/mef-cfm:maintenance-domain[mef-cfm:id=current()/../maintenance-domain]/mef-cfm:maintenance-association[mef-cfm:id=current()/../maintenance-association]/mef-cfm:maintenance-association-end-point/mef-cfm:mep-identifier";
+        path "/cisco-cfm:maintenance-domain[cisco-cfm:id=current()/../maintenance-domain]/cisco-cfm:maintenance-association[cisco-cfm:id=current()/../maintenance-association]/cisco-cfm:maintenance-association-end-point/cisco-cfm:mep-identifier";
       }
      description
         "A reference to a specific Maintenance association End Point.";
@@ -2101,7 +2102,7 @@ module mef-cfm {
     container local-mep {
       leaf md-id {
         type leafref {
-          path "/mef-cfm:maintenance-domain/mef-cfm:id";
+          path "/cisco-cfm:maintenance-domain/cisco-cfm:id";
         }
 
         description
@@ -2109,9 +2110,9 @@ module mef-cfm {
       }
       leaf ma-id {
         type leafref {
-          path "/mef-cfm:maintenance-domain" +
-               "[mef-cfm:id = current()/../md-id]/" +
-               "mef-cfm:maintenance-association/mef-cfm:id";
+          path "/cisco-cfm:maintenance-domain" +
+               "[cisco-cfm:id = current()/../md-id]/" +
+               "cisco-cfm:maintenance-association/cisco-cfm:id";
         }
     
         description
@@ -2120,12 +2121,12 @@ module mef-cfm {
       }
       leaf mep-id {
         type leafref {
-          path "/mef-cfm:maintenance-domain" +
-               "[mef-cfm:id = current()/../md-id]/" +
-               "mef-cfm:maintenance-association" +
-               "[mef-cfm:id = current()/../ma-id]/" +
-               "mef-cfm:maintenance-association-end-point/" +
-               "mef-cfm:mep-identifier";
+          path "/cisco-cfm:maintenance-domain" +
+               "[cisco-cfm:id = current()/../md-id]/" +
+               "cisco-cfm:maintenance-association" +
+               "[cisco-cfm:id = current()/../ma-id]/" +
+               "cisco-cfm:maintenance-association-end-point/" +
+               "cisco-cfm:mep-identifier";
         }
         mandatory true;
     

@@ -1,9 +1,8 @@
-module mef-soam-fm {
+module cisco-soam-fm {
+  namespace "urn:cisco:params:xml:ns:yang:cisco-soam-fm";
+  prefix "cisco-soam-fm";
 
-  namespace "http://metroethernetforum.org/ns/yang/mef-soam-fm";
-  prefix "mef-soam-fm";
-
-  import mef-cfm {
+  import cisco-cfm {
     prefix cfm;
     revision-date 2015-09-29;
   }
@@ -11,24 +10,32 @@ module mef-soam-fm {
     prefix yang;
   }
 
-  organization "Metro Ethernet Forum";
+  organization
+    "Cisco Systems, Inc.
+     Customer Service
+
+     Postal: 170 W Tasman Drive
+     San Jose, CA 95134
+
+     Tel: +1 1800 553-NETS
+     
+     E-mail: cs-yang@cisco.com";
+
   contact
-    "Web URL: http://metroethernetforum.org/
-     E-mail:  mibs@metroethernetforum.org
-     Postal:  Metro Ethernet Forum
-              6033 W. Century Boulevard, Suite 830
-              Los Angeles, CA 90045
-              U.S.A.
-     Phone:   +1 310-642-2800
-     Fax:     +1 310-642-2808";
+    "Richard Furness - rfurness@cisco.com";
 
   description 
     "This YANG module contains the management data definitions for the
      management of Ethernet Services Operations, Administration and
      Maintenance for Fault Management and extends the Connectivity Fault
-     Management (CFM) YANG modules.
+     Management (CFM) YANG module.
 
-    Reference Overview:
+     This module is derived from the mef-soam-fm module defined in MEF 38.
+     However there are a number of differences from the mef-soam-fm model. The
+     key differences are:
+     - @@@
+
+     Reference Overview:
       A number of base documents have been used to create the SOAM FM YANG. The
       following are the abbreviations for the baseline documents:
       [802.1q] refers to IEEE 802.1Q-2011 'IEEE Standard for Local and metropolitan
@@ -46,13 +53,7 @@ module mef-soam-fm {
 
   revision "2015-09-29" {
     description
-      "Cisco fixes @@@";
-  }
-  revision "2012-04-16" {
-    description
       "Initial revision";
-    reference
-      "Service OAM Fault Management YANG Modules (MEF XX), April 2012";
   }
 
   //
@@ -702,7 +703,7 @@ module mef-soam-fm {
     description
       "This set of data definitions extends the MEG End Point (as described in
        Y.1731) or Maintenance association End Point (as described in 802.1q)
-       defined in the MEF CFM module (MEF-CFM)";
+       defined in the MEF CFM module (cisco-cfm)";
     reference
       "[MEF7.1] 9.2.2";
 
@@ -835,7 +836,7 @@ module mef-soam-fm {
       "This set of data definitions extends the proactive Ethernet OAM Fault
        Management and Performance Monitoring Continuity Check function
        (ETH-CC) as described in Y.1731 and 802.1q and defined in
-       MEF-CFM";
+       cisco-cfm";
     reference
       "[MEF7.1] 9.3.1";
 
@@ -877,7 +878,7 @@ module mef-soam-fm {
     description
       "This set of data definitions extends on-demand Ethernet OAM Fault
        Management Loopback function (ETH-LB) as defined in Y.1731 and
-       802.1q and defined in MEF-CFM";
+       802.1q and defined in cisco-cfm";
     reference
       "[MEF7.1] 9.3.2";
 
@@ -1025,7 +1026,7 @@ module mef-soam-fm {
     description
       "This set of data definitions extends on-demand Ethernet OAM Fault
        Management Loopback function (ETH-LB) as defined in Y.1731 and
-       802.1q and defined in MEF-CFM";
+       802.1q and defined in cisco-cfm";
     reference
       "[MEF7.1] 9.3.2";
     leaf crc-errors-in {

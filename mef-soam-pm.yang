@@ -1,6 +1,6 @@
-module mef-soam-pm {
-  namespace "http://metroethernetforum.org/ns/yang/mef-soam-pm";
-  prefix mef-soam-pm;
+module cisco-soam-pm {
+  namespace "urn:cisco:params:xml:ns:yang:cisco-soam-pm";
+  prefix cisco-soam-pm;
 
   import mef-cfm {
     prefix cfm;
@@ -11,46 +11,48 @@ module mef-soam-pm {
     prefix yang;
   }
 
-  organization "Metro Ethernet Forum";
-  contact 
-    "Web URL: http://metroethernetforum.org/
-         E-mail:  mibs@metroethernetforum.org
-         Postal:  Metro Ethernet Forum
-                  6033 W. Century Boulevard, Suite 830
-                  Los Angeles, CA 90045
-                  U.S.A.
-         Phone:   +1 310-642-2800
-         Fax:     +1 310-642-2808";
+  organization
+    "Cisco Systems, Inc.
+     Customer Service
+
+     Postal: 170 W Tasman Drive
+     San Jose, CA 95134
+
+     Tel: +1 1800 553-NETS
+     
+     E-mail: cs-yang@cisco.com";
+
+  contact
+    "Richard Furness - rfurness@cisco.com";
 
   description 
     "This YANG module contains the management data definitions for the
-         management of Ethernet Services Operations, Administration and
-         Maintenance for Performance Monitoring and extends the Connectivity
-         Fault Management (CFM) YANG modules.
-         
-         Reference Overview:
-               A number of base documents have been used to create th
-               SOAM PM YANG Module.
-               The following are the abbreviations for the baseline documents:
-               [802.1q] refers to IEEE 802.1Q-2011 'IEEE Standard for Local and
-                   metro-politan area networks --Media Access Control (MAC)
-                   Bridges and Virtual Bridged Local Area Networks, August 2011
-               [MEF SOAM PM IA] refers to 'Service OAM Performance Monitoring
-                   Implementation Agreement', January 2012
-               [MEF SOAM PM MIB] refers to 'Service OAM Performance Monitoring
-                   Definition of Managed Objects', January 2012
-               [Y.1731] refers to ITU-T Y.1731 'OAM functions and mechanisms
-                   for Ethernet based networks', July 2011";
+     management of Ethernet Services Operations, Administration and
+     Maintenance for Performance Monitoring and extends the Connectivity
+     Fault Management (CFM) YANG modules.
+
+     This module is derived from the mef-soam-pm module defined in MEF 39.
+     However there are a number of differences from the mef-soam-fm model. The
+     key differences are:
+     - @@@
+     
+     Reference Overview:
+      A number of base documents have been used to create the
+      SOAM PM YANG Module.
+      The following are the abbreviations for the baseline documents:
+      [802.1q] refers to IEEE 802.1Q-2011 'IEEE Standard for Local and
+          metro-politan area networks --Media Access Control (MAC)
+          Bridges and Virtual Bridged Local Area Networks, August 2011
+      [MEF SOAM PM IA] refers to 'Service OAM Performance Monitoring
+          Implementation Agreement', January 2012
+      [MEF SOAM PM MIB] refers to 'Service OAM Performance Monitoring
+          Definition of Managed Objects', January 2012
+      [Y.1731] refers to ITU-T Y.1731 'OAM functions and mechanisms
+          for Ethernet based networks', July 2011";
 
   revision "2015-09-29" {
     description
-      "Cisco fixes @@@";
-  }
-  revision 2012-04-16 {
-    description
       "Initial revision";
-    reference
-      "Service OAM Performance Monitoring YANG Module (MEF XX), April 2012";
   }
 
   //

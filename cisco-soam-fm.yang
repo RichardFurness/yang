@@ -1,7 +1,7 @@
-// Contents of "cisco-soam-fm"
-module cisco-soam-fm {
-  namespace "urn:cisco:params:xml:ns:yang:cisco-soam-fm";
-  prefix "cisco-soam-fm";
+// Contents of "cisco-soam-fm-augments"
+module cisco-soam-fm-augments {
+  namespace "urn:cisco:params:xml:ns:yang:cisco-soam-fm-augments";
+  prefix "cisco-soam-fm-augments";
   
   import ietf-yang-types {
     prefix yang;
@@ -89,15 +89,6 @@ module cisco-soam-fm {
          defined in the MEF model.";
     }
     
-    leaf mhf-creation {
-      type cfm:mhf-creation-type;
-      default defer;
-      description
-        "An enumerated value indicating whether the management entity can create
-         MHFs(MIPs) for this MA. A value of 'defer' here is not valid.";
-      reference
-        "[802.1q] 12.14.6.1.3:c";
-    }
     leaf mip-ccm-learning {
       type boolean;
       default false;
