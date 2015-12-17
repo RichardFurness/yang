@@ -318,10 +318,6 @@ module cisco-soam-pm-augments {
     container backward-loss {
       uses per-metric-config-group;
     }
-
-    uses burst-config-group;
-    uses data-tlv-config-group;
-    uses schedule-config;
   }
 
   /*
@@ -347,10 +343,36 @@ module cisco-soam-pm-augments {
     container round-trip-ifdv {
       uses per-metric-config-group;
     }
+  }
 
+  /*
+   * Combined config group
+   */
+  grouping config-group {
     uses burst-config-group;
     uses data-tlv-config-group;
     uses schedule-config;
+
+    choice pm-type {
+      case lm {
+        when "'derived-from(../measurement-type, lm-packet-type)'";
+
+        uses lm-config-group;
+      }
+      case dm {
+        when "'derived-from(../measurement-type, dm-packet-type)'";
+
+        uses dm-config-group;
+      }
+    }
+  }
+
+  /*
+   * Augment the create-session-on-demand RPC to add Cisco-specific
+   * options
+   */
+  augment "/soam-pm:create-session-on-demand/soam-pm:input" {
+    uses config-group;
   }
 
   /*
@@ -360,59 +382,38 @@ module cisco-soam-pm-augments {
     description
       "Profiles allow PM configuration to be shared between multiple PM
        sessions";
-    list lm-profile {
+    list pm-profile {
       description
-        "Contains profiles for Loss Measurement session configuration";
+        "Contains profiles for PM session configuration";
       key name;
       leaf name {
         description
           "The name of the LM profile";
         type string;
       }
-      uses soam-pm:loss-measurement-configuration-group;
-      uses lm-config-group;
-    }
-    list dm-profile {
-      description
-        "Contains profiles for Delay Measurement session configuration";
-      key name;
-      leaf name {
-        description
-          "The name of the DM profile";
-        type string;
-      }
-      uses soam-pm:delay-measurement-configuration-group;
-      uses dm-config-group;
+
+      uses soam-pm:configuration-group;
+      uses config-group;
     }
   }
 
   /*
-   * Augmentat the create-session RPCs to add Cisco-specific options
+   * Profile reference that needs to be augmented into the session tables
    */
-  augment "/soam-pm:create-loss-measurement/soam-pm:input" {
-    uses lm-config-group;
-  }
-  augment "/soam-pm:create-delay-measurement/soam-pm:input" {
-    uses dm-config-group;
-  }
-
-  /*
-   * LM profile reference that needs to be augmented into the LM session tables
-   */
-  grouping lm-profile-ref {
+  grouping profile-ref {
     leaf pm-profile {
       description
-        "Reference to a LM configuration profile to use for this session.";
+        "Reference to a PM configuration profile to use for this session.";
       type leafref {
-        path "/pm-profiles/lm-profile/name";
+        path "/pm-profiles/pm-profile/name";
       }
     }
   }
 
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:loss-measurements" +
-          "/soam-pm:loss-measurement" {
-    uses lm-profile-ref;
+          "/cfm:maintenance-association-end-point/soam-pm:proactive-sessions" +
+          "/soam-pm:proactive-session" {
+    uses profile-ref;
   }
   
 
@@ -420,90 +421,10 @@ module cisco-soam-pm-augments {
    * New DM measurement type (packet type)
    */
   identity lbm {
-    base soam-pm:dm-type;
+    base soam-pm:dm-packet-type;
     description
       "Use loopback PDUs (LBM/LBR).";
   }
-
-  /*
-   * DM profile reference that needs to be augmented into the DM session tables
-   */
-  grouping dm-profile-ref {
-    leaf pm-profile {
-      description
-        "Reference to a DM configuration profile to use for this session.";
-      type leafref {
-        path "/pm-profiles/dm-profile/name";
-      }
-    }
-  }
-
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:delay-measurements" +
-          "/soam-pm:delay-measurement" {
-    uses dm-profile-ref;
-  }
-  
-  /*
-   * Finally we must define separate PM session configuration tables to support
-   * the Cisco model where proactive PM sessions can be created via
-   * configuration rather than RPC.
-   * 
-   * Note: we can't reuse the SOAM-PM defined remote-mep-group here for our
-   * list key as Yang doesn't support the use of leaves within a choice as
-   * list keys. Hence we define our own where both MAC address and MEP ID
-   * are always present.
-   */
-  grouping remote-mep-group {
-    description
-      "This grouping includes objects which identify a remote MEP. One or
-       other of mac-address or mep-id must be specified.";
-    leaf mac-address {
-      type yang:mac-address;
-
-      description
-        "The Target MAC Address Field to be transmitted: A unicast
-         destination MAC address. If the target is identified by MEP ID, the
-         MAC address should be set to 0000.0000.0000";
-    }
-    leaf mep-id {
-      type string;
-
-      description 
-        "The Maintenance Association End Point Identifier of another MEP in
-         the same Maintenance Association to which the SOAM Loss or Delay
-         Measurement frame is to be sent. If the target is identified by MAC
-         address, the MEP ID should be set to 0";
-    }
-  }
-
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:loss-measurements" {
-    list proactive-session-config {
-      key "mac-address mep-id pm-profile";
-      description
-        "A list of the configured proactive Loss Measurement PM Sessions.
-         The sessions are uniquely identified by the combination of target
-         and profile.";
-
-      uses remote-mep-group;
-      uses lm-profile-ref;
-    }
-  }
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:delay-measurements" {
-    list proactive-session-config {
-      key "mac-address mep-id pm-profile";
-      description
-        "A list of the configured proactive Delay Measurement PM Sessions.
-         The sessions are uniquely identified by the combination of target
-         and profile.";
-
-      uses remote-mep-group;
-      uses dm-profile-ref;
-    }
-  }
-
 
   /*
    * Oper: Bin stats for LM
@@ -606,13 +527,27 @@ module cisco-soam-pm-augments {
   }
 
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:loss-measurements" +
-          "/soam-pm:loss-measurement/soam-pm:current-measurement-stats" {
+          "/cfm:maintenance-association-end-point/soam-pm:proactive-sessions" +
+          "/soam-pm:proactive-session/soam-pm:current-stats/soam-pm:pm-type" +
+          "/soam-pm:lm" {
     uses loss-measurement-bins-group;
   }
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:loss-measurements" +
-          "/soam-pm:loss-measurement/soam-pm:history-measurement-stats" {
+          "/cfm:maintenance-association-end-point/soam-pm:proactive-sessions" +
+          "/soam-pm:proactive-session/soam-pm:history-stats/soam-pm:pm-type" +
+          "/soam-pm:lm" {
+    uses loss-measurement-bins-group;
+  }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/soam-pm:on-demand-sessions" +
+          "/soam-pm:on-demand-session/soam-pm:current-stats/soam-pm:pm-type" +
+          "/soam-pm:lm" {
+    uses loss-measurement-bins-group;
+  }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/soam-pm:on-demand-sessions" +
+          "/soam-pm:on-demand-session/soam-pm:history-stats/soam-pm:pm-type" +
+          "/soam-pm:lm" {
     uses loss-measurement-bins-group;
   }
 
@@ -725,23 +660,52 @@ module cisco-soam-pm-augments {
   }
   
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:loss-measurements" +
-          "/soam-pm:loss-measurement/soam-pm:current-measurement-stats" {
+          "/cfm:maintenance-association-end-point/soam-pm:proactive-sessions" +
+          "/soam-pm:proactive-session/soam-pm:current-stats/soam-pm:pm-type" +
+          "/soam-pm:lm" {
     uses unaggregated-results-lm-group;
   }
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:loss-measurements" +
-          "/soam-pm:loss-measurement/soam-pm:history-measurement-stats" {
+          "/cfm:maintenance-association-end-point/soam-pm:proactive-sessions" +
+          "/soam-pm:proactive-session/soam-pm:history-stats/soam-pm:pm-type" +
+          "/soam-pm:lm" {
     uses unaggregated-results-lm-group;
   }
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:delay-measurements" +
-          "/soam-pm:delay-measurement/soam-pm:current-stats" {
+          "/cfm:maintenance-association-end-point/soam-pm:proactive-sessions" +
+          "/soam-pm:proactive-session/soam-pm:current-stats/soam-pm:pm-type" +
+          "/soam-pm:dm" {
     uses unaggregated-results-dm-group;
   }
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:delay-measurements" +
-          "/soam-pm:delay-measurement/soam-pm:history-stats" {
+          "/cfm:maintenance-association-end-point/soam-pm:proactive-sessions" +
+          "/soam-pm:proactive-session/soam-pm:history-stats/soam-pm:pm-type" +
+          "/soam-pm:dm" {
+    uses unaggregated-results-dm-group;
+  }
+
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/soam-pm:on-demand-sessions" +
+          "/soam-pm:on-demand-session/soam-pm:current-stats/soam-pm:pm-type" +
+          "/soam-pm:lm" {
+    uses unaggregated-results-lm-group;
+  }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/soam-pm:on-demand-sessions" +
+          "/soam-pm:on-demand-session/soam-pm:history-stats/soam-pm:pm-type" +
+          "/soam-pm:lm" {
+    uses unaggregated-results-lm-group;
+  }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/soam-pm:on-demand-sessions" +
+          "/soam-pm:on-demand-session/soam-pm:current-stats/soam-pm:pm-type" +
+          "/soam-pm:dm" {
+    uses unaggregated-results-dm-group;
+  }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/soam-pm:on-demand-sessions" +
+          "/soam-pm:on-demand-session/soam-pm:history-stats/soam-pm:pm-type" +
+          "/soam-pm:dm" {
     uses unaggregated-results-dm-group;
   }
 }

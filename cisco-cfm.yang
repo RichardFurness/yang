@@ -62,6 +62,23 @@ module cisco-cfm {
   }
 
   //
+  // Features
+  //
+  feature bridge-model-ieee {
+    description
+      "The device supports the IEEE 802.1Q based bridge model, where
+       MEPs are configured on trunk interfaces, and the VLAN IDs
+       associated with each MEP are part of the CFM configuration.";
+  }
+  feature bridge-model-cisco {
+    description
+      "The device supports the 'Cisco' bridge model, where the CFM
+       service is associated with an externally configured 'bridge
+       domain' and MEPs are associated with externally configured
+       VLAN-based sub-interfaces (EFPs).";
+  }
+
+  //
   // Type definitions related to CFM
   //
 
@@ -1538,64 +1555,99 @@ module cisco-cfm {
           "[802.1q] 12.14.5.3.2:b, Table 21-20";        
       }
 
-      list component-list {
-        key component-id;
-
-        description
-          "A list of components each of which can be managed in a manner
-           essentially equivalent to an 802.1Q bridge.";
-        reference
-            "[802.1q] IEEE8021-CFM-V2-MIB.ieee8021CfmMaCompTable";
-
-        leaf component-id {
-          type uint32;
-          
+      choice bridge-properties {
+        case ieee {
+          if-feature bridge-model-ieee;
           description
-            "The bridge component within the system to which the information
-             in this maintenance-association applies";
-          
-          reference
-            "[802.1q] IEEE8021-CFM-V2-MIB.ieee8021CfmMaComponentId";
+            "The MA is associated with an 802.1Q bridge.";
+          leaf-list vid {
+            type vlan-id-type;
+            min-elements 1;
+            ordered-by user;
+
+            description
+              "The VID(s) monitored by this MA, or 0, if the MA is not attached to any
+               VID. The first VID returned is the MA's Primary VID";
+            reference
+              "[802.1q] 12.14.5.3.2:b";
+          }
         }
-        
-
-        leaf-list vid {
-          type vlan-id-type;
-          min-elements 1;
-          ordered-by user;
-
+        case cisco {
+          if-feature bridge-model-cisco;
           description
-            "The VID(s) monitored by this MA, or 0, if the MA is not attached to any
-             VID. The first VID returned is the MA's Primary VID";
-          reference
-            "[802.1q] 12.14.5.3.2:b";
-        }
+            "The MA is associated with a forwarding instance whose
+            configuration is shared with other features and hence outside of
+            the CFM model.";
+          leaf forwarding-domain-group {
+            /*
+             * @@@ ideally this would be a leaf-ref, but there's no model for these
+             * yet...
+             */
+            type string;
+            description
+              "Reference to a Cisco-style forwarding domain group (e.g. a Bridge
+               Domain or cross-connect group).";
+          }
 
-        leaf mhf-creation {
-          type mhf-creation-type;
-          default defer;
-          description
-            "An enumerated value indicating whether the management entity can create
-             MHFs for this MA. A value of 'defer' here means that control of
-             MHF creation is deferred to the corresponding variable in
-             the enclosing maintenance-domain.";
-          reference
-            "[802.1q] 12.14.6.1.3:c";
-        }
-
-        leaf id-permission {
-          type id-permission-type;
-          default defer;
-
-          description
-            "This parameter indicates what, if anything, is to be included in the
-             Sender ID TLV transmitted by MPs configured in this MA. A
-             value of 'defer' means that the contents of the Sender ID
-             TLV are determined by the enclosing maintenance-domain instance,";
-          reference
-            "[802.1q] 12.14.6.1.3:d";
+          leaf forwarding-domain {
+            /*
+             * @@@ ideally this would be a leaf-ref, but there's no model for these
+             * yet...
+             */
+            type string;
+            description
+              "Reference to a Cisco-style forwarding domain (e.g. a Bridge Domain or
+               cross-connect).";
+          }
         }
       }
+
+      leaf mhf-creation {
+        type mhf-creation-type;
+        default defer;
+        description
+          "An enumerated value indicating whether the management entity can create
+           MHFs for this MA. A value of 'defer' here means that control of
+           MHF creation is deferred to the corresponding variable in
+           the enclosing maintenance-domain.";
+        reference
+          "[802.1q] 12.14.6.1.3:c";
+      }
+
+      leaf id-permission {
+        type id-permission-type;
+        default defer;
+
+        description
+          "This parameter indicates what, if anything, is to be included in the
+           Sender ID TLV transmitted by MPs configured in this MA. A
+           value of 'defer' means that the contents of the Sender ID
+           TLV are determined by the enclosing maintenance-domain instance,";
+        reference
+          "[802.1q] 12.14.6.1.3:d";
+      }
+
+      leaf direction { 
+        type enumeration {
+          enum up {
+              description "Indicates when CFM frames are transmitted towards and 
+                           received from the bridging function.";
+          }
+          enum down {
+            description "Indicates when CFM frames are transmitted towards and 
+                         received from the wire.";
+          }
+        }
+        mandatory true;
+
+        description
+          "A value indicating the direction in which the MEP faces on the 
+           interface.";
+
+        reference
+          "[802.1q] 12.14.7.1.3:c";
+      }
+     
       leaf ccm-interval {
         type enumeration {
           enum invalid {
@@ -1680,28 +1732,8 @@ module cisco-cfm {
             "[802.1q] 12.14.7.1.3:b";
         }
 
-        leaf direction { 
-          type enumeration {
-            enum up {
-                description "Indicates when CFM frames are transmitted towards and 
-                             received from the bridging function.";
-            }
-            enum down {
-              description "Indicates when CFM frames are transmitted towards and 
-                           received from the wire.";
-            }
-          }
-          mandatory true;
-
-          description
-            "A value indicating the direction in which the MEP faces on the 
-             interface.";
-
-          reference
-            "[802.1q] 12.14.7.1.3:c";
-        }
-
-        leaf primary-vid { 
+        leaf primary-vid {
+          if-feature bridge-model-ieee; 
           type vlan-id-type;
           mandatory true;
 

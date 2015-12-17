@@ -57,6 +57,20 @@ module cisco-soam-fm {
   }
 
   //
+  // Features
+  //
+  feature locked-signal {
+    description
+      "The device supports the 'locked signal' functionality of
+       Y.1731.";
+  }
+  feature test-signal {
+    description
+      "The device supports the 'test signal' functionality of
+       Y.1731.";
+  }
+
+  //
   // Type definitions related to MEF SOAM FM
   //
 
@@ -515,6 +529,72 @@ module cisco-soam-fm {
     }
   }
 
+  grouping ais-config {
+    leaf enabled {
+      type boolean;
+      default false;
+
+      description
+        "This attribute specifies whether ETH-AIS transmission is enabled. The
+         value 'true' indicates ETH-AIS transmission is enabled. The
+         value 'false' indicates ETH-AIS transmission is disabled.";
+      reference
+        "[MEF7.1] 9.3.4.1, [MEF30] 8.4";
+    }
+
+    leaf interval {
+      type interval-type-ais-lck-type;
+      default one-second;
+
+      description
+        "This attribute specifies the ETH-AIS transmission period.";
+      reference
+        "[MEF7.1] 9.3.4.1";
+    }
+
+    leaf priority {
+      type cfm:priority-type;
+     
+      description
+        "This attribute specifies the priority of frames with ETH-AIS
+         information. If ETH-AIS is supported, the default value for
+         the CoS for AIS frame MUST be the value which yields the
+         lowest frame loss performance for this EVC.";
+      reference
+        "[MEF7.1] 9.3.4.1";
+    }
+
+    leaf client-meg-level {
+      type cfm:md-level-type;
+      default 0;
+
+      description
+        "The MEG/Maintenance Domain Level of the Client ETH-AIS PDU (transmitted
+         level).";
+      reference
+        "[Y.1731] 7.4";
+    }
+
+    leaf drop-eligible {
+      type boolean;
+      default false;
+
+      description
+        "This attribute specifies the eligibility of frames with ETH-AIS
+         information to be discarded when congestion conditions are
+         encountered.
+
+         The value 'true' indicates frames are eligible to be
+         discarded.
+
+         The value 'false' indicates frames are not eligible to be
+         discarded. This attribute may be constrained to read-only in
+         some implementations";
+      reference
+        "[MEF7.1] 9.3.4.1";
+    }
+  }
+
   //
   // Augments into CFM related to MEF SOAM FM
   //
@@ -628,14 +708,13 @@ module cisco-soam-fm {
     }
   }
 
-  augment "/cfm:maintenance-domain/cfm:maintenance-association/cfm:component-list" {
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" {
     description
-      "This set of data definitions extends the component list of the Maintenance
-       Entity Group (as defined in Y.1731) or Maintenance Association (as defined
-       in 802.1q)";
+      "This set of data definitions extends the the Maintenance
+       Entity Group (as defined in Y.1731) or Maintenance Association
+       (as defined in 802.1q)";
     reference
       "[MEF7.1] 9.2.2";
-
 
     leaf connectivity-status-interval {
       type yang:gauge32 {
@@ -1151,69 +1230,7 @@ module cisco-soam-fm {
       reference
         "[Y.1731] 7.4, [MEF30] 8.5";
 
-      leaf enabled {
-        type boolean;
-        default false;
-
-        description
-          "This attribute specifies whether ETH-AIS transmission is enabled. The
-           value 'true' indicates ETH-AIS transmission is enabled. The
-           value 'false' indicates ETH-AIS transmission is disabled.";
-        reference
-          "[MEF7.1] 9.3.4.1, [MEF30] 8.4";
-      }
-
-      leaf interval {
-        type interval-type-ais-lck-type;
-        default one-second;
-
-        description
-          "This attribute specifies the ETH-AIS transmission period.";
-        reference
-          "[MEF7.1] 9.3.4.1";
-      }
-
-      leaf priority {
-        type cfm:priority-type;
-       
-        description
-          "This attribute specifies the priority of frames with ETH-AIS
-           information. If ETH-AIS is supported, the default value for
-           the CoS for AIS frame MUST be the value which yields the
-           lowest frame loss performance for this EVC.";
-        reference
-          "[MEF7.1] 9.3.4.1";
-      }
-
-      leaf client-meg-level {
-        type cfm:md-level-type;
-        default 0;
-
-        description
-          "The MEG/Maintenance Domain Level of the Client ETH-AIS PDU (transmitted
-           level).";
-        reference
-          "[Y.1731] 7.4";
-      }
-
-      leaf drop-eligible {
-        type boolean;
-        default false;
-
-        description
-          "This attribute specifies the eligibility of frames with ETH-AIS
-           information to be discarded when congestion conditions are
-           encountered.
-
-           The value 'true' indicates frames are eligible to be
-           discarded.
-
-           The value 'false' indicates frames are not eligible to be
-           discarded. This attribute may be constrained to read-only in
-           some implementations";
-        reference
-          "[MEF7.1] 9.3.4.1";
-      }
+      uses ais-config;
 
       leaf transmit-status {
         type boolean;
@@ -1284,6 +1301,7 @@ module cisco-soam-fm {
   }
 
   augment "/cfm:maintenance-domain/cfm:maintenance-association/cfm:maintenance-association-end-point" {
+    if-feature locked-signal;
     description
       "Augments to support the Locked Signal functionality";
     reference
@@ -1370,6 +1388,7 @@ module cisco-soam-fm {
   }
 
   augment "/cfm:maintenance-domain/cfm:maintenance-association/cfm:maintenance-association-end-point" {
+    if-feature test-signal;
     description
       "Augments to support the Test Signal functionality";
     reference
@@ -1453,6 +1472,7 @@ module cisco-soam-fm {
   //
 
   rpc create-test-signal {
+    if-feature test-signal;
     description
       "Start a test-signal session on a specific MEP according to the
        content of the test signal parameters.
@@ -1471,6 +1491,7 @@ module cisco-soam-fm {
   }
 
   rpc abort-test-signal {
+    if-feature test-signal;
     description
       "Administratively abort a test-signal session on a specific MEP";
 
@@ -1604,6 +1625,7 @@ module cisco-soam-fm {
   }
 
   notification lock-alarm {
+    if-feature locked-signal;
     description
       "A lock-alarm notification is sent when either receive-status or
        transmit-status changes. Reception of the LCK PDU causes the MEP

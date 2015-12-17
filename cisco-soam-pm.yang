@@ -160,103 +160,94 @@ module cisco-soam-pm {
       "MEF-SOAM-TC-MIB.MefSoamTcAvailabilityType";
   }
 
-  typedef measurement-bin-type {
-    type enumeration {
-      enum two-way-frame-delay {
-        description
-          "Indicates a measurement bin for two-way Frame Delay.";
-      }
-      enum forward-frame-delay {
-        description
-          "Indicates a measurement bin for one-way Frame Delay in the forward 
-           direction.";
-      }
-      enum backward-frame-delay {
-        description 
-          "Indicates a measurement bin for one-way Frame Delay in the backward
-           direction.";
-      }
-      enum two-way-inter-frame-delay-variation {
-        description
-          "Indicates a measurement bin for two-way Inter-frame Delay
-           Variation.";
-      }
-      enum forward-inter-frame-delay-variation {
-        description
-          "Indicates a measurement bin for one-way Inter-frame Delay
-           Variation in the forward direction.";
-      }
-      enum backward-inter-frame-delay-variation {
-        description
-          "Indicates a measurement bin for one-way Inter-frame Delay Variation
-           in the backward direction.";
-      }
-      enum two-way-frame-delay-range {
-        description
-          "Indicates a measurement bin for two-way Frame Delay Range.";
-      }
-      enum forward-frame-delay-range {
-        description
-          "Indicates a measurement bin for one-way Frame Delay Range in the
-           forward direction.";
-      }
-      enum backward-frame-delay-range {
-        description
-          "Indicates a measurement bin for one-way Frame Delay Range in the
-           backward direction.";
-      }
-    }
-
+  identity metric-type {
     description
-      "This enumeration data type indicates whether the bin number is for Frame
-       Delay, Inter-Frame Delay Variation or Frame Delay Range.";
-    reference
-      "MEF-SOAM-TC-MIB.MefSoamTcDelayMeasurementBinType";
+      "Base identity for the set of metrics that may be measured.";
+  }
+  identity delay-metric-type {
+    base metric-type;
+    description
+      "Base identify for the set of delay metric types.";
+  }
+  identity two-way-frame-delay {
+    base delay-metric-type;
+    description
+      "Metric type for two-way Frame Delay";
+  }
+  identity forward-frame-delay {
+    base delay-metric-type;
+    description
+      "Metric type for one-way Frame Delay in the forward direction";
+  }
+  identity backward-frame-delay {
+    base delay-metric-type;
+    description
+      "Metric type for one-way Frame Delay in the backward direction";
+  }
+  identity two-way-inter-frame-delay-variation {
+    base delay-metric-type;
+    description
+      "Metric type for two-way Inter-frame Delay Variation";
+  }
+  identity forward-inter-frame-delay-variation {
+    base delay-metric-type;
+    description
+      "Metric type for one-way Inter-frame Delay Variation in the
+       forward direction";
+  }
+  identity backward-inter-frame-delay-variation {
+    base delay-metric-type;
+    description
+      "Metric type for one-way Inter-frame Delay Variation in the
+       backward direction";
+  }
+  identity two-way-frame-delay-range {
+    base delay-metric-type;
+    description
+      "Metric type for two-way Frame Delay Range";
+  }
+  identity forward-frame-delay-range {
+    base delay-metric-type;
+    description
+      "Metric type for one-way Frame Delay Range in the forward
+       direction";
+  }
+  identity backward-frame-delay-range {
+    base delay-metric-type;
+    description
+      "Metric type for one-way Frame Delay Range in the backward
+       direction";
+  }
+
+  typedef remote-mep {
+    type union {
+      type cfm:mep-id-type;
+      type yang:mac-address;
+    }
+    description
+      "A value to identify the remote MEP with which a PM session is
+       associated, either by:
+       MEP ID:
+         The Maintenance Association End Point Identifier of
+         another MEP in the same Maintenance Association. This is
+         not valid for dual-ended operations of 'rx' type, for which
+         the source MAC address must be specified instead.
+
+       or
+
+       MAC address:
+         For single-ended operations this is used to specify the
+         unicast destination MAC address. For dual-ended operations
+         of 'tx' type this is a unicast destination MAC address or a
+         multicast address indicating the level of the MEG. For
+         dual-ended operations of type 'rx' this is the source MAC
+         address from which SOAM packets will be received.
+       .";
   }
 
   //
   // Groupings related to MEF SOAM PM
   //
-
-  grouping remote-mep-group {
-    description
-      "This grouping includes objects which identify a remote MEP.";
-    choice remote-mep {
-      mandatory true;
-      description
-        "The remote MEP can be identified by either a MAC address or a MEP ID";
-
-      case mac-address {
-        leaf mac-address {
-          type yang:mac-address;
-
-          description
-            "The Target MAC Address Field to be transmitted: A unicast
-             destination MAC address.
-                         
-             This object is only valid for the entity transmitting the
-             SOAM Loss and Delay Measurement frames and is ignored by
-             the entity receiving SOAM Loss and Delay Measurement
-             frames.";
-        }
-      }
-      case mep-id {
-        leaf mep-id {
-          type string;
-
-          description 
-            "The Maintenance Association End Point Identifier of another MEP in
-             the same Maintenance Association to which the SOAM Loss or Delay
-             Measurement frame is to be sent.
-                         
-             This object is only valid for the entity transmitting the
-             SOAM Loss Measurement or Delay Measurement frames and is
-             ignored by the entity receiving SOAM Loss Measurement or
-             Delay Measurement frames.";
-        }
-      }
-    }
-  }
 
   grouping measurement-timing-group {
     description
@@ -370,24 +361,54 @@ module cisco-soam-pm {
     }
   }
 
-  identity lm-type {
+  identity pm-packet-type {
+    description
+      "Base identity for the set of Performance Monitoring packet
+       types.";
+  }
+
+  identity lm-packet-type {
+    base pm-packet-type;
     description
       "Base identity for the set of Loss Measurement 'types'.";
   }
   identity lmm {
-    base lm-type;
+    base lm-packet-type;
     description
       "LMM SOAM PDU generated and received LMR responses tracked.";
   }
   identity slm {
-    base lm-type;
+    base lm-packet-type;
     description
       "SLM SOAM PDU generated and received SLR responses tracked.";
   }
   identity ccm {
-    base lm-type;
+    base lm-packet-type;
     description
       "CCM SOAM PDU generated and received CCM PDUs tracked.";
+  }
+
+  identity dm-packet-type {
+    base pm-packet-type;
+    description
+      "Base identity for the set of Delay Measurement 'types'.";
+  }
+  identity dmm {
+    base dm-packet-type;
+    description
+      "DMM SOAM PDU generated, DMR responses received (one-way or
+       two-way measurements).";
+  }
+  identity dm1-transmitted {
+    base dm-packet-type;
+    description
+      "1DM SOAM PDU generated (one-way measurements are made by the
+       receiver).";
+  }
+  identity dm1-received {
+    base dm-packet-type;
+    description
+      "1DM SOAM PDU received and tracked (one-way measurements).";
   }
 
   identity data-tlv-pattern {
@@ -406,24 +427,20 @@ module cisco-soam-pm {
       "Indicates the Data TLV contains all ones.";
   }
 
-  grouping loss-measurement-configuration-group {
+  grouping configuration-group {
     description
-      "This grouping includes configuration objects for the Frame Loss
-       Measurement function defined in [Y.1731] and [MEF SOAM PM IA].";
-    reference 
-      "MEF-SOAM-PM-MIB.mefSoamLmCfgTable, [Y.1731] and [MEF SOAM PM IA]";
+      "This grouping includes configuration objects for PM sessions.";
 
     leaf measurement-type {
       type identityref {
-        base lm-type;
+        base pm-packet-type;
       }
-      default slm;
 
       description
         "This object specifies what type of Loss Measurement will be
-         performed.";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgType";
+         performed.
+         The exact PDUs to use are specified by this object in
+         combination with version";
     }
 
     leaf version {
@@ -440,79 +457,24 @@ module cisco-soam-pm {
       default Y.1731-2008;
 
       description 
-        "This object indicates the version of the PDUs used to perform Loss
-         Measurement.
+        "This object indicates the version of the PDUs used.
 
          The exact PDUs to use are specified by this object in
          combination with measurement-type.";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgVersion";
-    }
-
-    leaf enabled-counters {
-      type bits {
-        bit forward-transmitted-frames;
-        bit forward-received-frames;
-        bit forward-min-flr;
-        bit forward-max-flr;
-        bit forward-average-flr;
-        bit backward-transmitted-frames;
-        bit backward-received-frames;
-        bit backward-min-flr;
-        bit backward-max-flr;
-        bit backward-average-flr;
-        bit soam-pdus-sent;
-        bit soam-pdus-received;
-        bit availability-forward-high-loss;
-        bit availability-forward-consecutive-high-loss;
-        bit availability-forward-available;
-        bit availability-forward-unavailable;
-        bit availabilility-forward-min-flr;
-        bit availability-forward-max-flr;
-        bit availability-forward-average-flr;
-        bit availability-backward-high-loss;
-        bit availability-backward-consecutive-high-loss;
-        bit availability-backward-available;
-        bit available-backward-unavailable;
-        bit available-backward-min-flr;
-        bit available-backward-max-flr;
-        bit available-backward-average-flr;
-        bit measured-stats-forward-measured-flr;
-        bit measured-stats-backward-measured-flr;
-        bit measured-stats-availability-forward-status;
-        bit measured-stats-availability-backward-status;
-      }
-      default " ";
-
-      description 
-        "A vector of bits that indicates the type of SOAM LM counters found in
-         the current-stats and history-stats that are enabled.
-                 
-         A present bit enables the specific SOAM LM counter. A not present
-         bit disables the SOAM LM counter.
-                 
-         If a particular SOAM LM counter is not supported the BIT value
-         is not present.
-                 
-         Not all SOAM LM counters are supported for all SOAM LM types. ";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgMeasurementEnable";
     }
 
     leaf message-period {
       type performance-monitoring-interval-type;
       units ms;
-      default 1000;
 
       description
-        "This object specifies the interval between Loss Measurement OAM message
+        "This object specifies the interval between OAM packet
          transmission. For Loss Measurement monitoring applications the
-         default value is 1 sec.
+         default value is 1 sec. For Delay Measurement monitoring
+         applications, the default value is 100ms.
                  
          This object is not applicable if measurement-type is set to
          'ccm' and is ignored for that Loss Measurement Type.";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgMessagePeriod";
     }
 
     leaf priority {
@@ -522,8 +484,6 @@ module cisco-soam-pm {
       description 
         "This object specifies the priority of frames with Performance
          Monitoring OAM message information.";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgPriority";
     }
 
     leaf frame-size {
@@ -556,14 +516,12 @@ module cisco-soam-pm {
       default zeroes;
 
       description 
-        "This object specifies the LM data pattern included in a Data TLV when
-         the size of the LM frame is determined by the frame-size object
+        "This object specifies the data pattern included in a Data TLV when
+         the size of the frame is determined by the frame-size object
          and test-tlv-included is 'false'.
                  
-         If the frame size object does not define the LM frame size or
+         If the frame size object does not define the frame size or
          test-tlv-included is 'true' the value of this object is ignored.";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgDataPattern";
     }
 
     leaf test-tlv-included {
@@ -572,17 +530,14 @@ module cisco-soam-pm {
 
       description 
         "This object indicates whether a Test TLV or Data TLV is included when
-         the size of the LM frame is determined by the
-         frame-size object.
+         the size of the frame is determined by the frame-size object.
                  
          A value of 'true' indicates that the Test TLV is to be
          included. A value of 'false' indicates that the Data TLV is to
          be included.
                  
-         If the frame-size object does not define the LM frame size the
+         If the frame-size object does not define the frame size the
          value of this object is ignored.";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgTestTlvIncluded";
     }
 
     leaf test-tlv-pattern {
@@ -590,14 +545,12 @@ module cisco-soam-pm {
       default null-signal-without-crc-32;
 
       description 
-        "This object specifies the type of test pattern to be sent in the LM
-         frame Test TLV when the size of LM PDU is determined by the
+        "This object specifies the type of test pattern to be sent in the
+         frame Test TLV when the size of the PDU is determined by the
          frame-size object and test-tlv-included is 'true'. If the frame
-         size object does not define the LM frame size or
+         size object does not define the frame size or
          test-tlv-included is 'false' the value of this object is
          ignored.";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgTestTlvPattern";
     }
 
     leaf measurement-interval {
@@ -608,13 +561,10 @@ module cisco-soam-pm {
       default 15;
 
       description 
-        "This object specifies the Measurement Interval for FLR statistics, in
-         minutes.
+        "This object specifies the Measurement Interval in minutes.
                  
          A Measurement Interval of 15 minutes needs to be supported,
          other intervals may be supported.";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgMeasurementInterval";
     }
 
     leaf number-intervals-stored {
@@ -628,8 +578,6 @@ module cisco-soam-pm {
                  
          At least 32 completed measurement intervals are to be
          stored. 96 measurement intervals are recommended to be stored.";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgNumIntervalsStored";
     }
 
     leaf align-measurement-intervals {
@@ -637,29 +585,32 @@ module cisco-soam-pm {
       default true;
 
       description 
-        "This object specifies whether the measurement intervals for the Loss
-         Measurement session are aligned with a zero offset to real
-         time.
+        "This object specifies whether the Measurement Intervals for the
+         session are aligned with a zero offset to real time.
                  
          The value 'true' indicates that each Measurement Interval
-         starts at a time which is aligned to NE time source hour if the
-         interval is a factor of an hour, i.e. 60min/15min = 4. For
-         instance, a measurement time interval of 15 minutes would
-         stop/start the measurement interval at 0, 15, 30, and 45
-         minutes of an hour. A measurement interval of 7 minutes would
-         not align to the hour since 7 minutes is NOT a factor of an
-         hour, i.e.  60min/7min = 8.6, and the behavior is the same as
-         if the object is set to 'false'.
+         starts at a time which is aligned to NE time source hour, if
+         the repetition time (or the Measurement Interval, if the
+         repetition time is 0) is a factor of an hour, i.e. 60min/15min
+         = 4. For instance, a Measurement Interval/Repetition Time of 15
+         minutes would stop/start the Measurement Interval at 0, 15, 30,
+         and 45 minutes of an hour. A Measurement Interval/Repetition
+         Time of 7 minutes would not align to the hour since 7 minutes
+         is NOT a factor of an hour, i.e.  60min/7min = 8.6.  In this
+         case the behavior is the same as if the object is set to
+         'false'.
                  
-         The value 'false' indicates that each Measurement Interval
-         starts at a time which is indicated by repetition-period.
-                 
+         The value 'false' indicates that the first Measurement Interval
+         starts at an arbitrary time and each subsequent Measurement
+         Interval starts at a time which is determined by
+         repetition-time.
+
          One side effect of the usage of this parameter is that if the
          value is true and the repetition-period is not a factor of an
          hour then the start of the next Measurement Interval will be
-         delayed until the next factor of an hour.";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgAlignMeasurementIntervals";
+         delayed until the next factor of an hour.
+         @@@ not sure if this last para makes sense, it was only
+         present for LM not DM (not that that means anything). Check!";
     }
 
     leaf align-measurement-offset {
@@ -679,25 +630,101 @@ module cisco-soam-pm {
          align-measurement-intervals is true and if this object was set
          to 5 minutes, the Measurement Intervals would start at 5, 20,
          35, 50 minutes past each hour.";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgAlignMeasurementOffset";
     }
 
-    leaf availability-measurement-interval {
-      type uint32 {
-        range "1..525600";
+    leaf session-type {
+      type enumeration {
+        enum proactive {
+          description
+            "The current session is 'proactive'";
+        }
+        enum on-demand {
+          description
+            "The current session is 'on-demand'";
+        }
       }
-      units minutes;
-      default 15;
+      mandatory true;
+
+      description
+        "This object indicates whether the current session is defined to be
+         'proactive' or 'on-demand'.";
+      reference
+        "[MEF SOAM IA] R3";
+    }
+
+    uses measurement-timing-group;
+
+    choice type-specific-config {
+      case lm {
+        when "'derived-from(../measurement-type, lm-packet-type)'";
+
+        uses loss-measurement-configuration-group;
+      }
+      case dm {
+        when "'derived-from(../measurement-type, dm-packet-type)'";
+
+        uses delay-measurement-configuration-group;
+      }
+    }
+  }
+
+  grouping loss-measurement-configuration-group {
+    description
+      "This grouping includes configuration objects for the Frame Loss
+       Measurement function defined in [Y.1731] and [MEF SOAM PM IA].";
+    reference 
+      "MEF-SOAM-PM-MIB.mefSoamLmCfgTable, [Y.1731] and [MEF SOAM PM IA]";
+
+    leaf enabled-counters {
+      type bits {
+        bit forward-transmitted-frames;
+        bit forward-received-frames;
+        bit forward-min-flr;
+        bit forward-max-flr;
+        bit forward-average-flr;
+        bit backward-transmitted-frames;
+        bit backward-received-frames;
+        bit backward-min-flr;
+        bit backward-max-flr;
+        bit backward-average-flr;
+        bit soam-pdus-sent;
+        bit soam-pdus-received;
+        bit availability-forward-high-loss;
+        bit availability-forward-consecutive-high-loss;
+        bit availability-forward-available;
+        bit availability-forward-unavailable;
+        bit availability-forward-min-flr;
+        bit availability-forward-max-flr;
+        bit availability-forward-average-flr;
+        bit availability-backward-high-loss;
+        bit availability-backward-consecutive-high-loss;
+        bit availability-backward-available;
+        bit availability-backward-unavailable;
+        bit availability-backward-min-flr;
+        bit availability-backward-max-flr;
+        bit availability-backward-average-flr;
+        bit measured-stats-forward-measured-flr;
+        bit measured-stats-backward-measured-flr;
+        bit measured-stats-availability-forward-status;
+        bit measured-stats-availability-backward-status;
+      }
+      default " ";
 
       description 
-        "This object specifies the availability measurement interval in minutes.
-                         
-         A measurement interval of 15 minutes is to be supported, other
-         intervals can be supported.";
+        "A vector of bits that indicates the type of SOAM LM counters found in
+         the current-stats and history-stats that are enabled.
+                 
+         A present bit enables the specific SOAM LM counter. A not present
+         bit disables the SOAM LM counter.
+                 
+         If a particular SOAM LM counter is not supported the BIT value
+         is not present.
+                 
+         Not all SOAM LM counters are supported for all SOAM LM types. ";
       reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgAvailabilityMeasurementInterval";
+        "MEF-SOAM-PM-MIB.mefSoamLmCfgMeasurementEnable";
     }
+
     leaf availability-number-consecutive-flr-measurements {
       type uint32 {
         range "1..1000000";
@@ -798,26 +825,7 @@ module cisco-soam-pm {
         "MEF-SOAM-PM-MIB.mefSoamLmCfgAvailabilityNumConsecutiveHighFlr";
     }
 
-    leaf session-type {
-      type enumeration {
-        enum proactive {
-          description
-            "The current session is 'proactive'";
-        }
-        enum on-demand {
-          description
-            "The current session is 'on-demand'";
-        }
-      }
-
-      description
-        "This object indicates whether the current session is defined to be
-         'proactive' or 'on-demand'.";
-      reference
-        "[MEF SOAM IA] R3";
-    }
-
-    list thresholds {
+    list lm-thresholds {
       key id;
       description 
         "This list contains the list of Loss Measurement configuration threshold
@@ -1078,24 +1086,6 @@ module cisco-soam-pm {
       "This grouping includes availability statistics objects for a SOAM Loss
        Measurement session.";
 
-    leaf suspect-status {
-      type suspect-status-type;
-      description 
-        "This object indicates whether the Measurement Interval has been marked
-         as suspect.
-                 
-         The object is set to false at the start of a measurement
-         interval. It is set to true when there is a discontinuity in
-         the performance measurements during the Measurement Interval.
-         Conditions for a discontinuity include, but are not limited to
-         the following:
-                 
-          1 - The local time-of-day clock is adjusted by at least 10 seconds
-          2 - The conducting of a performance measurement is halted before the
-              current Measurement Interval is completed
-          3 - A local test, failure, or reconfiguration that disrupts service";
-    }
-
     leaf forward-high-loss {
       type yang:gauge32;
 
@@ -1194,7 +1184,7 @@ module cisco-soam-pm {
         "MEF-SOAM-PM-MIB.mefSoamLmCurrentAvailStatsBackwardUnavailable";
     }
 
-    leaf forward-min-frame-loss-ratio {
+    leaf forward-avail-min-frame-loss-ratio {
       type uint32 {
         range "0..100000";
       }
@@ -1215,7 +1205,7 @@ module cisco-soam-pm {
         "MEF-SOAM-PM-MIB.mefSoamLmCurrentAvailStatsForwardMinFlr";
     }
 
-    leaf forward-max-frame-loss-ratio {
+    leaf forward-avail-max-frame-loss-ratio {
       type uint32 {
         range "0..100000";
       }
@@ -1237,7 +1227,7 @@ module cisco-soam-pm {
         "MEF-SOAM-PM-MIB.mefSoamLmCurrentAvailStatsForwardMaxFlr";
     }
 
-    leaf forward-average-frame-loss-ratio {
+    leaf forward-avail-average-frame-loss-ratio {
       type uint32 {
         range "0..100000";
       }
@@ -1259,7 +1249,7 @@ module cisco-soam-pm {
         "MEF-SOAM-PM-MIB.mefSoamLmCurrentAvailStatsForwardAvgFlr";
     }
 
-    leaf backward-min-frame-loss-ratio {
+    leaf backward-avail-min-frame-loss-ratio {
       type uint32 {
         range "0..100000";
       }
@@ -1281,7 +1271,7 @@ module cisco-soam-pm {
         "MEF-SOAM-PM-MIB.mefSoamLmCurrentAvailStatsBackwardMinFlr";
     }
 
-    leaf backward-max-frame-loss-ratio {
+    leaf backward-avail-max-frame-loss-ratio {
       type uint32 {
         range "0..100000";
       }
@@ -1303,7 +1293,7 @@ module cisco-soam-pm {
         "MEF-SOAM-PM-MIB.mefSoamLmCurrentAvailStatsBackwardMaxFlr";
     }
 
-    leaf backward-average-frame-loss-ratio {
+    leaf backward-avail-average-frame-loss-ratio {
       type uint32 {
         range "0..100000";
       }
@@ -1326,10 +1316,10 @@ module cisco-soam-pm {
     }
   }
 
-  grouping loss-measurement-stats-group {
+  grouping common-stats-group {
     description
-      "This grouping includes statistics objects for a SOAM Loss Measurement
-       session.";
+      "This grouping includes statistics objects common to LM and DM
+       sessions.";
 
     leaf suspect-status {
       type suspect-status-type;
@@ -1347,9 +1337,34 @@ module cisco-soam-pm {
           2 - The conducting of a performance measurement is halted before the
               current Measurement Interval is completed
           3 - A local test, failure, or reconfiguration that disrupts service";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCurrentStatsSuspect";
     }
+
+    leaf soam-pdus-sent {
+      type yang:gauge32;
+      description 
+        "This object contains the count of the number of SOAM PDUs sent during
+         this Measurement Interval.
+                 
+         This object is undefined if measurement-type is dm1-received.
+         It indicates the number of SOAM frames transmitted.";
+    }
+
+    leaf soam-pdus-received {
+      type yang:gauge32;
+
+      description 
+        "This object contains the count of the number of SOAM PDUs PDUs received
+         in this Measurement Interval.
+                 
+         This object is undefined if measurement-type is dm1-transmitted.
+         It indicates the number of SOAM frames received.";
+    }
+  }
+
+  grouping loss-measurement-stats-group {
+    description
+      "This grouping includes statistics objects for a SOAM Loss Measurement
+       session.";
 
     leaf forward-transmitted-frames {
       type yang:gauge32;
@@ -1528,53 +1543,6 @@ module cisco-soam-pm {
       reference
         "MEF-SOAM-PM-MIB.mefSoamLmCurrentStatsBackwardAvgFlr";
     }
-
-    leaf soam-pdus-sent {
-      type yang:gauge32;
-      description 
-        "This object contains the count of the number of SOAM PDUs sent during
-         this Measurement Interval.
-                 
-         This object applies when type is lmm, slm or ccm. It indicates
-         the number of LMM, CCM, or SLM SOAM frames transmitted.";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCurrentStatsSoamPdusSent";
-    }
-
-    leaf soam-pdus-received {
-      type yang:gauge32;
-
-      description 
-        "This object contains the count of the number of SOAM PDUs PDUs received
-         in this Measurement Interval.
-                 
-         This object applies when type is lmm, slm, or ccm. This object
-         indicates the number of LMR, CCM, or SLR SOAM frames received.";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCurrentStatsSoamPdusReceived";
-    }
-  }
-
-  identity dm-type {
-    description
-      "Base identity for the set of Delay Measurement 'types'.";
-  }
-  identity dmm {
-    base dm-type;
-    description
-      "DMM SOAM PDU generated, DMR responses received (one-way or
-       two-way measurements).";
-  }
-  identity dm1-transmitted {
-    base dm-type;
-    description
-      "1DM SOAM PDU generated (one-way measurements are made by the
-       receiver).";
-  }
-  identity dm1-received {
-    base dm-type;
-    description
-      "1DM SOAM PDU received and tracked (one-way measurements).";
   }
 
   grouping delay-measurement-configuration-group {
@@ -1583,43 +1551,6 @@ module cisco-soam-pm {
        function defined in [Y.1731] and [MEF SOAM PM IA].";
     reference 
       "MEF-SOAM-PM-MIB.mefSoamDmCfgTable, [Y.1731], and [MEF SOAM PM IA].";
-
-    leaf measurement-type {
-      type identityref {
-        base dm-type;
-      }
-      mandatory true;
-
-      description 
-        "This object indicates what type of Delay Measurement is to be
-         performed.
-                 
-         The exact PDUs to use are specified by this object in
-         combination with version.";
-    }
-
-    leaf version {
-      type enumeration {
-        enum Y.1731-2008 {
-          description
-            "Indicates the PDU formats defined in Y.1731-2008.";
-        }
-        enum Y.1731-2011 {
-          description
-            "Indicates the PDU formats defined in Y.1731-2011.";
-        }
-      }
-      default Y.1731-2008;
-
-      description 
-        "This object indicates the version of the PDUs used to perform Delay
-         Measurement.
-                 
-         The exact PDUs to use are specified by this object in
-         combination with measurement-type.";
-      reference
-        "[Y.1731]";
-    }
 
     leaf measurement-enable {
       type bits {
@@ -1681,119 +1612,6 @@ module cisco-soam-pm {
                  Not all SOAM DM counters are supported for all SOAM DM types.";
     }
 
-    leaf message-period {
-      type performance-monitoring-interval-type;
-      default 100;
-
-      description 
-        "This object specifies the interval between Delay Measurement OAM
-         message transmission. For Delay Measurement monitoring applications,
-         the default value is 100ms.";
-    }
-
-    leaf priority {
-      type cfm:priority-type;
-      mandatory true;
-
-      description 
-        "This object specifies the priority of frames with Performance
-         Monitoring OAM message information.";
-    }
-
-    leaf frame-size {
-      type uint32 {
-        range "64 .. 9600";
-      }
-      default 64;
-
-      description 
-        "This object specifies the Delay Measurement frame size between 64 bytes
-         and the maximum transmission unit of the EVC.
-
-         The range of frame sizes from 64 through 2000 octets need to be
-         supported, and the range of frame sizes from 2001 through 9600
-         octets is suggested to be supported.
-                 
-         The adjustment to the frame size of the standard frame size is
-         accomplished by the addition of a Data or Test TLV. A Data or
-         Test TLV is only added to the frame if the frame size is
-         greater than 64 bytes.";
-    }
-
-    leaf data-pattern {
-      type identityref {
-        base data-tlv-pattern;
-      }
-      default zeroes;
-
-      description 
-        "This object specifies the DM data pattern included in a Data TLV when
-         the size of the DM frame is determined by the frame-size object
-         and test-tlv-included is 'false'.  If the frame size object
-         does not define the DM frame size or test-tlv-included is
-         'true' the value of this object is ignored.";
-    }
-
-    leaf test-tlv-included {
-      type boolean;
-      default false;
-
-      description 
-        "Indicates whether a Test TLV or Data TLV is included when the size of
-         the LBM frame is determined by the frame-size leaf.
-                 
-         A value of 'true' indicates that the Test TLV is to be
-         included.
-                 
-         A value of 'false' indicates that the Data TLV is to be
-         included.";
-      reference
-        "[Y.1731] 9.3";
-    }
-
-    leaf test-tlv-pattern {
-      type test-pattern-type;
-      default null-signal-without-crc-32;
-
-      description 
-        "This object specifies the type of test pattern to be sent in the DM
-         frame Test TLV when the size of DM PDU is determined by the
-         frame-size object and test-tlv-included is 'true'. If the frame
-         size object does not define the DM frame size or
-         test-tlv-included is 'false' the value of this object can be
-         ignored.";
-    }
-
-    leaf measurement-interval {
-      type uint32 {
-        range "1..1440";
-      }
-      units minutes;
-      default 15;
-
-      description 
-        "This object specifies a Measurement Interval in minutes.
-                 
-         A Measurement Interval 15 minutes needs to be supported, other
-         intervals may be supported.";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamDmCfgMeasurementInterval";
-    }
-
-    leaf number-intervals-stored {
-      type uint32 {
-        range "2..1000";
-      }
-      default 32;
-
-      description 
-        "This object specifies the number of completed measurement intervals to
-         store in the history statistic table.
-                 
-         At least 32 completed measurement intervals are to be
-         stored. 96 measurement intervals are recommended to be stored.";
-    }
-
     leaf source-mac-address {
       type yang:mac-address;
 
@@ -1806,52 +1624,6 @@ module cisco-soam-pm {
          This object is only valid for measurement-type set to
          dm1-received. It is ignored for measurement-type set to dmm
          or dm1-transmitted.";
-    }
-
-    leaf align-measurement-intervals {
-      type boolean;
-      default true;
-
-      description 
-        "This object specifies whether the Measurement Intervals for the Delay
-         Measurement session are aligned with a zero offset to real
-         time.
-                 
-         The value 'true' indicates that each Measurement Interval
-         starts at a time which is aligned to NE time source hour, if
-         the repetition time (or the Measurement Interval, if the
-         repetition time is 0) is a factor of an hour, i.e. 60min/15min
-         = 4. For instance, a Measurement Interval/Repetition Time of 15
-         minutes would stop/start the Measurement Interval at 0, 15, 30,
-         and 45 minutes of an hour. A Measurement Interval/Repetition
-         Time of 7 minutes would not align to the hour since 7 minutes
-         is NOT a factor of an hour, i.e.  60min/7min = 8.6.  In this
-         case the behavior is the same as if the object is set to
-         'false'.
-                 
-         The value 'false' indicates that the first Measurement Interval
-         starts at an arbitrary time and each subsequent Measurement
-         Interval starts at a time which is determined by
-         repetition-time.";
-    }
-
-    leaf align-measurement-offset {
-      type uint32 {
-        range "0..525600";
-      }
-      units minutes;
-      default 0;
-
-      description 
-        "This object specifies the offset in minutes from the time of day value
-         if align-measurement-intervals is 'true' and the repetition
-         time is a factor of 60 minutes. If not, the value of this
-         object is ignored.
-                 
-         If the Measurement Interval is 15 minutes and
-         align-measurement-intervals is true and if this object was set
-         to 5 minutes, the Measurement Intervals would start at 5, 20,
-         35, 50 minutes past each hour.";
     }
 
     leaf bins-per-fd-interval {
@@ -1910,27 +1682,7 @@ module cisco-soam-pm {
          MEF-SOAM-PM-MIB.mefSoamDmCfgNumMeasBinsPerFrameDelayRangeInterval";
     }
 
-    leaf session-type {
-      type enumeration {
-        enum proactive {
-          description
-            "The current session is 'proactive'";
-        }
-        enum on-demand {
-          description
-            "The current session is 'on-demand'";
-        }
-      }
-      mandatory true;
-
-      description
-        "This object indicates whether the current session is defined to be
-         'proactive' or 'on-demand'.";
-      reference
-        "[MEF SOAM IA] R3";
-    }
-        
-    list thresholds {
+    list dm-thresholds {
       key id;
       description 
         "This list contains the Delay Measurement threshold configuration values
@@ -2320,23 +2072,6 @@ module cisco-soam-pm {
       "This grouping includes statistics objects for a SOAM Delay Measurement
        session.";
 
-    leaf suspect-status {
-      type suspect-status-type;
-      description 
-        "Whether the Measurement Interval has been marked as suspect.
-                 
-         The object is to be set to false at the start of a measurement
-         interval. It is set to true when there is a discontinuity in
-         the performance measurements during the Measurement Interval.
-         Conditions for a discontinuity include, but are not limited to
-         the following:
-                 
-          1 - The local time-of-day clock is adjusted by at least 10 seconds
-          2 - The conducting of a performance measurement is halted before the
-              current Measurement Interval is completed
-          3 - A local test, failure, or reconfiguration that disrupts service";
-    }
-
     leaf frame-delay-two-way-min {
       type yang:gauge32;
       units microseconds;
@@ -2641,30 +2376,6 @@ module cisco-soam-pm {
          The value of this object is undefined when measurement-type is
          dm1-transmitted or dm1-received.";
     }
-    leaf soam-pdus-sent {
-      type yang:gauge32;
-
-      description 
-        "This object contains the count of the number of SOAM PDUs sent during
-         this Measurement Interval.
-                 
-         This object applies when measurement-type is dmm or
-         dm1-transmitted and is undefined if measurement-type is
-         dm1-received. It indicates the number of DMM or 1DM SOAM frames
-         transmitted.";
-    }
-
-    leaf soam-pdus-received {
-      type yang:gauge32;
-      description 
-        "This object contains the count of the number of SOAM PDUs received in
-         this Measurement Interval.
-                 
-         This object indicates the number of DMR and 1DM SOAM frames
-         received. This object applies when measurement-type is dmm or
-         dm1-received and is undefined if measurement-type is
-         dm1-transmitted.";
-    }
   }
 
   grouping delay-measurement-bins-content-group {
@@ -2673,10 +2384,12 @@ module cisco-soam-pm {
        Measurement session.";
 
     leaf type {
-      type measurement-bin-type;
+      type identityref {
+        base delay-metric-type;
+      }
 
       description
-        "This object specifies whether the bin number is for Frame De-lay,
+        "This object specifies whether the bin number is for Frame Delay,
          Inter-Frame Delay Variation or Frame Delay Range.";
     }
 
@@ -2857,52 +2570,35 @@ module cisco-soam-pm {
     }
   }
 
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point" {
-    description
-      "This set of data definitions extends the MEG End Point (as described
-       Y.1731) or Maintenance End Point (as described in 802.1q) defined
-       in the MEF CFM module (MEF-CFM), specifically with regards to
-       Loss Measurement.";
+  grouping session-common {
+    leaf session-id {
+      type uint32;
+      config false;
 
-    container loss-measurements {
-      description
-        "This container contains a collection of data definitions re-lated to
-         Loss Measurements.";
+      description 
+        "This object uniquely identifies a scheduled PM session. It is
+         automatically generated by the server on creation of a new
+         session.";
+    }
 
-      list loss-measurement {
-        key session-id;
-        config false;
-        description
-          "A list of Loss Measurement PM Sessions where each in-stance is uniquely
-           identified by an id attribute.";
+    leaf session-status {
+      type session-status-type;
+      config false;
 
-        leaf session-id {
-          type uint32;
+      description 
+        "This object indicates the current status of the PM session. A value
+         of 'active' indicates the current PM session is active,
+         i.e. the current time lies between the start time and the
+         stop time, and enabled is true. A value of 'not-active'
+         indicates the current PM session is not active, i.e. it has
+         not started yet, has stopped upon reaching the stop time,
+         or is disabled.";
+    }
 
-          description 
-            "This object uniquely identifies a scheduled measurement. It is
-             automatically generated by the server on creation of a new
-             measurement.";
-        }
-
-        leaf session-status {
-          type session-status-type;
-          config false;
-
-          description 
-            "This object indicates the current status of the LM session. A value
-             of 'active' indicates the current LM session is active,
-             i.e. the current time lies between the start time and the
-             stop time, and enabled is true. A value of 'not-active'
-             indicates the current LM session is not active, i.e. it has
-             not started yet, has stopped upon reaching the stop time,
-             or is disabled.";
-        }
-
-        uses loss-measurement-configuration-group;
-        uses remote-mep-group;
-        uses measurement-timing-group;
+    choice measured-stats {
+      config false;
+      case lm {
+        when "'derived-from(../measurement-type, lm-packet-type)'";
 
         leaf measured-forward-flr {
           type yang:gauge32 {
@@ -2987,204 +2683,11 @@ module cisco-soam-pm {
             "MEF-SOAM-PM-MIB." +
             "mefSoamLmMeasuredStatsAvailBackwardLastTransitionTime";
         }
-        container current-availability-stats {
-          description 
-            "This container contains the current results for a SOAM Loss
-             Measurement session for availability statistics gathered during the
-             interval indicated by availability-measurement-interval.";
-
-          leaf id {
-            type uint32;
-            description 
-              "The index for the current availability Measurement Interval for
-               this PM session. This value will become the value for id of the
-               history-availability-stats list once the Measurement
-               Interval is completed.  The duration of the Measurement
-               Interval is specified by availability-measurement-interval.";
-          }
-
-          leaf start-time {
-            type yang:date-and-time;
-            mandatory true;
-
-            description
-              "The time that the current Measurement Interval started.";
-          }
-
-          leaf elapsed-time {
-            type uint32 {
-              range "0..2147483647";
-            }
-            mandatory true;
-
-            description 
-              "The time that the current Measurement Interval has been running,
-               in 0.01 seconds.";
-          }
-
-          uses loss-availability-stats-group;
-        }
-
-        container current-measurement-stats {
-          description 
-            "This container contains the results for the current Measurement
-             Interval in a SOAM Loss Measurement session gathered during
-             the interval indicated by measurement-interval.";
-
-          leaf id {
-            type uint32;
-
-            description 
-              "The index for the current Measurement Interval for this PM
-               session. This value will become the value for id of the
-               history-measurement-stats list once the Measurement
-               Interval is completed.";
-          }
-
-          leaf start-time {
-            type yang:date-and-time;
-            mandatory true;
-
-            description
-              "The time that the current Measurement Interval started.";
-          }
-
-          leaf elapsed-time {
-            type uint32 {
-              range "0..2147483647";
-            }
-            mandatory true;
-
-            description 
-              "The time that the current Measurement Interval has been running,
-               in 0.01 seconds.";
-          }
-
-          uses loss-measurement-stats-group;
-        }
-
-        list history-availability-stats {
-          key id;
-          description 
-            "This list contains the results for availability history Measurement
-             Intervals in a SOAM Loss Measurement session.";
-
-          leaf id {
-            type uint32;
-            description 
-              "The index for the availability Measurement Interval within this
-               PM session.";
-          }
-
-          leaf end-time {
-            type yang:date-and-time;
-            mandatory true;
-
-            description
-              "The time that the Measurement Interval ended.";
-          }
-
-          leaf elapsed-time {
-            type uint32 {
-              range "0..2147483647";
-            }
-            mandatory true;
-
-            description 
-              "The length of time that the Measurement Interval ran for,
-               in 0.01 seconds.";
-          }
-
-          uses loss-availability-stats-group;
-        }
-
-        list history-measurement-stats {
-          key id;
-          description 
-            "This list contains the results for history Measurement
-             Intervals in a SOAM Loss Measurement session.";
-
-          leaf id {
-            type uint32;
-
-            description 
-              "The index for the Measurement Interval within this
-               PM session.";
-          }
-
-          leaf end-time {
-            type yang:date-and-time;
-            mandatory true;
-
-            description
-              "The time that the Measurement Interval ended.";
-          }
-
-          leaf elapsed-time {
-            type uint32 {
-              range "0..2147483647";
-            }
-            mandatory true;
-
-            description 
-              "The length of time that the Measurement Interval ran for,
-              in 0.01 seconds.";
-          }
-
-          uses loss-measurement-stats-group;
-        }
       }
-    }
-  }
+      case dm {
+        when "'derived-from(../measurement-type, dm-packet-type)'";
 
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point" {
-    description
-      "This set of data definitions extends the MEG End Point (as described in
-           Y.1731) or Maintenance End Point (as described in 802.1q)
-           defined in the MEF CFM module (MEF-CFM), specifically with
-           regards to Delay Measurement.";
-
-    container delay-measurements {
-      description
-        "This container contains a collection of data definitions related to
-         Delay Measurements.";
-
-      list delay-measurement {
-        key id;
-        config false;
-        description
-          "A list of Delay Measurement PM Sessions where each instance is
-           uniquely identified by an id attribute.";
-
-        leaf id {
-          type string;
- 
-          description 
-            "This object uniquely identifies a scheduled measurement. It is
-             automatically generated by the server on creation of a new
-             measurement.";
-        }
-
-        leaf session-status {
-          type session-status-type;
-          config false;
-
-          description 
-            "This object indicates the current status of the DM session. A value
-             of 'active' indicates the current DM session is active,
-             i.e. the current time lies between the start time and the
-             stop time, and enabled is true. A value of 'not-active'
-             indicates the current DM session is not active, i.e. it has
-             not started yet, has stopped upon reaching the stop time,
-             or is disabled.";
-        }
-
-        uses delay-measurement-configuration-group;
-        uses remote-mep-group;
-        uses measurement-timing-group;
-
-        leaf frame-delay-two-way {
+        leaf measured-frame-delay-two-way {
           type yang:gauge32;
           units microseconds;
           description 
@@ -3197,7 +2700,7 @@ module cisco-soam-pm {
             "MEF-SOAM-PM-MIB.mefSoamDmMeasuredStatsFrameDelayTwoWay";
         }
 
-        leaf frame-delay-forward {
+        leaf measured-frame-delay-forward {
           type yang:gauge32;
           units microseconds;
           description 
@@ -3212,7 +2715,7 @@ module cisco-soam-pm {
             "MEF-SOAM-PM-MIB.mefSoamDmMeasuredStatsFrameDelayForward";
         }
 
-        leaf frame-delay-backward {
+        leaf measured-frame-delay-backward {
           type yang:gauge32;
           units microseconds;
 
@@ -3228,7 +2731,7 @@ module cisco-soam-pm {
             "MEF-SOAM-PM-MIB.mefSoamDmMeasuredStatsFrameDelayBackward";
         }
 
-        leaf inter-frame-delay-variation-two-way {
+        leaf measured-inter-frame-delay-variation-two-way {
           type yang:gauge32;
           units microseconds;
 
@@ -3242,7 +2745,7 @@ module cisco-soam-pm {
             "MEF-SOAM-PM-MIB.mefSoamDmMeasuredStatsIfdvTwoWay";
         }
 
-        leaf inter-frame-delay-variation-forward {
+        leaf measured-inter-frame-delay-variation-forward {
           type yang:gauge32;
           units microseconds;
 
@@ -3256,7 +2759,7 @@ module cisco-soam-pm {
             "MEF-SOAM-PM-MIB.mefSoamDmMeasuredStatsIfdvForward";
         }
 
-        leaf inter-frame-delay-variation-backward {
+        leaf measured-inter-frame-delay-variation-backward {
           type yang:gauge32;
           units microseconds;
 
@@ -3269,72 +2772,177 @@ module cisco-soam-pm {
           reference
             "MEF-SOAM-PM-MIB.mefSoamDmMeasuredStatsIfdvBackward";
         }
+      }
+    }
 
-        container current-stats {
-          description 
-            "This container contains the results for the current Measurement
-             Interval in a SOAM Delay Measurement session gathered
-             during the interval indicated by measurement-interval.";
- 
-         leaf start-time {
-            type yang:date-and-time;
-            mandatory true;
+    container current-stats {
+      config false;
+      description 
+        "This container contains the results for the current Measurement
+         Interval in a SOAM PM session gathered during
+         the interval indicated by measurement-interval.";
 
-            description
-              "The time that the current Measurement Interval started.";
-          }
+      leaf id {
+        type uint32;
 
-          leaf elapsed-time {
-            type uint32 {
-              range "0..2147483647";
-            }
-            mandatory true;
+        description 
+          "The index for the current Measurement Interval for this PM
+           session. This value will become the value for id of the
+           history-stats list once the Measurement Interval is
+           completed.";
+      }
 
-            description 
-              "The time that the current Measurement Interval has been running,
-               in 0.01 seconds.";
-          }
+      leaf start-time {
+        type yang:date-and-time;
+        mandatory true;
 
+        description
+          "The time that the current Measurement Interval started.";
+      }
+
+      leaf elapsed-time {
+        type uint32 {
+          range "0..2147483647";
+        }
+        mandatory true;
+
+        description 
+          "The time that the current Measurement Interval has been running,
+           in 0.01 seconds.";
+      }
+
+      uses common-stats-group;
+
+      choice pm-type {
+        case lm {
+          when "'derived-from(../measurement-type, lm-packet-type)'";
+          uses loss-measurement-stats-group;
+          uses loss-availability-stats-group;
+        }
+        case dm {
+          when "'derived-from(../measurement-type, dm-packet-type)'";
           uses delay-measurement-stats-group;
+          /*
+           * @@@ ought to have this for LM too, so perhaps pull
+           * out of the choice, and have an inner choice instead?
+           */
           uses delay-measurement-bins-group;
         }
+      }
+    }
 
-        list history-stats {
-          key id;
-          description 
-            "This list contains the results for history Measurement Intervals in
-             a SOAM Delay Measurement session.";
+    list history-stats {
+      config false;
+      key id;
+      description 
+        "This list contains the results for history Measurement
+         Intervals in a SOAM Loss Measurement session.";
 
-          leaf id {
-            type uint32;
- 
-            description 
-              "The identifier for the Measurement Interval within this
-               PM session.";
-          }
+      leaf id {
+        type uint32;
 
-          leaf end-time {
-            type yang:date-and-time;
-            mandatory true;
+        description 
+          "The index for the Measurement Interval within this
+           PM session.";
+      }
 
-            description
-              "The time that the Measurement Interval ended.";
-          }
+      leaf end-time {
+        type yang:date-and-time;
+        mandatory true;
 
-          leaf elapsed-time {
-            type uint32 {
-              range "0..2147483647";
-            }
-            mandatory true;
+        description
+          "The time that the Measurement Interval ended.";
+      }
 
-            description 
-              "The length of time that the Measurement Interval ran for, in 0.01
-               seconds.";
-          }
+      leaf elapsed-time {
+        type uint32 {
+          range "0..2147483647";
+        }
+        mandatory true;
 
+        description 
+          "The length of time that the Measurement Interval ran for,
+          in 0.01 seconds.";
+      }
+
+      uses common-stats-group;
+
+      choice pm-type {
+        case lm {
+          when "'derived-from(../measurement-type, lm-packet-type)'";
+          uses loss-measurement-stats-group;
+          uses loss-availability-stats-group;
+        }
+        case dm {
+          when "'derived-from(../measurement-type, dm-packet-type)'";
           uses delay-measurement-stats-group;
+          /*
+           * @@@ ought to have this for LM too, so perhaps pull
+           * out of the choice, and have an inner choice instead?
+           */
           uses delay-measurement-bins-group;
         }
+      }
+    }
+  }
+
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point" {
+    description
+      "This set of data definitions extends the MEG End Point (as described
+       Y.1731) or Maintenance End Point (as described in 802.1q) defined
+       in the MEF CFM module (MEF-CFM), specifically with regards to
+       Performance Monitoring sessions.";
+
+    container on-demand-sessions {
+      description
+        "Contains a list of on-demand session information. New
+         sessions must be created using the 'create-session-on-demand'
+         RPC.";
+
+      list on-demand-session {
+        key session-id;
+        config false;
+        description
+          "A list of on-demand PM Sessions where each instance is
+           uniquely identified by an integer session ID.";
+
+        leaf remote-mep {
+          type remote-mep;
+          description
+            "The remote MEP to which this PM session runs, specified
+             by either MEP ID or MAC address.";
+        }
+
+        uses configuration-group;
+        uses session-common;
+      }
+    }
+
+    container proactive-sessions {
+      description
+        "Contains a list of proactive session information.";
+      list proactive-session {
+        key "remote-mep name";
+        description
+          "A list of proactive PM Sessions. New sessions can be
+           configured by creating a new entry in this list.";
+
+        leaf remote-mep {
+          type remote-mep;
+          description
+            "The remote MEP to which this PM session runs, specified
+             by either MEP ID or MAC address.";
+        }
+
+        leaf name {
+          type string;
+          description
+            "A name to uniquely identify this PM session.";
+        }
+
+        uses configuration-group;
+        uses session-common;
       }
     }
   }
@@ -3343,13 +2951,13 @@ module cisco-soam-pm {
   // RPCs related to MEF SOAM PM
   //
 
-  rpc create-loss-measurement {
+  rpc create-session-on-demand {
     description 
-      "Schedule a one-way and two-way on-demand and proactive performance
-       monitoring loss measurements on a specific MEP.
+      "Schedule a one-way or two-way on-demand performance monitoring
+       session on a specific MEP.
 
        A list entry associated with the newly created session will be
-       created in the loss-measurements container and the assigned
+       created in the on-demand-sessions container and the assigned
        session identifier will be returned in the output parameter.";
 
     input {
@@ -3357,9 +2965,13 @@ module cisco-soam-pm {
         description
           "The MEP on which the session will be started";
       }
-      uses loss-measurement-configuration-group;
-      uses remote-mep-group;
-      uses measurement-timing-group;
+      leaf remote-mep {
+        type remote-mep;
+        description
+          "The remote MEP to which this PM session runs, specified
+           by either MEP ID or MAC address.";
+      }
+      uses configuration-group;
     }
 
     output {
@@ -3368,17 +2980,14 @@ module cisco-soam-pm {
         mandatory true;
 
         description
-          "The session identifier of the newly created loss measurement
-           session.";
+          "The session identifier of the newly created PM session.";
       }
     }
   }
 
-  rpc abort-loss-measurement {
+  rpc abort-session-on-demand {
     description 
-      "Abort a currently running or scheduled single-ended on-demand ETH-LM
-       function. This operation is not applicable to dual-ended
-       proactive ETH-LM.";
+      "Abort a currently running or scheduled on-demand PM session.";
 
     input {
       uses cfm:MEP-REFERENCE {
@@ -3391,21 +3000,20 @@ module cisco-soam-pm {
         mandatory true;
 
         description
-          "The session ID of the measurement session to be aborted.";
+          "The session ID of the PM session to be aborted.";
       }
     }
   }
 
-  rpc clear-loss-history-stats {
+  rpc clear-history-stats-on-demand {
     description 
-      "Clear the Loss Measurement history list (history-availability-stats and
-       history-measurement-stats) for a specific session. All instance
-       data is deleted.";
+      "Clear the historical statistics (history-stats) for a
+       specific on-demand PM session. All instance data is deleted.";
 
     input {
       uses cfm:MEP-REFERENCE {
         description
-          "The MEP on which the loss history stats should be cleared";
+          "The MEP on which the history stats should be cleared";
       }
 
       leaf session-id {
@@ -3413,81 +3021,35 @@ module cisco-soam-pm {
         mandatory true;
 
         description
-          "The session ID of the loss measurement session of which the loss
-           measurement history should be cleared";
+          "The session ID of the PM session of which the historical
+           stats should be cleared. This was returned from the
+           create-session-on-demand RPC.";
       }
     }
   }
 
-  rpc create-delay-measurement {
+  rpc clear-history-stats-proactive {
     description 
-      "Schedule one-way and two-way on-demand and proactive performance
-       monitoring frame delay measurements on a specific MEP.
-
-       A list entry associated with the newly created session will be
-       created in the delay-measurements container and the assigned
-       session identifier will be returned in the output parameter.";
+      "Clear the historical statistics (history-stats) for a
+       specific proactive PM session. All instance data is deleted.";
 
     input {
       uses cfm:MEP-REFERENCE {
         description
-          "The MEP on which the session will be started";
-      }
-      uses delay-measurement-configuration-group;
-      uses remote-mep-group;
-      uses measurement-timing-group;
-    }
-
-    output {
-      leaf session-id {
-        type uint32;
-        mandatory true;
-
-        description
-          "The session identifier of the newly created delay measurement
-           session.";
-      }
-    }
-  }
-
-  rpc abort-delay-measurement {
-    description 
-      "Abort a pre-scheduled instances of performance monitoring";
-
-    input {
-      uses cfm:MEP-REFERENCE {
-        description
-          "The MEP on which the session should be stopped";
+          "The MEP on which the historical stats should be cleared";
       }
 
-      leaf session-id {
-        type uint32;
-        mandatory true;
-          
+      leaf remote-mep {
+        type remote-mep;
         description
-          "The session ID of the measurement session to be aborted.";
-      }
-    }
-  }
-
-  rpc clear-delay-history-stats {
-    description 
-      "Clear the Delay Measurement history list (history-stats) for a specific
-       session. All instance data is deleted.";
-
-    input {
-      uses cfm:MEP-REFERENCE {
-        description
-          "The MEP on which delay history stats should be cleared";
+          "The remote MEP to which this PM session runs, specified
+           by either MEP ID or MAC address.";
       }
 
-      leaf session-id {
-        type uint32;
-        mandatory true;
-
+      leaf name {
+        type string;
         description
-          "The session ID of the loss measurement session of which the loss
-           measurement history should be cleared";
+          "The name that uniquely identifies this PM session.";
       }
     }
   }

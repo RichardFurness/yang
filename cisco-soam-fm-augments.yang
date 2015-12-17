@@ -62,33 +62,11 @@ module cisco-soam-fm-augments {
   }
   
   /*
-   * Interface/BD stuff
+   * MIP CCM learning
+   *
+   * @@@ why is this here? check!
    */
   augment "/cfm:maintenance-domain/cfm:maintenance-association" {
-    leaf forwarding-domain-group {
-      /*
-       * @@@ ideally this would be a leaf-ref, but there's no model for these
-       * yet...
-       */
-      type string;
-      description
-        "Reference to a Cisco-style forwarding domain group (e.g. a Bridge
-         Domain or cross-connect group). This supercedes the contents of the
-         'component-list' defined in the base model.";
-    }
-
-    leaf forwarding-domain {
-      /*
-       * @@@ ideally this would be a leaf-ref, but there's no model for these
-       * yet...
-       */
-      type string;
-      description
-        "Reference to a Cisco-style forwarding domain (e.g. a Bridge Domain or
-         cross-connect). This supercedes the contents of the 'component-list'
-         defined in the base model.";
-    }
-    
     leaf mip-ccm-learning {
       type boolean;
       default false;
@@ -159,22 +137,90 @@ module cisco-soam-fm-augments {
   }
 
   /*
-   * Per-MEG fault alarm config
+   * Per-MEG reported defects config
    */
   augment "/cfm:maintenance-domain/cfm:maintenance-association" {
-    leaf lowest-fault-priority-defect {
-      type cfm:fault-alarm-defect-type;
-      default remote-mac-error;
-
+    container report-defects {
       description
-        "The lowest priority defect that is allowed to generate a Fault
-         Alarm. A value of 'none' means that no defects are to
-         be reported.
-         On Cisco devices this can only be configured at the MA level; an
-         attempt to set the per-MEP leaf of the same name (in cisco-cfm) will
-         be rejected.";
-      reference
-        "[802.1q] 12.14.7.1.3:k";
+        "The set of defects that are to be reported (that is that
+         will result in RDI being sent in outgoing CCMs, and generate
+         fault alarms, AIS and trigger EFD, where these are
+         configured).
+         On Cisco devices this can only be configured at the MA
+         level; an attempt to set the per-MEP
+         lowest-fault-priority-defect (in cisco-cfm) will be
+         rejected";
+      choice report-defects {
+        case all {
+          leaf all {
+            type empty;
+            description
+              "Report all errors in MacRemoteErrorXcon, plus
+               DefRDICCM (CCMs containing the RDI bit received)";
+          }
+        }
+        case none {
+          leaf none {
+            type empty;
+            description
+              "Do not report any defects";
+          }
+        }
+        case ieee {
+          leaf lowest-fault-priority-defect {
+            type cfm:fault-alarm-defect-type;
+            default remote-mac-error;
+            must "not(. == remote-rdi)";
+
+            description
+              "The lowest priority defect that will be reported.";
+            reference
+              "[802.1q] 12.14.7.1.3:k";
+          }
+        }
+        case cisco {
+          leaf rdi {
+            type empty;
+            description
+              "@@@";
+          }
+          leaf our-mac {
+            type empty;
+            description
+              "@@@";
+          }
+          leaf our-mepid {
+            type empty;
+            description
+              "@@@";
+          }
+          leaf wrong-maid {
+            type empty;
+            description
+              "@@@";
+          }
+          leaf peer-port-down {
+            type empty;
+            description
+              "@@@";
+          }
+          leaf wrong-interval {
+            type empty;
+            description
+              "@@@";
+          }
+          leaf wrong-level {
+            type empty;
+            description
+              "@@@";
+          }
+          leaf missing {
+            type empty;
+            description
+              "@@@";
+          }
+        }
+      }
     }
   }
   
@@ -183,46 +229,11 @@ module cisco-soam-fm-augments {
    * - MA-level config
    * - Interface-level config (for server MEP support)
    */
-  grouping ais-config {
-    leaf enabled {
-      type boolean;
-      default false;
-
-      description
-        "This attribute specifies whether ETH-AIS transmission is enabled. The
-         value 'true' indicates ETH-AIS transmission is enabled. The
-         value 'false' indicates ETH-AIS transmission is disabled.";
-      reference
-        "[MEF7.1] 9.3.4.1, [MEF30] 8.4";
-    }
-
-    leaf interval {
-      type soam-fm:interval-type-ais-lck-type;
-      default one-second;
-
-      description
-        "This attribute specifies the ETH-AIS transmission period.";
-      reference
-        "[MEF7.1] 9.3.4.1";
-    }
-
-    leaf priority {
-      type cfm:priority-type;
-     
-      description
-        "This attribute specifies the priority of frames with ETH-AIS
-         information. If ETH-AIS is supported, the default value for
-         the CoS for AIS frame MUST be the value which yields the
-         lowest frame loss performance for this EVC.";
-      reference
-        "[MEF7.1] 9.3.4.1";
-    }
-  }
   augment "/cfm:maintenance-domain/cfm:maintenance-association" {
     container alarm-indication-signal {
       description
         "AIS configuration applying to all MEPs in the service.";
-      uses ais-config;
+      uses soam-fm:ais-config;
     }
   }
   augment "/if:interfaces/if:interface" {
@@ -234,7 +245,7 @@ module cisco-soam-fm-augments {
           "Enables AIS transmission from the interface in the Up direction. This
            configuration has no effect if there are any Down MEPs configured
            on the interface.";
-        uses ais-config; 
+        uses soam-fm:ais-config; 
       }
     }
   }
@@ -257,9 +268,23 @@ module cisco-soam-fm-augments {
   augment "/cfm:transmit-loopback/cfm:input" {
     leaf interface {
       type if:interface-ref;
-      //mandatory true;
       description
         "Interface name as defined by ietf-interfaces.";
+    }
+
+    leaf data-tlv-repeated { 
+      type binary {
+        length 4;
+      }
+      must "not(../data-tlv)" {
+        error-message
+          "Repeated data-pattern not allowed, pattern is based on data-tlv";
+      }
+
+      description
+        "4 octets of data used repeatedly to populate the Data TLV
+         when the size of the LBM frame is determined by the frame-size
+         leaf and test-tlv-included is 'false'.";
     }
   }
   
@@ -409,5 +434,46 @@ module cisco-soam-fm-augments {
            exploratory linktrace.";
       }            
     }
+  }
+
+
+  /*
+   * Deviations
+   */
+  deviation "/cfm:maintenance-domain/cfm:maintenance-association" +
+            "/cfm:maintenance-association-end-point" +
+            "/cfm:continuity-check/cfm:lowest-fault-priority-defect" {
+    deviate not-supported;
+    description
+      "Not supported as configuration is per-MA (and more flexible)";
+  }
+  deviation "/cfm:maintenance-domain/cfm:maintenance-association" +
+            "/cfm:maintenance-association-end-point" +
+            "/cfm:continuity-check/cfm:last-error-ccm" {
+    deviate not-supported;
+  }
+  deviation "/cfm:maintenance-domain/cfm:maintenance-association" +
+            "/cfm:maintenance-association-end-point" +
+            "/cfm:continuity-check/cfm:last-cross-connect-ccm" {
+    deviate not-supported;
+  }
+  deviation "/cfm:transmit-loopback/cfm:input" +
+            "/soam-fm:multicast-enabled" {
+    deviate add {
+      must ". == false";
+    }
+  }
+  deviation "/cfm:maintenance-domain/cfm:maintenance-association" +
+            "/cfm:maintenance-association-end-point/cfm:loopback" {
+    deviate not-supported;
+  }
+  deviation "/cfm:abort-loopback" {
+    deviate not-supported;
+  }
+  deviation "/cfm:configuration-error-list" {
+    deviate not-supported;
+    description
+      "Not applicable to XR, but equivalent is provided by per-MA
+       and per-MEP 'configuration-errors' lists.";
   }
 }
