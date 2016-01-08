@@ -476,4 +476,47 @@ module cisco-soam-fm-augments {
       "Not applicable to XR, but equivalent is provided by per-MA
        and per-MEP 'configuration-errors' lists.";
   }
+
+  deviation "/cfm:maintenance-domain/cfm:maintenance-association" +
+            "/cfm:maintenance-association-end-point" +
+            "/soam-fm:alarm-indication-signal" +
+            "/soam-fm:enabled" {
+    deviate add {
+      must "not(../../.." +
+               "/cfm:maintenance-association-end-point" +
+               "/soam-fm:alarm-indication-signal" +
+               "/soam-fm:enabled[. = current()])";
+    }
+    description
+      "In XR, AIS configuration must be identical for all MEPs in
+       a MEG";
+  }
+  deviation "/cfm:maintenance-domain/cfm:maintenance-association" +
+            "/cfm:maintenance-association-end-point" +
+            "/soam-fm:alarm-indication-signal" +
+            "/soam-fm:interval" {
+    deviate add {
+      must "not(../../.." +
+               "/cfm:maintenance-association-end-point" +
+               "/soam-fm:alarm-indication-signal" +
+               "/soam-fm:interval[. = current()])";
+    }
+    description
+      "In XR, AIS configuration must be identical for all MEPs in
+       a MEG";
+  }
+  deviation "/cfm:maintenance-domain/cfm:maintenance-association" +
+            "/cfm:maintenance-association-end-point" +
+            "/soam-fm:alarm-indication-signal" +
+            "/soam-fm:priority" {
+    deviate add {
+      must "not(../../.." +
+               "/cfm:maintenance-association-end-point" +
+               "/soam-fm:alarm-indication-signal" +
+               "/soam-fm:priority[. = current()])";
+    }
+    description
+      "In XR, AIS configuration must be identical for all MEPs in
+       a MEG";
+  }
 }

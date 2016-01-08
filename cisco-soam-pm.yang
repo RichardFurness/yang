@@ -56,6 +56,18 @@ module cisco-soam-pm {
   }
 
   //
+  // Features
+  //
+  feature availability {
+    description
+      "The device supports measuring 'availability'.";
+  }
+  feature frame-delay-range {
+    description
+      "The device supports measuring 'frame delay range'.";
+  }
+
+  //
   // Type definitions related to MEF SOAM PM
   //
 
@@ -63,20 +75,20 @@ module cisco-soam-pm {
     type boolean;
     description 
       "This boolean data type indicates whether the measurement interval
-             has been marked as suspect.
-                   
-             The object is set to false at the start of a measurement
-             interval. It is set to true when there is a discontinuity in the
-             performance measurements during the measurement interval.
-             Conditions for a discontinuity include, but are not limited to
-             the following:
-                   
-               1 - The local time-of-day clock is adjusted by at least 10
-                   seconds
-               2 - The conducting of a performance measurement is halted before
-                   the current measurement interval is completed
-               3 - A local test, failure, or reconfiguration that disrupts
-                   service";
+       has been marked as suspect.
+             
+       The object is set to false at the start of a measurement
+       interval. It is set to true when there is a discontinuity in the
+       performance measurements during the measurement interval.
+       Conditions for a discontinuity include, but are not limited to
+       the following:
+             
+         1 - The local time-of-day clock is adjusted by at least 10
+             seconds
+         2 - The conducting of a performance measurement is halted before
+             the current measurement interval is completed
+         3 - A local test, failure, or reconfiguration that disrupts
+             service";
     reference
       "[MEF SOAM PM IA] R39, R40, 41 and R42";
   }
@@ -202,17 +214,20 @@ module cisco-soam-pm {
        backward direction";
   }
   identity two-way-frame-delay-range {
+    if-feature frame-delay-range;
     base delay-metric-type;
     description
       "Metric type for two-way Frame Delay Range";
   }
   identity forward-frame-delay-range {
+    if-feature frame-delay-range;
     base delay-metric-type;
     description
       "Metric type for one-way Frame Delay Range in the forward
        direction";
   }
   identity backward-frame-delay-range {
+    if-feature frame-delay-range;
     base delay-metric-type;
     description
       "Metric type for one-way Frame Delay Range in the backward
@@ -249,14 +264,14 @@ module cisco-soam-pm {
   // Groupings related to MEF SOAM PM
   //
 
-  grouping measurement-timing-group {
+  grouping on-demand-timing-group {
     description
-      "This grouping includes objects used for proactive and on-demand
-       scheduling of PM measurement sessions.";
+      "This grouping includes objects used for scheduling of
+       on-demand PM measurement sessions.";
 
     container start-time {
       description
-        "This container defines the session start time";
+        "This container defines the on-demand session start time";
 
       choice start-time {
         mandatory true;
@@ -275,25 +290,22 @@ module cisco-soam-pm {
           type yang:timeticks;
 
           description 
-            "This object specifies the relative start time, from the current
-             system time, to perform on-demand ETH-DM.  This attribute has no
-             meaning for proactive ETH-DM.";
+            "This object specifies the relative start time, from the
+             current system time, to start the session.";
         }
         leaf absolute {
           type yang:date-and-time;
 
           description 
-            "This object specifies the scheduled start date/time to perform the
-             on-demand Performance Monitoring OAM operations. This attribute
-             has no meaning for proactive Performance Monitoring OAM
-             operations.";
+            "This object specifies the scheduled date/time to start
+             the session.";
         }
       }
     }
 
     container stop-time {
       description
-        "This container defines the session stop time";
+        "This container defines the on-demand session stop time";
 
       choice stop-time {
         mandatory true;
@@ -305,7 +317,8 @@ module cisco-soam-pm {
           presence "Never end the measurement session.";
 
           description
-            "This object specifies the measurement  session to never end.";
+            "This object specifies the measurement session to never
+             end.";
         }
 
         leaf relative {
@@ -313,14 +326,14 @@ module cisco-soam-pm {
           mandatory true;
 
           description 
-            "This object specifies the duration of the Delay Measurement PM
-             Session.  The duration time can be specified as forever
-             (represented by a zero value) or as relative time (e.g., a
-             given number of hours, minutes, and seconds from the start
+            "This object specifies the duration of the session. The
+             duration time can be specified as forever (represented
+             by a zero value) or as relative time (e.g. a given
+             number of hours, minutes, and seconds from the start
              time).  If the duration time is relative time, then the
-             duration time should be equal to or greater than the frame
-             transmission period of the PM function(s) comprising the PM
-             Solution";
+             duration time should be equal to or greater than the
+             frame transmission period of the PM function(s)
+             comprising the PM Solution";
               
         }
 
@@ -328,36 +341,12 @@ module cisco-soam-pm {
           type yang:date-and-time;
 
           description 
-            "This object specifies the scheduled stop date and time to perform
-             on-demand Performance Monitoring OAM operations.  This
-             attribute has no meaning for proactive Performance
-             Monitoring OAM operations.  The stop date and time value should
-             be greater than or equal to the scheduled start date and time
-             value.";
+            "This object specifies the scheduled date and time to
+             stop the PM session. The stop date and time value should
+             be greater than or equal to the scheduled start date and
+             time.";
         }
       }
-    }
-
-
-    leaf repetition-period {
-      type yang:timeticks;
-      default 0;
-
-      description 
-        "This object specifies a configurable repetition time between
-         Measurement Intervals in a Measurement session in hundredths of a
-         second.
-                 
-         If the value is less than or equal to one Measurement Interval
-         there is no time gap between the end of one Measurement
-         Interval and the start of a new Measurement Interval. This is
-         the normal usage case.
-                 
-         If the value is greater than one Measurement Interval there is
-         time gap between the end of one Measurement Interval and the
-         start of the next Measurement Interval.";
-      reference
-        "[MEF SOAM PM IA] R18, D3, R19, R20";
     }
   }
 
@@ -585,32 +574,36 @@ module cisco-soam-pm {
       default true;
 
       description 
-        "This object specifies whether the Measurement Intervals for the
-         session are aligned with a zero offset to real time.
+        "This object specifies whether the Measurement Intervals for
+         the session should be aligned with real time.
                  
          The value 'true' indicates that each Measurement Interval
-         starts at a time which is aligned to NE time source hour, if
-         the repetition time (or the Measurement Interval, if the
-         repetition time is 0) is a factor of an hour, i.e. 60min/15min
-         = 4. For instance, a Measurement Interval/Repetition Time of 15
-         minutes would stop/start the Measurement Interval at 0, 15, 30,
-         and 45 minutes of an hour. A Measurement Interval/Repetition
-         Time of 7 minutes would not align to the hour since 7 minutes
-         is NOT a factor of an hour, i.e.  60min/7min = 8.6.  In this
-         case the behavior is the same as if the object is set to
-         'false'.
-                 
-         The value 'false' indicates that the first Measurement Interval
-         starts at an arbitrary time and each subsequent Measurement
-         Interval starts at a time which is determined by
-         repetition-time.
+         starts at a time which is aligned to NE time source (with an
+         offset determined by align-measurement-offset), if the
+         repetition time (or the Measurement Interval, if the
+         repetition time is 0) is compatible. If it is not
+         compatible, the behaviour is the same as if the object is
+         set to 'false'.
 
-         One side effect of the usage of this parameter is that if the
-         value is true and the repetition-period is not a factor of an
-         hour then the start of the next Measurement Interval will be
-         delayed until the next factor of an hour.
-         @@@ not sure if this last para makes sense, it was only
-         present for LM not DM (not that that means anything). Check!";
+         The definition of 'compatible' is device-dependent, but at
+         the very least it includes all values that are a factor of
+         an hour (i.e. 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30 or 60
+         minutes). For instance, a Measurement Interval/Repetition
+         Time of 15 minutes and an offset of zero minutes would
+         stop/start the Measurement Interval at 0, 15, 30, and 45
+         minutes of each hour.
+
+         Some devices may also consider values that are a factor
+         of 24 hours to be 'compatible', which results in the
+         Measurement Intervals being aligned to the time of 00:00
+         each day. For instance, a Measurement Interval/Repetition
+         Time of 8 hours and an offset of 5 minutes would stop/start
+         the Measurement Interval at 00:05, 08:05 and 16:05.
+
+         The value 'false' indicates that the first Measurement
+         Interval starts at an arbitrary time and each subsequent
+         Measurement Interval starts at a time which is determined by
+         repetition-time.";
     }
 
     leaf align-measurement-offset {
@@ -621,15 +614,36 @@ module cisco-soam-pm {
       default 0;
 
       description 
-        "This object specifies the offset in minutes from the time of day value
-         if align-measurement-intervals is 'true' and the repetition
-         time is a factor of 60 minutes. If not, the value of this
-         object is ignored.
+        "This object specifies the offset in minutes from the time of
+         day value if align-measurement-intervals is 'true' and the
+         Measurement Interval/Repetition Time is compatible. If not,
+         the value of this object is ignored.
                  
-         If the Measurement Interval is 15 minutes and
-         align-measurement-intervals is true and if this object was set
-         to 5 minutes, the Measurement Intervals would start at 5, 20,
-         35, 50 minutes past each hour.";
+         See description of align-measurement-intervals for full
+         details.";
+    }
+
+    leaf repetition-period {
+      type uint32 {
+        range "0..31536000";
+      }
+      units seconds;
+      default 0;
+
+      description 
+        "This object specifies a configurable repetition time between
+         Measurement Intervals in a Measurement session in seconds.
+                 
+         If the value is less than or equal to one Measurement Interval
+         there is no time gap between the end of one Measurement
+         Interval and the start of a new Measurement Interval. This is
+         the normal usage case.
+                 
+         If the value is greater than one Measurement Interval there is
+         time gap between the end of one Measurement Interval and the
+         start of the next Measurement Interval.";
+      reference
+        "[MEF SOAM PM IA] R18, D3, R19, R20";
     }
 
     leaf session-type {
@@ -652,7 +666,80 @@ module cisco-soam-pm {
         "[MEF SOAM IA] R3";
     }
 
-    uses measurement-timing-group;
+    container metrics {
+      list metric {
+        /*
+         * @@@ per-metric config
+         * - Should we change the "enabled" bits to be booleans in
+         * this list?
+         */
+        key metric-type;
+
+        leaf metric-type {
+          type identityref {
+            base metric-type;
+          }
+          description
+            "The specific metric type that this list entry defines
+             the configuration for";
+        }
+
+        leaf bin-count {
+          type uint32 {
+            range "0..100";
+          }
+          default 1;
+
+          description 
+            "This object specifies the number of measurement bins per
+             Measurement Interval for this metric. A value of zero
+             indicates that no bin statistics should be gathered.
+                     
+             At least 2 bins are to be supported; at least 10 bins
+             are recommended to be supported.";
+        }
+
+        list bin-lower-bounds {
+          key "index";
+
+          leaf index {
+            type uint32;
+            description
+              "Index of the bin whose lower bound is specified. The
+               first bin has index 1.";
+          }
+
+          leaf lower-bound {
+            type uint32;
+
+            description 
+              "This object specifies the lower boundary for a measurement bin. The
+               upper boundary is defined by the next bin value or infinite for
+               the last bin defined.  The measurement boundary for each
+               measurement bin is to be larger than the measurement boundary
+               of the preceding measurement bin.
+
+               For delay metrics:
+               - The units are miliseconds.
+               - By default, the next bin is set to 5000us larger than the
+                 lower bin boundary.
+
+               For loss metrics:
+               - For Synthetic Loss, the units are percentage points.
+               - For Data Loss, the units are tenths of a percent
+               - @@@ defaults?
+
+               The values in a bin boundary object represents the range
+               used to segregate data into the appropriate statistical
+               data bin. 
+
+               The first bin boundary (number set to 1) always contains the
+               value of 0. Attempting to write a non-zero value to this bin
+               will result in an error.";
+          }
+        }
+      }
+    }
 
     choice type-specific-config {
       case lm {
@@ -726,6 +813,7 @@ module cisco-soam-pm {
     }
 
     leaf availability-number-consecutive-flr-measurements {
+      if-feature availability;
       type uint32 {
         range "1..1000000";
       }
@@ -748,22 +836,23 @@ module cisco-soam-pm {
          during this 'delta_t' and the last LMM/R or CCM in the previous
          'delta_t'.
                  
-          If the measurement-type is slm, this object defines the number
-          of SLM PDUs transmitted during each 'delta_t' period.  The
-          Availability flr for a given 'delta_t' is calculated based on
-          the number of those SLM PDUs that are lost.
-                 
-          If the measurement-type is lmm or ccm, the number range of 1
-          through 10 must be supported. The number range of 10 through
-          1000000 may be supported, but is not mandatory.
-                 
-          If the measurement-type is slm, the number range of 10 through
-          100 must be supported. The number range of 100 through 1000000
-          may be supported, but is not mandatory.";
+         If the measurement-type is slm, this object defines the number
+         of SLM PDUs transmitted during each 'delta_t' period.  The
+         Availability flr for a given 'delta_t' is calculated based on
+         the number of those SLM PDUs that are lost.
+                
+         If the measurement-type is lmm or ccm, the number range of 1
+         through 10 must be supported. The number range of 10 through
+         1000000 may be supported, but is not mandatory.
+                
+         If the measurement-type is slm, the number range of 10 through
+         100 must be supported. The number range of 100 through 1000000
+         may be supported, but is not mandatory.";
       reference
         "MEF-SOAM-PM-MIB.mefSoamLmCfgAvailabilityNumConsecutiveMeasPdus";
     }
     leaf availability-flr-threshold {
+      if-feature availability;
       type uint32 {
         range "0..100000";
       }
@@ -784,6 +873,7 @@ module cisco-soam-pm {
     }
 
     leaf availability-number-consecutive-intervals {
+      if-feature availability;
       type uint32 {
         range "1..1000";
       }
@@ -803,6 +893,7 @@ module cisco-soam-pm {
     }
 
     leaf availability-number-consecutive-high-flr {
+      if-feature availability;
       type uint32 {
         range "1..1000";
       }
@@ -1015,6 +1106,7 @@ module cisco-soam-pm {
       }
 
       leaf forward-unavailable-count {
+        if-feature availability;
         type uint32;
         default 2147483647;
 
@@ -1027,6 +1119,7 @@ module cisco-soam-pm {
       }
 
       leaf forward-available-ratio {
+        if-feature availability;
         type uint32 {
           range "0..100000";
         }
@@ -1048,6 +1141,7 @@ module cisco-soam-pm {
       }
 
       leaf backward-unavailable-count {
+        if-feature availability;
         type uint32;
         default 2147483647;
         description 
@@ -1059,6 +1153,7 @@ module cisco-soam-pm {
       }
 
       leaf backward-available-ratio {
+        if-feature availability;
         type uint32 {
           range "0..100000";
         }
@@ -1087,6 +1182,7 @@ module cisco-soam-pm {
        Measurement session.";
 
     leaf forward-high-loss {
+      if-feature availability;
       type yang:gauge32;
 
       description 
@@ -1100,6 +1196,7 @@ module cisco-soam-pm {
     }
 
     leaf backward-high-loss {
+      if-feature availability;
       type yang:gauge32;
 
       description 
@@ -1113,6 +1210,7 @@ module cisco-soam-pm {
     }
 
     leaf forward-consecutive-high-loss {
+      if-feature availability;
       type yang:gauge32;
 
       description 
@@ -1126,6 +1224,7 @@ module cisco-soam-pm {
     }
 
     leaf backward-consecutive-high-loss {
+      if-feature availability;
       type yang:gauge32;
 
       description 
@@ -1139,6 +1238,7 @@ module cisco-soam-pm {
     }
 
     leaf forward-available {
+      if-feature availability;
       type yang:gauge32;
 
       description 
@@ -1151,6 +1251,7 @@ module cisco-soam-pm {
     }
 
     leaf backward-available {
+      if-feature availability;
       type yang:gauge32;
 
       description 
@@ -1162,6 +1263,7 @@ module cisco-soam-pm {
         "MEF-SOAM-PM-MIB.mefSoamLmCurrentAvailStatsBackwardAvailable";
     }
     leaf forward-unavailable {
+      if-feature availability;
       type yang:gauge32;
 
       description 
@@ -1173,6 +1275,7 @@ module cisco-soam-pm {
         "MEF-SOAM-PM-MIB.mefSoamLmCurrentAvailStatsForwardUnavailable";
     }
     leaf backward-unavailable {
+      if-feature availability;
       type yang:gauge32;
 
       description 
@@ -1185,6 +1288,7 @@ module cisco-soam-pm {
     }
 
     leaf forward-avail-min-frame-loss-ratio {
+      if-feature availability;
       type uint32 {
         range "0..100000";
       }
@@ -1206,6 +1310,7 @@ module cisco-soam-pm {
     }
 
     leaf forward-avail-max-frame-loss-ratio {
+      if-feature availability;
       type uint32 {
         range "0..100000";
       }
@@ -1228,6 +1333,7 @@ module cisco-soam-pm {
     }
 
     leaf forward-avail-average-frame-loss-ratio {
+      if-feature availability;
       type uint32 {
         range "0..100000";
       }
@@ -1250,6 +1356,7 @@ module cisco-soam-pm {
     }
 
     leaf backward-avail-min-frame-loss-ratio {
+      if-feature availability;
       type uint32 {
         range "0..100000";
       }
@@ -1272,6 +1379,7 @@ module cisco-soam-pm {
     }
 
     leaf backward-avail-max-frame-loss-ratio {
+      if-feature availability;
       type uint32 {
         range "0..100000";
       }
@@ -1294,6 +1402,7 @@ module cisco-soam-pm {
     }
 
     leaf backward-avail-average-frame-loss-ratio {
+      if-feature availability;
       type uint32 {
         range "0..100000";
       }
@@ -1626,35 +1735,6 @@ module cisco-soam-pm {
          or dm1-transmitted.";
     }
 
-    leaf bins-per-fd-interval {
-      type uint32 {
-        range "2..100";
-      }
-      default 3;
-
-      description 
-        "This object specifies the number of measurement bins per Measurement
-         Interval for Frame Delay measurements.
-                 
-         At least 3 bins are to be supported; at least 10 bins are
-         recommended to be supported.";
-    }
-
-    leaf bins-per-ifdv-interval {
-      type uint32 {
-        range "2..100";
-      }
-      default 2;
-
-      description 
-        "This object specifies the number of measurement bins per Measurement
-         Interval for Inter-Frame Delay Variation measurements.
-                 
-         The minimum number of measurement bins to be supported is
-         2. The desired number of measurements bins to be supported is
-         10.";
-    }
-
     leaf ifdv-selection-offset {
       type yang:gauge32 {
         range "1..100";
@@ -1668,18 +1748,6 @@ module cisco-soam-pm {
          between frame F and frame (F+n).";
       reference
         "MEF-SOAM-PM-MIB.mefSoamDmCfgInterFrameDelayVariationSelectionOffset";
-    }
-
-    leaf bins-per-fdr-interval {
-      type uint32;
-      default 2;
-
-      description
-        "This object specifies the number of measurement bins per Measurement
-         Interval for Frame Delay Range measurements.";
-      reference
-        "[MEF SOAM PM IA] R31, D15, R32, D16
-         MEF-SOAM-PM-MIB.mefSoamDmCfgNumMeasBinsPerFrameDelayRangeInterval";
     }
 
     list dm-thresholds {
@@ -1830,6 +1898,7 @@ module cisco-soam-pm {
           "MEF-SOAM-PM-MIB.mefSoamDmThresholdCfgAvgIfdvTwoWayThreshold";
       }
       leaf max-frame-delay-range-two-way {
+        if-feature frame-delay-range;
         type yang:gauge32;
         units microseconds;
         default 2147483647;
@@ -1843,6 +1912,7 @@ module cisco-soam-pm {
           "mefSoamDmThresholdCfgMaxFrameDelayRangeTwoWayThreshold";
       }
       leaf average-frame-delay-range-two-way {
+        if-feature frame-delay-range;
         type yang:gauge32;
         units microseconds;
         default 2147483647;
@@ -1861,7 +1931,7 @@ module cisco-soam-pm {
         default 2147483647;
 
         description 
-          "This object is used to set the measurement forward delay thresh-old
+          "This object is used to set the measurement forward delay threshold
            value that will be used to determine if a threshold
            notification is generated.";
         reference
@@ -1934,6 +2004,7 @@ module cisco-soam-pm {
       }
 
       leaf max-frame-delay-range-forward {
+        if-feature frame-delay-range;
         type yang:gauge32;
         units microseconds;
         default 2147483647;
@@ -1948,6 +2019,7 @@ module cisco-soam-pm {
       }
 
       leaf average-frame-delay-range-forward {
+        if-feature frame-delay-range;
         type yang:gauge32;
         units microseconds;
         default 2147483647;
@@ -2007,7 +2079,7 @@ module cisco-soam-pm {
         default 2147483647;
 
         description 
-          "This object is used to set the measurement backward IFDV thresh-old
+          "This object is used to set the measurement backward IFDV threshold
            value that will be used to determine if a threshold
            notification is generated.";
         reference
@@ -2038,6 +2110,7 @@ module cisco-soam-pm {
           "MEF-SOAM-PM-MIB.mefSoamDmThresholdCfgAvgIfdvBackwardThreshold";
       }
       leaf max-frame-delay-range-backward {
+        if-feature frame-delay-range;
         type yang:gauge32;
         units microseconds;
         default 2147483647;
@@ -2052,6 +2125,7 @@ module cisco-soam-pm {
       }
 
       leaf average-frame-delay-range-backward {
+        if-feature frame-delay-range;
         type yang:gauge32;
         units microseconds;
         default 2147483647;
@@ -2302,6 +2376,7 @@ module cisco-soam-pm {
     }
 
     leaf frame-delay-range-forward-max {
+      if-feature frame-delay-range;
       type yang:gauge32;
       units microseconds;
 
@@ -2315,6 +2390,7 @@ module cisco-soam-pm {
     }
 
     leaf frame-delay-range-forward-average {
+      if-feature frame-delay-range;
       type yang:gauge32;
       units microseconds;
 
@@ -2328,6 +2404,7 @@ module cisco-soam-pm {
     }
 
     leaf frame-delay-range-backward-max {
+      if-feature frame-delay-range;
       type yang:gauge32;
       units microseconds;
 
@@ -2341,6 +2418,7 @@ module cisco-soam-pm {
     }
 
     leaf frame-delay-range-backward-average {
+      if-feature frame-delay-range;
       type yang:gauge32;
       units microseconds;
 
@@ -2354,6 +2432,7 @@ module cisco-soam-pm {
     }
 
     leaf frame-delay-range-two-way-max {
+      if-feature frame-delay-range;
       type yang:gauge32;
       units microseconds;
 
@@ -2366,6 +2445,7 @@ module cisco-soam-pm {
     }
 
     leaf frame-delay-range-two-way-average {
+      if-feature frame-delay-range;
       type yang:gauge32;
       units microseconds;
 
@@ -2406,27 +2486,7 @@ module cisco-soam-pm {
       units microseconds;
 
       description 
-        "This object specifies the lower boundary for a measurement bin. The
-         upper boundary is defined by the next bin value or infinite for
-         the last bin defined.  The measurement boundary for each
-         measurement bin is to be larger than the measurement boundary
-         of the preceding measurement bin. By default, the next bin is
-         set to 5000us larger than the lower bin boundary.
-
-         The values in a bin boundary object represents the time range
-         used to segregate delay data into the appropriate statistical
-         data bin. For five bins with default values, each bin has the
-         following time range:
-                 
-          bin 1 =     0, range is 0us
-          bin 2 =  5000, range is 5,000us
-          bin 3 = 10000, range is 10,000us
-          bin 4 = 15000, range is 15,000us
-          bin 5 = 20000, range is 20,000us 
-
-        The first bin boundary (number set to 1) always contains the
-        value of 0. Attempting to write a non-zero value to this bin
-        will result in an error.";
+        "@@@ copy from config once finalized";
     }
 
     leaf counter {
@@ -2473,6 +2533,7 @@ module cisco-soam-pm {
       }
 
       list frame-delay-range {
+        if-feature frame-delay-range;
         key "type number";
         uses delay-measurement-bins-content-group;
 
@@ -2637,6 +2698,7 @@ module cisco-soam-pm {
         }
 
         leaf measured-availability-forward-status {
+          if-feature availability;
           type availability-type;
 
           description 
@@ -2648,6 +2710,7 @@ module cisco-soam-pm {
         }
 
         leaf measured-availability-backward-status {
+          if-feature availability;
           type availability-type;
 
           description 
@@ -2659,6 +2722,7 @@ module cisco-soam-pm {
         }
 
         leaf measured-forward-last-transition-time {
+          if-feature availability;
           type yang:date-and-time;
           description 
             "This object indicates the time of the last transition between
@@ -2672,6 +2736,7 @@ module cisco-soam-pm {
         }
 
         leaf measured-backward-last-transition-time {
+          if-feature availability;
           type yang:date-and-time;
           description 
             "This object indicates the time of the last transition between
@@ -2915,6 +2980,7 @@ module cisco-soam-pm {
         }
 
         uses configuration-group;
+        uses on-demand-timing-group;
         uses session-common;
       }
     }
@@ -2972,6 +3038,7 @@ module cisco-soam-pm {
            by either MEP ID or MAC address.";
       }
       uses configuration-group;
+      uses on-demand-timing-group;
     }
 
     output {
@@ -3059,6 +3126,7 @@ module cisco-soam-pm {
   //
 
   notification availability-change-alarm {
+    if-feature availability;
     description 
       "An availability-change-alarm notification is sent when the state of
        measured-availability-forward-status or

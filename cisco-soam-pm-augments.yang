@@ -30,41 +30,26 @@ module cisco-soam-pm-augments {
     "Richard Furness - rfurness@cisco.com";
   
   description 
-    "This YANG module augments the Service OAM PM module with Cisco-specific
-     extensions";
+    "This YANG module augments the Service OAM PM module with
+     Cisco-specific extensions";
   
   revision 2015-09-29 {
     description "Initial revision";
   }
 
   /*
-   * Per-metric bucket sizes and bin counts/widths (including LM)
+   * Per-metric bucket sizes and bin counts/widths
    */
   grouping per-metric-config-group {
     leaf probes-per-bucket {
       description
-        "This value acts as a multiplier to increase the Measurement Interval
-         duration to a multiple of the duration defined by 'repetition-period'
-         in the base model. This has no impact on the scheduling of the SOAM
-         PDUs, but simply causes PM statistics to be aggregated over a longer
-         period of time.";
+        "This value acts as a multiplier to increase the Measurement
+         Interval duration to a multiple of the duration defined by
+         'repetition-period' in the base model. This has no impact on
+         the scheduling of the SOAM PDUs, but simply causes PM
+         statistics to be aggregated over a longer period of time.";
       type uint32;
       default 1;
-    }
-    leaf bin-count {
-      type uint32 {
-        range "0..100";
-      }
-
-      description 
-        "This object specifies the number of measurement bins per Measurement
-         Interval for this particular metric. This overrides the per-'metric
-         class' configuration from the base model (if any). A value of zero
-         signifies that no aggregation should be performed (and hence the
-         un-aggregated results should be reported instead).
-                 
-         If no per-'metric class' bin configuration is present, the default
-         is 1 bin.";
     }
     leaf bin-width {
       type uint32 {
@@ -72,15 +57,14 @@ module cisco-soam-pm-augments {
       }
 
       description 
-        "This object specifies the width of each bin for this particular
-         metric. This overrides the per-'metric class' configuration from the
-         base model (if any).
+        "This object specifies the width of each bin for this
+         particular metric.
                  
          For Delay and IFDV, the units are milliseconds.
-         For Synthetic Loss, the units are percentage points (and the maximum
-         value is 100).
-         For Data Loss, the units are tenths of a percent (and the maximum
-         value is 1000)";
+         For Synthetic Loss, the units are percentage points (and the
+         maximum value is 100).
+         For Data Loss, the units are tenths of a percent (and the
+         maximum value is 1000)";
     }
   }
 
@@ -91,52 +75,59 @@ module cisco-soam-pm-augments {
     type enumeration {
       enum Houts {
         description
-          "Send bursts within a probe with an interval unit of hours.";
+          "Send bursts within a probe with an interval unit of
+           hours.";
       }
       enum Minutes {
         description
-          "Send bursts within a probe with an interval unit of minutes.";
+          "Send bursts within a probe with an interval unit of
+           minutes.";
       }
       enum Seconds {
-        description "Send bursts within a probe with an interval unit of
-                     seconds.";
+        description
+          "Send bursts within a probe with an interval unit of
+           seconds.";
       }
       enum Once {
-        description "Send one burst per probe.";
+        description
+          "Send one burst per probe.";
       }
     }
 
     description
-      "Enumeration of units of time to apply to the burst interval value.";
+      "Enumeration of units of time to apply to the burst interval
+       value.";
   }
 
   grouping burst-config-group {
     leaf burst-interval {
       description
-        "Interval between bursts. This must be specified if, and only if,
-         the burst-enabled is True and burst-interval-unit is not 'once'.";
+        "Interval between bursts. This must be specified if, and only
+         if, the burst-enabled is True and burst-interval-unit is not
+         'once'.";
       type uint32 {
         range "1 .. 3600";
       }
     }
     leaf burst-interval-unit {
       description
-        "Time unit associated with the burst-interval.  This must be specified
-         if, and only if, burst-enabled is True.";
+        "Time unit associated with the burst-interval.  This must be
+         specified if, and only if, burst-enabled is True.";
       type burst-interval-units;
     }
     leaf burst-packet-count {
       description
-        "The number of packets in each burst.  This must be specified if, and
-         only if, burst-enabled is True.";
+        "The number of packets in each burst.  This must be specified
+         if, and only if, burst-enabled is True.";
       type uint32 {
         range "2 .. 1200";
       }
     }
     leaf burst-enabled {
       description
-        "Whether or not packets should be sent in bursts. If True, both
-         burst-packet-count and burst-interval-unit must be specified.";
+        "Whether or not packets should be sent in bursts. If True,
+         both burst-packet-count and burst-interval-unit must be
+         specified.";
       type boolean;
     }
   }
@@ -148,18 +139,15 @@ module cisco-soam-pm-augments {
     type enumeration {
       enum seconds {
         description
-          "Schedule probes to run with a duration unit of
-          seconds";
+          "Schedule probes to run with a duration unit of seconds";
       }
       enum minutes {
         description
-          "Schedule probes to run with a duration unit of
-          minutes";
+          "Schedule probes to run with a duration unit of minutes";
       }
       enum hours {
         description
-          "Schedule probes to run with a duration unit of
-          hours";
+          "Schedule probes to run with a duration unit of hours";
       }
       enum day {
         description
@@ -177,19 +165,19 @@ module cisco-soam-pm-augments {
     type enumeration {
       enum minutes {
         description
-          "Schedule probes to run with an interval unit of
-           minutes";
+          "Schedule probes to run with an interval unit of minutes";
       }
       enum hours {
         description
-          "Schedule probes to run with an interval unit of
-           hours";
+          "Schedule probes to run with an interval unit of hours";
       }
       enum day {
-        description "Schedule probes to run every day";
+        description
+          "Schedule probes to run every day";
       }
       enum week {
-        description "Schedule probes to run every week";
+        description
+          "Schedule probes to run every week";
       }
     }
     description "Probe interval units enum";
@@ -290,8 +278,8 @@ module cisco-soam-pm-augments {
   identity hex-4-bytes {
     base soam-pm:data-tlv-pattern;
     description
-      "Indicates the Data TLV contains a 4-byte pattern repeated
-       as necessary to the end of the TLV.";
+      "Indicates the Data TLV contains a 4-byte pattern repeated as
+       necessary to the end of the TLV.";
   }
   grouping data-tlv-config-group {
     leaf data-pattern-hex {
@@ -308,63 +296,12 @@ module cisco-soam-pm-augments {
   }
   
   /*
-   * LM config that needs to be used by profiles as well as per
-   * interface cases
-   */
-  grouping lm-config-group {
-    container forward-loss {
-      uses per-metric-config-group;
-    }
-    container backward-loss {
-      uses per-metric-config-group;
-    }
-  }
-
-  /*
-   * DM config that needs to be used by profiles as well as per
-   * interface cases
-   */
-  grouping dm-config-group {
-    container forward-delay {
-      uses per-metric-config-group;
-    }
-    container backward-delay {
-      uses per-metric-config-group;
-    }
-    container round-trip-delay {
-      uses per-metric-config-group;
-    }
-    container forward-ifdv {
-      uses per-metric-config-group;
-    }
-    container backward-ifdv {
-      uses per-metric-config-group;
-    }
-    container round-trip-ifdv {
-      uses per-metric-config-group;
-    }
-  }
-
-  /*
    * Combined config group
    */
   grouping config-group {
     uses burst-config-group;
     uses data-tlv-config-group;
     uses schedule-config;
-
-    choice pm-type {
-      case lm {
-        when "'derived-from(../measurement-type, lm-packet-type)'";
-
-        uses lm-config-group;
-      }
-      case dm {
-        when "'derived-from(../measurement-type, dm-packet-type)'";
-
-        uses dm-config-group;
-      }
-    }
   }
 
   /*
@@ -374,14 +311,18 @@ module cisco-soam-pm-augments {
   augment "/soam-pm:create-session-on-demand/soam-pm:input" {
     uses config-group;
   }
+  augment "/soam-pm:create-session-on-demand/soam-pm:input"+
+          "/soam-pm:metrics/soam-pm:metric" {
+    uses per-metric-config-group;
+  }
 
   /*
    * PM Profiles
    */
   container pm-profiles {
     description
-      "Profiles allow PM configuration to be shared between multiple PM
-       sessions";
+      "Profiles allow PM configuration to be shared between multiple
+       PM sessions";
     list pm-profile {
       description
         "Contains profiles for PM session configuration";
@@ -392,28 +333,47 @@ module cisco-soam-pm-augments {
         type string;
       }
 
-      uses soam-pm:configuration-group;
+      uses soam-pm:configuration-group {
+        augment "metrics/metric" {
+          uses per-metric-config-group;
+        }
+      }
       uses config-group;
     }
   }
 
   /*
-   * Profile reference that needs to be augmented into the session tables
+   * Profile reference that needs to be augmented into the session
+   * tables
    */
   grouping profile-ref {
     leaf pm-profile {
       description
-        "Reference to a PM configuration profile to use for this session.";
+        "Reference to a PM configuration profile to use for this
+         session.";
       type leafref {
         path "/pm-profiles/pm-profile/name";
       }
     }
   }
 
+  /*
+   * Augment proactive session table with profile reference and
+   * XR-specific config
+   */
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:proactive-sessions" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:proactive-sessions" +
           "/soam-pm:proactive-session" {
     uses profile-ref;
+    uses config-group;
+  }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:proactive-sessions" +
+          "/soam-pm:proactive-session"+
+          "/soam-pm:metrics/soam-pm:metric" {
+    uses per-metric-config-group;
   }
   
 
@@ -427,128 +387,42 @@ module cisco-soam-pm-augments {
   }
 
   /*
+   * Oper: augment on-demand table with XR-specific config
+   */
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:on-demand-sessions" +
+          "/soam-pm:on-demand-session" {
+    uses config-group;
+  }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:on-demand-sessions" +
+          "/soam-pm:on-demand-session"+
+          "/soam-pm:metrics/soam-pm:metric" {
+    uses per-metric-config-group;
+  }
+
+  /*
    * Oper: Bin stats for LM
    */
   typedef lm-measurement-bin-type {
     type enumeration {
       enum forward-flr {
         description
-          "Indicates a measurement bin for one-way Frame Loss Ratio in the
-           forward direction.";
+          "Indicates a measurement bin for one-way Frame Loss Ratio
+           in the forward direction.";
       }
       enum backward-flr {
         description 
-          "Indicates a measurement bin for one-way Frame Loss Ratio in the
-           backward direction.";
+          "Indicates a measurement bin for one-way Frame Loss Ratio
+           in the backward direction.";
       }
     }
 
     description
-      "This enumeration data type indicates whether a Loss Measurement bin
-       is for forward or backward FLR.";
-  }
-
-  grouping loss-measurement-bins-content-group {
-    description
-      "This grouping contains result measurement bin objects for a SOAM Loss
-       Measurement session.";
-
-    leaf type {
-      type lm-measurement-bin-type;
-
-      description
-        "This object specifies whether a Loss Measurement bin is for forward
-         or backward FLR.";
-    }
-
-    leaf number {
-      type uint32;
-
-      description 
-        "This object specifies the bin number for the configured boundary.  The
-         first bin has bin number 1.";
-    }
-
-    leaf lower-bound-percent {
-      type yang:gauge32;
-      units percent;
-
-      description 
-        "This object specifies the lower boundary for a measurement bin. The
-         upper boundary is defined by the next bin value or infinite for
-         the last bin defined.  The measurement boundary for each
-         measurement bin is to be larger than the measurement boundary
-         of the preceding measurement bin.
-         This object is only valid for SLM operations.";
-    }
-
-    leaf lower-bound-tenth-percent {
-      type yang:gauge32;
-      units tenth-percent;
-
-      description 
-        "This object specifies the lower boundary for a measurement bin. The
-         upper boundary is defined by the next bin value or infinite for
-         the last bin defined.  The measurement boundary for each
-         measurement bin is to be larger than the measurement boundary
-         of the preceding measurement bin.
-         This object is only valid for LMM operations.";
-    }
-
-    leaf counter {
-      type yang:gauge32;
-
-      description 
-        "This object contains the count of the number of completed measurements
-         initiated in this Measurement Interval whose value falls within
-         the range specified for this bin (that is, greater than or
-         equal to the measurement boundary for the bin, and (unless the
-         bin is the last bin) less than the measurement boundary for the
-         following bin.";
-    }
-  }
-
-  grouping loss-measurement-bins-group {
-    description
-      "This grouping contains the common structure for LM bin stats";
-
-    container bins {
-      description
-        "This container defines the bins content LM sessions.";
-      
-      list flr {
-        key "type number";
-        uses loss-measurement-bins-content-group;
-
-        description
-          "Data definitions related to LM bins content.";
-      }
-    }
-  }
-
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:proactive-sessions" +
-          "/soam-pm:proactive-session/soam-pm:current-stats/soam-pm:pm-type" +
-          "/soam-pm:lm" {
-    uses loss-measurement-bins-group;
-  }
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:proactive-sessions" +
-          "/soam-pm:proactive-session/soam-pm:history-stats/soam-pm:pm-type" +
-          "/soam-pm:lm" {
-    uses loss-measurement-bins-group;
-  }
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:on-demand-sessions" +
-          "/soam-pm:on-demand-session/soam-pm:current-stats/soam-pm:pm-type" +
-          "/soam-pm:lm" {
-    uses loss-measurement-bins-group;
-  }
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:on-demand-sessions" +
-          "/soam-pm:on-demand-session/soam-pm:history-stats/soam-pm:pm-type" +
-          "/soam-pm:lm" {
-    uses loss-measurement-bins-group;
+      "This enumeration data type indicates whether a Loss
+       Measurement bin is for forward or backward FLR.";
   }
 
 
@@ -565,8 +439,8 @@ module cisco-soam-pm-augments {
         type uint32;
         mandatory true;
         description
-          "The time (in milliseconds relative to the start time of the
-           measurement interval) that the sample was sent at";
+          "The time (in milliseconds relative to the start time of
+           the measurement interval) that the sample was sent at";
       }
 
       leaf sent {
@@ -600,8 +474,8 @@ module cisco-soam-pm-augments {
       leaf result {
         type int32;
         description
-          "The result (in microseconds or millionths of a percent) of the
-           sample, if available";
+          "The result (in microseconds or millionths of a percent) of
+           the sample, if available";
       }
     }
   }
@@ -612,20 +486,22 @@ module cisco-soam-pm-augments {
           type boolean;
           mandatory true;
           description
-            "Whether a measurement could not be made because no data packets
-             were sent in the sample period. Only applicable for LMM
-             measurements";
+            "Whether a measurement could not be made because no data
+             packets were sent in the sample period. Only applicable
+             for LMM measurements";
         }
         leaf frames-sent {
           type uint32;
           description
-            "For FLR measurements, the number of frames sent, if available";
+            "For FLR measurements, the number of frames sent, if
+             available";
         }
 
         leaf frames-lost {
           type uint32;
           description
-            "For FLR measurements, the number of frames lost, if available";
+            "For FLR measurements, the number of frames lost, if
+             available";
         }
       }
     }
@@ -660,52 +536,83 @@ module cisco-soam-pm-augments {
   }
   
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:proactive-sessions" +
-          "/soam-pm:proactive-session/soam-pm:current-stats/soam-pm:pm-type" +
-          "/soam-pm:lm" {
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:proactive-sessions/soam-pm:proactive-session"+
+          "/soam-pm:current-stats/soam-pm:pm-type/soam-pm:lm" {
     uses unaggregated-results-lm-group;
   }
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:proactive-sessions" +
-          "/soam-pm:proactive-session/soam-pm:history-stats/soam-pm:pm-type" +
-          "/soam-pm:lm" {
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:proactive-sessions/soam-pm:proactive-session"+
+          "/soam-pm:history-stats/soam-pm:pm-type/soam-pm:lm" {
     uses unaggregated-results-lm-group;
   }
+  /*
+   * @@@ fix up alignment of rest of these...
+   */
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:proactive-sessions" +
-          "/soam-pm:proactive-session/soam-pm:current-stats/soam-pm:pm-type" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:proactive-sessions/soam-pm:proactive-session"+
+          "/soam-pm:current-stats/soam-pm:pm-type" +
           "/soam-pm:dm" {
     uses unaggregated-results-dm-group;
   }
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:proactive-sessions" +
-          "/soam-pm:proactive-session/soam-pm:history-stats/soam-pm:pm-type" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:proactive-sessions/soam-pm:proactive-session"+
+          "/soam-pm:history-stats/soam-pm:pm-type" +
           "/soam-pm:dm" {
     uses unaggregated-results-dm-group;
   }
 
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:on-demand-sessions" +
-          "/soam-pm:on-demand-session/soam-pm:current-stats/soam-pm:pm-type" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:on-demand-sessions/soam-pm:on-demand-session"+
+          "/soam-pm:current-stats/soam-pm:pm-type" +
           "/soam-pm:lm" {
     uses unaggregated-results-lm-group;
   }
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:on-demand-sessions" +
-          "/soam-pm:on-demand-session/soam-pm:history-stats/soam-pm:pm-type" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:on-demand-sessions/soam-pm:on-demand-session"+
+          "/soam-pm:history-stats/soam-pm:pm-type" +
           "/soam-pm:lm" {
     uses unaggregated-results-lm-group;
   }
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:on-demand-sessions" +
-          "/soam-pm:on-demand-session/soam-pm:current-stats/soam-pm:pm-type" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:on-demand-sessions/soam-pm:on-demand-session"+
+          "/soam-pm:current-stats/soam-pm:pm-type" +
           "/soam-pm:dm" {
     uses unaggregated-results-dm-group;
   }
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point/soam-pm:on-demand-sessions" +
-          "/soam-pm:on-demand-session/soam-pm:history-stats/soam-pm:pm-type" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:on-demand-sessions/soam-pm:on-demand-session"+
+          "/soam-pm:history-stats/soam-pm:pm-type" +
           "/soam-pm:dm" {
     uses unaggregated-results-dm-group;
+  }
+
+  /*
+   * Deviations
+   */
+  deviation "/cfm:maintenance-domain/cfm:maintenance-association" +
+            "/cfm:maintenance-association-end-point" +
+            "/soam-pm:on-demand-sessions" +
+            "/soam-pm:on-demand-session" +
+            "/soam-pm:measured-stats" {
+    deviate not-supported;
+    description
+      "Measured statistics are not supported in XR";
+  }
+  deviation "/cfm:maintenance-domain/cfm:maintenance-association" +
+            "/cfm:maintenance-association-end-point" +
+            "/soam-pm:proactive-sessions" +
+            "/soam-pm:proactive-session" +
+            "/soam-pm:measured-stats" {
+    deviate not-supported;
+    description
+      "Measured statistics are not supported in XR";
   }
 }

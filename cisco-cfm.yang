@@ -28,15 +28,17 @@ module cisco-cfm {
     "Richard Furness - rfurness@cisco.com";
 
   description 
-    "This YANG module contains the management data definitions for the
-     management of Ethernet Services Operations, Administration and
-     Maintenance for Connectivity Fault Management.
+    "This YANG module contains the management data definitions for
+     the management of Ethernet Services Operations, Administration
+     and Maintenance for Connectivity Fault Management.
 
-     This module is derived from the mef-cfm module defined in MEF 38.
-     However there are a number of differences from the mef-cfm model,
-     including bug fixes and structural changes. The key differences are:
+     This module is derived from the mef-cfm module defined in MEF
+     38. However there are a number of differences from the mef-cfm
+     model, including bug fixes and structural changes. The key
+     differences are:
      - @@@
 
+     @@@ probably needs updating:
      Reference Overview:
       A number of base documents have been used to create the CFM YANG. The
       following are the abbreviations for the baseline documents:
@@ -88,9 +90,9 @@ module cisco-cfm {
     }
 
     description
-      "Maintenance association End Point Identifier (MEPID): A small integer,
-       unique over a given Maintenance Association, identifying a
-       specific MEP.";
+      "Maintenance association End Point Identifier (MEPID): A small
+       integer, unique over a given Maintenance Association,
+       identifying a specific MEP.";
     reference
       "[802.1q] 3.19 and 19.2.1";
   }
@@ -101,8 +103,8 @@ module cisco-cfm {
     }
 
     description
-      "The VLAN-ID that uniquely identifies a VLAN.  This is the 12-bit VLAN-ID
-       used in the VLAN Tag header.";
+      "The VLAN-ID that uniquely identifies a VLAN.  This is the
+       12-bit VLAN-ID used in the VLAN Tag header.";
 
     reference
       "[802.1q] 9.6";
@@ -111,24 +113,27 @@ module cisco-cfm {
   typedef port-status-type {
     type enumeration {
       enum no-status-tlv {
-          description "Indicates either that no CCM has been received or that 
-                       no port status TLV was present in the last CCM received.";
+        description
+          "Indicates either that no CCM has been received or that no
+           port status TLV was present in the last CCM received.";
       }
       enum blocked {
-          description "Ordinary data cannot pass freely through the port on 
-                       which the remote MEP resides. Value of enableRmepDefect 
-                       is equal to false.";
+        description
+          "Ordinary data cannot pass freely through the port on which
+           the remote MEP resides. Value of enableRmepDefect is equal
+           to false.";
       }
       enum up {
-          description "Ordinary data can pass freely through the port on which
-                       the remote MEP resides. Value of enableRmepDefect is 
-                       equal to true.";
+        description
+          "Ordinary data can pass freely through the port on which
+           the remote MEP resides. Value of enableRmepDefect is equal
+           to true.";
       }
     }    
 
     description
-      "The set of values available from the Port Status TLV in CCM PDUs
-       including the default no-status-tlv";
+      "The set of values available from the Port Status TLV in CCM
+       PDUs including the default no-status-tlv";
 
     reference
       "[802.1q] 20.19.3, 12.14.7.6.3:f
@@ -138,37 +143,47 @@ module cisco-cfm {
   typedef interface-status-type {
     type enumeration {
       enum no-status-tlv {
-          description "Indicates either that no CCM has been received or that
-                       no interface status TLV was present in the last CCM received.";
+        description
+          "Indicates either that no CCM has been received or that no
+           interface status TLV was present in the last CCM
+           received.";
       }
       enum up {
-          description "The interface is ready to pass packets.";
+        description
+          "The interface is ready to pass packets.";
       }
       enum down {
-          description "The interface cannot pass packets.";
+        description
+          "The interface cannot pass packets.";
       }
       enum testing {
-          description "The interface is in some test mode.";
+        description
+          "The interface is in some test mode.";
       }
       enum unknown {
-          description "The interface status cannot be determined for some reason.";
+        description
+          "The interface status cannot be determined for some
+           reason.";
       }
       enum dormant {
-          description "The interface is not in a state to pass packets but is in 
-                       a pending state, waiting for some external event.";
+        description
+          "The interface is not in a state to pass packets but is in
+           a pending state, waiting for some external event.";
       }
       enum not-present {
-          description "Some component of the interface is missing.";
+        description
+          "Some component of the interface is missing.";
       }
       enum lower-layer-down {
-          description "The interface is down due to state of the lower layer 
-                       interfaces.";
+        description
+          "The interface is down due to state of the lower layer 
+           interfaces.";
       }
     }
 
     description
-      "The set of values available from the Interface Status TLV in CCM PDUs
-       including the default no-status-tlv";
+      "The set of values available from the Interface Status TLV in
+       CCM PDUs including the default no-status-tlv";
     reference
       "[802.1q] 20.19.4, 12.14.7.6.3:g
        IEEE8021-CFM-MIB.Dot1agCfmInterfaceStatus";
@@ -182,29 +197,30 @@ module cisco-cfm {
       }
       enum default {
         description
-          "MHFs can be created for this VID(s) on any Bridge Port through which the
-           VID(s) can pass where:
+          "MHFs can be created for this VID(s) on any Bridge Port
+           through which the VID(s) can pass where:
             - There are no lower active MD levels; or
-            - There is a MEP at the next lower active MD-level on the port.";
+            - There is a MEP at the next lower active MD-level on the
+              port.";
       }
       enum explicit {
         description
-          "MHFs can be created for this VID(s) only on Bridge Ports through which
-           this VID(s) can pass, and only if there is a MEP at the next
-           lower active MD-level on the port.";
+          "MHFs can be created for this VID(s) only on Bridge Ports
+           through which this VID(s) can pass, and only if there is a
+           MEP at the next lower active MD-level on the port.";
       }
 
       enum defer {
         description
-          "In the Maintenance Association managed object only, the control of MHF
-           creation is deferred to the corresponding variable in the
-           enclosing Maintenance Domain";
+          "In the Maintenance Association managed object only, the
+           control of MHF creation is deferred to the corresponding
+           variable in the enclosing Maintenance Domain";
       }
     }
 
     description
-      "An enumerated value indicating whether the management entity can create
-       MHFs for this VID(s)";
+      "An enumerated value indicating whether the management entity
+       can create MHFs for this VID(s)";
     reference
       "[802.1q] 22.2.3, 12.14.3.1.3:d";
   }
@@ -217,34 +233,34 @@ module cisco-cfm {
       }
       enum chassis {
         description
-          "The Chassis ID Length, Chassis ID Subtype, and Chassis ID fields of the
-           Sender ID TLV are to be sent, but not the Management Address
-           Length or Management Address fields.";
+          "The Chassis ID Length, Chassis ID Subtype, and Chassis ID
+           fields of the Sender ID TLV are to be sent, but not the
+           Management Address Length or Management Address fields.";
       }
       enum manage {
         description
-          "The Management Address Length and Management Address of the Sender ID
-           TLV are to be sent, but the Chassis ID Length is to be
-           transmitted with a 0 value, and the Chassis ID Subtype and
-           Chassis ID fields not sent;";
+          "The Management Address Length and Management Address of
+           the Sender ID TLV are to be sent, but the Chassis ID
+           Length is to be transmitted with a 0 value, and the
+           Chassis ID Subtype and Chassis ID fields not sent;";
       }
       enum chassis-manage {
         description
-          "The Chassis ID Length, Chassis ID Subtype, Chassis ID, Management
-           Address Length, and Management Address fields are all to be
-           sent.";
+          "The Chassis ID Length, Chassis ID Subtype, Chassis ID,
+           Management Address Length, and Management Address fields
+           are all to be sent.";
       }
       enum defer {
         description
-          "The contents of the Sender ID TLV are determined by the Maintenance
-           Domain managed object.";
+          "The contents of the Sender ID TLV are determined by the
+           Maintenance Domain managed object.";
       }
     }
 
     description
-      "An enumerated value indicating what, if anything, is to be included in
-       the Sender ID TLV transmitted by maintenance-points configured in the
-       default Maintenance Domain";
+      "An enumerated value indicating what, if anything, is to be
+       included in the Sender ID TLV transmitted by maintenance-
+       points configured in the default Maintenance Domain";
     reference
       "[802.1q] 21.5.3, 12.14.3.1.3:e";
   }
@@ -262,31 +278,37 @@ module cisco-cfm {
   typedef fault-alarm-defect-type {
     type enumeration {
       enum remote-rdi {
-          description "Indicates the aggregate health of the remote MEPs.";
+        description
+          "Indicates the aggregate health of the remote MEPs.";
       }
       enum remote-mac-error {
-          description "Indicates that one or more of the remote MEPs is
-                       reporting a failure in its Port Status TLV or
-                       Interface Status TLV.";
+        description
+          "Indicates that one or more of the remote MEPs is reporting
+           a failure in its Port Status TLV or Interface Status
+           TLV.";
       }
       enum remote-invalid-ccm {
-          description "Indicates that at least one of the Remote MEP
-                       state machines is not receiving valid CCMs
-                       from its remote MEP.";
+        description
+          "Indicates that at least one of the Remote MEP state
+           machines is not receiving valid CCMs from its remote
+           MEP.";
       }
       enum invalid-ccm {
-          description "Indicates that one or more invalid CCMs has been
-                       received and that 3.5 times that CCMs transmission
-                       interval has not yet expired.";
+        description
+          "Indicates that one or more invalid CCMs has been received
+           and that 3.5 times that CCMs transmission interval has not
+           yet expired.";
       }
       enum cross-connect-ccm {
-          description "Indicates that one or more cross connect CCMs has been
-                       received and that 3.5 times of at least one of those
-                       CCMs transmission interval has not yet expired.";
+        description
+          "Indicates that one or more cross connect CCMs has been
+           received and that 3.5 times of at least one of those CCMs
+           transmission interval has not yet expired.";
       }
       enum none {
-          description "Only used in 'lowest-fault-priority-defect';
-                       indicates that no alarms should be generated";
+        description
+          "Only used in 'lowest-fault-priority-defect'; indicates
+          that no alarms should be generated";
       }
     }
 
@@ -307,14 +329,17 @@ module cisco-cfm {
 
     description
       "A set of bits indicating the the current defects:
-        - cross-connect-ccm One or more cross connect CCMs has been received
-        - invalid-ccm One or more invalid CCMs has been received
-        - remote-invalid-ccm At least one of the Remote MEP state machines is not
-          receiving valid CCMs from its remote MEP
-        - remote-mac-error One or more of the remote MEPs is reporting a failure
-          in its Port Status TLV or Interface Status
-        - remote-rdi Indicates that at least one of the Remote MEP state machines is 
-          receiving valid CCMs from its remote MEP that has the RDI bit set.";
+        - cross-connect-ccm: One or more cross connect CCMs has been
+          received
+        - invalid-ccm: One or more invalid CCMs has been received
+        - remote-invalid-ccm: At least one of the Remote MEP state
+          machines is not receiving valid CCMs from its remote MEP
+        - remote-mac-error: One or more of the remote MEPs is
+          reporting a failure in its Port Status TLV or Interface
+          Status
+        - remote-rdi: Indicates that at least one of the Remote MEP
+          state machines is receiving valid CCMs from its remote MEP
+          that has the RDI bit set.";
     reference
       "[802.1q] 20.33.9";
   }
@@ -343,12 +368,13 @@ module cisco-cfm {
     }
 
     description
-      "Maintenance Domain Level (MD Level) identifier.  Higher numbers
-       correspond to higher Maintenance Domains, those with the greatest
-       physical reach, with the highest values for customers' CFM PDUs.
-       Lower numbers correspond to lower Maintenance Domains, those with
-       more limited physical reach, with the lowest values for CFM PDUs
-       protecting single bridges or physical links.";
+      "Maintenance Domain Level (MD Level) identifier.  Higher
+       numbers correspond to higher Maintenance Domains, those with
+       the greatest physical reach, with the highest values for
+       customers' CFM PDUs. Lower numbers correspond to lower
+       Maintenance Domains, those with more limited physical reach,
+       with the lowest values for CFM PDUs protecting single bridges
+       or physical links.";
 
     reference
       "[802.1q] 18.3, 21.4.1, IEEE8021-CFM-MIB.Dot1agCfmMDLevel";
@@ -363,7 +389,8 @@ module cisco-cfm {
     }
 
     description
-      "A list of errors that may occur on creation or deletion of a MEP";
+      "A list of errors that may occur on creation or deletion of a
+       MEP";
 
     reference
       "[802.1q] 22.2.4";
