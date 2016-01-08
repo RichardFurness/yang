@@ -1,7 +1,7 @@
-// Contents of "cisco-soam-pm-augments"
-module cisco-soam-pm-augments {
-  namespace "urn:cisco:params:xml:ns:yang:cisco-soam-pm-augments";
-  prefix "cisco-soam-pm-augments";
+// Contents of "cisco-xr-soam-pm"
+module cisco-xr-soam-pm {
+  namespace "urn:cisco:params:xml:ns:yang:cisco-xr-soam-pm";
+  prefix "cisco-xr-soam-pm";
   
   import ietf-yang-types {
     prefix yang;
@@ -30,8 +30,8 @@ module cisco-soam-pm-augments {
     "Richard Furness - rfurness@cisco.com";
   
   description 
-    "This YANG module augments the Service OAM PM module with
-     Cisco-specific extensions";
+    "This YANG module extends the Cisco Service OAM PM module with
+     IOS-XR-specific augmentations and deviations";
   
   revision 2015-09-29 {
     description "Initial revision";

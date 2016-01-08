@@ -1,7 +1,7 @@
-// Contents of "cisco-soam-fm-augments"
-module cisco-soam-fm-augments {
-  namespace "urn:cisco:params:xml:ns:yang:cisco-soam-fm-augments";
-  prefix "cisco-soam-fm-augments";
+// Contents of "cisco-xr-soam-fm"
+module cisco-xr-soam-fm {
+  namespace "urn:cisco:params:xml:ns:yang:cisco-xr-soam-fm-";
+  prefix "cisco-xr-soam-fm";
   
   import ietf-yang-types {
     prefix yang;
@@ -33,8 +33,8 @@ module cisco-soam-fm-augments {
     "Richard Furness - rfurness@cisco.com";
   
   description 
-    "This YANG module augments the Service OAM FM module with Cisco-specific
-     extensions";
+    "This YANG module extends the Cisco CFM and Service OAM FM
+     modules with IOS-XR-specific augmentations and deviations";
   
   revision 2015-09-29 {
     description "Initial revision";
