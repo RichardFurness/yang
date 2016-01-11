@@ -63,16 +63,15 @@ module cisco-xr-soam-fm {
   
   /*
    * MIP CCM learning
-   *
-   * @@@ why is this here? check!
    */
   augment "/cfm:maintenance-domain/cfm:maintenance-association" {
     leaf mip-ccm-learning {
       type boolean;
       default false;
       description
-        "Enable punting of CCMs on MIPs. This should only be used in services
-         with a relatively long CCM interval (at least 100ms).";
+        "Enable punting of CCMs on MIPs. This should only be used in
+         services with a relatively long CCM interval (at least
+         100ms).";
     }
   }
 
@@ -182,42 +181,44 @@ module cisco-xr-soam-fm {
           leaf rdi {
             type empty;
             description
-              "@@@";
-          }
-          leaf our-mac {
-            type empty;
-            description
-              "@@@";
-          }
-          leaf our-mepid {
-            type empty;
-            description
-              "@@@";
-          }
-          leaf wrong-maid {
-            type empty;
-            description
-              "@@@";
+              "CCMs received with RDI bit set";
           }
           leaf peer-port-down {
             type empty;
             description
-              "@@@";
-          }
-          leaf wrong-interval {
-            type empty;
-            description
-              "@@@";
-          }
-          leaf wrong-level {
-            type empty;
-            description
-              "@@@";
+              "A peer MEP has interface status down or ALL remote
+               MEPs have port status down";
           }
           leaf missing {
             type empty;
             description
-              "@@@";
+              "CCMs are not being received from a MEP configured as
+               a crosscheck peer MEP";
+          }
+          leaf our-mac {
+            type empty;
+            description
+              "CCMs received with our MAC address";
+          }
+          leaf our-mepid {
+            type empty;
+            description
+              "CCMs received with our MEP-ID";
+          }
+          leaf wrong-interval {
+            type empty;
+            description
+              "CCMs received with an incorrect CCM interval";
+          }
+          leaf wrong-maid {
+            type empty;
+            description
+              "CCMs received with an incorrect MAID";
+          }
+          leaf wrong-level {
+            type empty;
+            description
+              "CCMs received with an incorrect level";
           }
         }
       }
@@ -242,9 +243,9 @@ module cisco-xr-soam-fm {
         "Ethernet CFM-related configuration items.";
       container ais-server-mep {
         description
-          "Enables AIS transmission from the interface in the Up direction. This
-           configuration has no effect if there are any Down MEPs configured
-           on the interface.";
+          "Enables AIS transmission from the interface in the Up
+           direction. This configuration has no effect if there are
+           any Down MEPs configured on the interface.";
         uses soam-fm:ais-config; 
       }
     }
@@ -278,13 +279,14 @@ module cisco-xr-soam-fm {
       }
       must "not(../data-tlv)" {
         error-message
-          "Repeated data-pattern not allowed, pattern is based on data-tlv";
+          "Repeated data-pattern not allowed, pattern is based on
+           data-tlv";
       }
 
       description
         "4 octets of data used repeatedly to populate the Data TLV
-         when the size of the LBM frame is determined by the frame-size
-         leaf and test-tlv-included is 'false'.";
+         when the size of the LBM frame is determined by the
+         frame-size leaf and test-tlv-included is 'false'.";
     }
   }
   
@@ -294,17 +296,17 @@ module cisco-xr-soam-fm {
   grouping LT-PARAMETERS {
     leaf explore {
       description
-        "TRUE to initiate an exploratory traceroute, FALSE to initiate a
-         standard traceroute.  For exploratory traceroute, the target must be
-         the broadcast MAC address";
+        "TRUE to initiate an exploratory traceroute, FALSE to
+         initiate a standard traceroute.  For exploratory traceroute,
+         the target must be the broadcast MAC address";
       type boolean;
       default false;
     }
 
     leaf starting-address {
       description
-        "The MAC address to start exploring from. This may only be specified
-         if 'explore' is TRUE.";
+        "The MAC address to start exploring from. This may only be
+         specified if 'explore' is TRUE.";
       type yang:mac-address;
     }
 
@@ -314,11 +316,13 @@ module cisco-xr-soam-fm {
          exploratory link-trace.";
       type enumeration {
         enum default {
-          description "Responses should only be handled from ports where the
-                       ELT is forwarded.";
+          description
+            "Responses should only be handled from ports where the
+             ELT is forwarded.";
         }
         enum all-ports {
-          description "Responses should be handled from all ports.";
+          description
+            "Responses should be handled from all ports.";
         }
       }
       default default;
@@ -339,8 +343,8 @@ module cisco-xr-soam-fm {
       type cfm:priority-type;
 
       description
-        "The priority parameter (CoS) for LTM/ELMs. If not specified, will use
-         the value configured for the MEP.";
+        "The priority parameter (CoS) for LTM/ELMs. If not specified,
+         will use the value configured for the MEP.";
     }
 
     uses LT-PARAMETERS;
@@ -365,22 +369,26 @@ module cisco-xr-soam-fm {
       leaf elr-relay {
         type enumeration {
           enum hit {
-              description "Indicates the ELM reached an MP whose MAC
-                           address matches the target MAC address.";
-              value 1;
+            description
+              "Indicates the ELM reached an MP whose MAC address
+               matches the target MAC address.";
+            value 1;
           }
           enum filtering-database {
-              description "Indicates the Egress Port was determined by
-                           consulting the Filtering Database.";
-              value 2;
+            description
+              "Indicates the Egress Port was determined by consulting
+               the Filtering Database.";
+            value 2;
           }
           enum flood {
-              description "Indicates the ELM was flood-forwarded.";
-              value 3;
+            description
+              "Indicates the ELM was flood-forwarded.";
+            value 3;
           }
           enum drop {
-              description "Indicates the ELM was dropped.";
-              value 4;
+            description
+              "Indicates the ELM was dropped.";
+            value 4;
           }
         }
 
@@ -394,35 +402,37 @@ module cisco-xr-soam-fm {
       leaf elr-egress-action {
         type enumeration {
           enum ok {
-              description "Indicates the targeted data frame would be
-                           forwarded.";
-              value 1;
+            description
+              "Indicates the targeted data frame would be
+               forwarded.";
+            value 1;
           }
           enum down {
-              description "Indicates the Egress Port can be identified,
-                           but that Bridge Ports MAC Operational
-                           parameter is false.";
-              value 2;
+            description
+              "Indicates the Egress Port can be identified, but that
+               Bridge Ports MAC Operational parameter is false.";
+            value 2;
           }
           enum blocked {
-              description "Indicates the Egress Port can be identified,
-                           but the data frame would not pass through the
-                           the Egress Port due to active topology 
-                           management, i.e., the Bridge Port is not in the
-                           Forwarding state.";
-              value 3;
+            description
+              "Indicates the Egress Port can be identified, but the
+               data frame would not pass through the the Egress Port
+               due to active topology management, i.e., the Bridge
+               Port is not in the Forwarding state.";
+            value 3;
           }
           enum vid {
-              description "Indicates the Egress Port can be identified,
-                           but the Bridge Port is not in the ELMs VIDs
-                           member set, so would be filtered by egress 
-                           filtering.";
-              value 4;
+            description
+              "Indicates the Egress Port can be identified, but the
+               Bridge Port is not in the ELMs VIDs member set, so
+               would be filtered by egress filtering.";
+            value 4;
           }
           enum mac {
-              description "Indicates the Egress Port can be identified,
-                           but the ELM would be filtered by MAC pruning.";
-              value 255;
+            description
+              "Indicates the Egress Port can be identified, but the
+               ELM would be filtered by MAC pruning.";
+            value 255;
           }
         }
  
@@ -442,7 +452,8 @@ module cisco-xr-soam-fm {
    */
   deviation "/cfm:maintenance-domain/cfm:maintenance-association" +
             "/cfm:maintenance-association-end-point" +
-            "/cfm:continuity-check/cfm:lowest-fault-priority-defect" {
+            "/cfm:continuity-check" +
+            "/cfm:lowest-fault-priority-defect" {
     deviate not-supported;
     description
       "Not supported as configuration is per-MA (and more flexible)";

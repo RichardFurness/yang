@@ -547,9 +547,6 @@ module cisco-xr-soam-pm {
           "/soam-pm:history-stats/soam-pm:pm-type/soam-pm:lm" {
     uses unaggregated-results-lm-group;
   }
-  /*
-   * @@@ fix up alignment of rest of these...
-   */
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
           "/cfm:maintenance-association-end-point"+
           "/soam-pm:proactive-sessions/soam-pm:proactive-session"+
