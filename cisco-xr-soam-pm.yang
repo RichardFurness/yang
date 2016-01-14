@@ -42,14 +42,14 @@ module cisco-xr-soam-pm {
    */
   grouping per-metric-config-group {
     leaf probes-per-bucket {
+      type uint32;
+      default 1;
       description
         "This value acts as a multiplier to increase the Measurement
          Interval duration to a multiple of the duration defined by
          'repetition-period' in the base model. This has no impact on
          the scheduling of the SOAM PDUs, but simply causes PM
          statistics to be aggregated over a longer period of time.";
-      type uint32;
-      default 1;
     }
     leaf bin-width {
       type uint32 {
@@ -101,34 +101,34 @@ module cisco-xr-soam-pm {
 
   grouping burst-config-group {
     leaf burst-interval {
+      type uint32 {
+        range "1 .. 3600";
+      }
       description
         "Interval between bursts. This must be specified if, and only
          if, the burst-enabled is True and burst-interval-unit is not
          'once'.";
-      type uint32 {
-        range "1 .. 3600";
-      }
     }
     leaf burst-interval-unit {
+      type burst-interval-units;
       description
         "Time unit associated with the burst-interval.  This must be
          specified if, and only if, burst-enabled is True.";
-      type burst-interval-units;
     }
     leaf burst-packet-count {
-      description
-        "The number of packets in each burst.  This must be specified
-         if, and only if, burst-enabled is True.";
       type uint32 {
         range "2 .. 1200";
       }
+      description
+        "The number of packets in each burst.  This must be specified
+         if, and only if, burst-enabled is True.";
     }
     leaf burst-enabled {
+      type boolean;
       description
         "Whether or not packets should be sent in bursts. If True,
          both burst-packet-count and burst-interval-unit must be
          specified.";
-      type boolean;
     }
   }
 
@@ -210,7 +210,7 @@ module cisco-xr-soam-pm {
     description "Probe interval day enum";
   }
 
-  grouping schedule-config {
+  grouping schedule-config-group {
     leaf probe-interval {
       type uint32 {
         range "1..90";
@@ -284,6 +284,7 @@ module cisco-xr-soam-pm {
   grouping data-tlv-config-group {
     leaf data-pattern-hex {
       type uint32;
+      must "../data-pattern = 'hex-4-bytes'";
       description
         "If data-pattern is 'hex-4-bytes', this leaf contains a
          4-byte arbitrary data pattern, represented as the 32-bit
@@ -291,7 +292,6 @@ module cisco-xr-soam-pm {
          big-endian format. The data TLV is filled with as many
          repetitions of this pattern as are required to pad the
          packet to the specified size.";
-      must "../data-pattern = 'hex-4-bytes'";
     }
   }
   
@@ -301,7 +301,7 @@ module cisco-xr-soam-pm {
   grouping config-group {
     uses burst-config-group;
     uses data-tlv-config-group;
-    uses schedule-config;
+    uses schedule-config-group;
   }
 
   /*
@@ -324,13 +324,14 @@ module cisco-xr-soam-pm {
       "Profiles allow PM configuration to be shared between multiple
        PM sessions";
     list pm-profile {
+      key name;
       description
         "Contains profiles for PM session configuration";
-      key name;
+
       leaf name {
+        type string;
         description
           "The name of the LM profile";
-        type string;
       }
 
       uses soam-pm:configuration-group {
@@ -343,21 +344,6 @@ module cisco-xr-soam-pm {
   }
 
   /*
-   * Profile reference that needs to be augmented into the session
-   * tables
-   */
-  grouping profile-ref {
-    leaf pm-profile {
-      description
-        "Reference to a PM configuration profile to use for this
-         session.";
-      type leafref {
-        path "/pm-profiles/pm-profile/name";
-      }
-    }
-  }
-
-  /*
    * Augment proactive session table with profile reference and
    * XR-specific config
    */
@@ -365,7 +351,15 @@ module cisco-xr-soam-pm {
           "/cfm:maintenance-association-end-point"+
           "/soam-pm:proactive-sessions" +
           "/soam-pm:proactive-session" {
-    uses profile-ref;
+    leaf pm-profile {
+      type leafref {
+        path "/pm-profiles/pm-profile/name";
+      }
+      description
+        "Reference to a PM configuration profile to use for this
+         session.";
+    }
+
     uses config-group;
   }
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
@@ -404,193 +398,179 @@ module cisco-xr-soam-pm {
   }
 
   /*
-   * Oper: Bin stats for LM
+   * Oper: support different bucket lengths for each metric 
+   *  
+   * @@@ will have to enhance the EDM to handle this properly! 
    */
-  typedef lm-measurement-bin-type {
-    type enumeration {
-      enum forward-flr {
+  grouping per-metric-bucket-list-group {
+    container metrics-stats {
+      config false;
+      description
+        "Statistic for all metrics gathered for this session";
+
+      list metric-stats {
+        key metric-type;
         description
-          "Indicates a measurement bin for one-way Frame Loss Ratio
-           in the forward direction.";
-      }
-      enum backward-flr {
-        description 
-          "Indicates a measurement bin for one-way Frame Loss Ratio
-           in the backward direction.";
+          "Statistics for a specific metric";
+
+        leaf metric-type {
+          type identityref {
+            base soam-pm:metric-type;
+          }
+          description
+            "The specific metric type that this list entry contains
+             statistics for";
+        }
+
+        container buckets {
+          description
+            "Contains a list of buckets (measurement intervals)";
+          list bucket {
+            key id;
+            description
+              "The statistics for an individual bucket (measurement
+               interval)";
+
+            uses soam-pm:common-stats-group;
+            uses soam-pm:metric-stats-group;
+          }
+        }
       }
     }
-
-    description
-      "This enumeration data type indicates whether a Loss
-       Measurement bin is for forward or backward FLR.";
   }
-
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:proactive-sessions/soam-pm:proactive-session" {
+    uses per-metric-bucket-list-group;
+  }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:on-demand-sessions/soam-pm:on-demand-session" {
+    uses per-metric-bucket-list-group;
+  }
 
   /*
    * Oper: Unaggregated results
    */
   grouping samples-group {
-    list samples {
+    container samples {
       description
-        "A list of every sample recorded for this metric during this
-         measurement inverval";
-
-      leaf sent-at {
-        type uint32;
-        mandatory true;
+        "Contains a list of every sample recorded for this metric
+         during this measurement inverval";
+      list sample {
         description
-          "The time (in milliseconds relative to the start time of
-           the measurement interval) that the sample was sent at";
-      }
+          "Details of an individual sample";
 
-      leaf sent {
-        type boolean;
-        mandatory true;
-        description
-          "Whether the sample packet was successfully sent";
-      }
+        leaf sent-at {
+          type uint32;
+          mandatory true;
+          description
+            "The time (in milliseconds relative to the start time of
+             the measurement interval) that the sample was sent at";
+        }
 
-      leaf timed-out {
-        type boolean;
-        mandatory true;
-        description
-          "Whether the sample packet timed out";
-      }
-
-      leaf corrupt {
-        type boolean;
-        mandatory true;
-        description
-          "Whether the sample packet was corrupt";
-      }
-
-      leaf out-of-order {
-        type boolean;
-        mandatory true;
-        description
-          "Whether the sample packet was received out-of-order";
-      }
-
-      leaf result {
-        type int32;
-        description
-          "The result (in microseconds or millionths of a percent) of
-           the sample, if available";
-      }
-    }
-  }
-  grouping lm-samples-group {
-    uses samples-group {
-      augment "samples" {
-        leaf no-data {
+        leaf sent {
           type boolean;
           mandatory true;
           description
-            "Whether a measurement could not be made because no data
-             packets were sent in the sample period. Only applicable
-             for LMM measurements";
-        }
-        leaf frames-sent {
-          type uint32;
-          description
-            "For FLR measurements, the number of frames sent, if
-             available";
+            "Whether the sample packet was successfully sent";
         }
 
-        leaf frames-lost {
-          type uint32;
+        leaf timed-out {
+          type boolean;
+          mandatory true;
           description
-            "For FLR measurements, the number of frames lost, if
-             available";
+            "Whether the sample packet timed out";
+        }
+
+        leaf corrupt {
+          type boolean;
+          mandatory true;
+          description
+            "Whether the sample packet was corrupt";
+        }
+
+        leaf out-of-order {
+          type boolean;
+          mandatory true;
+          description
+            "Whether the sample packet was received out-of-order";
+        }
+
+        leaf result {
+          type int32;
+          description
+            "The result (in microseconds or millionths of a percent) of
+             the sample, if available";
+        }
+
+        container flr {
+          description
+            "Leaves specified to loss measurement";
+          leaf no-data {
+            type boolean;
+            description
+              "Whether a measurement could not be made because no data
+               packets were sent in the sample period. Only applicable
+               for LMM measurements";
+          }
+          leaf frames-sent {
+            type uint32;
+            description
+              "For FLR measurements, the number of frames sent, if
+               available";
+          }
+
+          leaf frames-lost {
+            type uint32;
+            description
+              "For FLR measurements, the number of frames lost, if
+               available";
+          }
         }
       }
     }
   }
-  grouping unaggregated-results-lm-group {
-    container frame-loss-forward-samples {
-      uses lm-samples-group;
-    }
-    container frame-loss-backward-samples {
-      uses lm-samples-group;
-    }
+
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:proactive-sessions/soam-pm:proactive-session"+
+          "/soam-pm:current-stats/soam-pm:metrics/soam-pm:metric" {
+    uses samples-group;
   }
-  grouping unaggregated-results-dm-group {
-    container frame-delay-two-way-samples {
-      uses samples-group;
-    }
-    container frame-delay-forward-samples {
-      uses samples-group;
-    }
-    container frame-delay-backward-samples {
-      uses samples-group;
-    }
-    container ifdv-two-way-samples {
-      uses samples-group;
-    }
-    container ifdv-forward-samples {
-      uses samples-group;
-    }
-    container ifdv-backward-samples {
-      uses samples-group;
-    }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:on-demand-sessions/soam-pm:on-demand-session"+
+          "/soam-pm:current-stats/soam-pm:metrics/soam-pm:metric" {
+    uses samples-group;
   }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:proactive-sessions/soam-pm:proactive-session"+
+          "/soam-pm:history-stats/soam-pm:metrics/soam-pm:metric" {
+    uses samples-group;
+  }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:on-demand-sessions/soam-pm:on-demand-session"+
+          "/soam-pm:history-stats/soam-pm:metrics/soam-pm:metric" {
+    uses samples-group;
+  }
+
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:proactive-sessions/soam-pm:proactive-session"+
+          "/metrics-stats/metric-stats/buckets/bucket" {
+    uses samples-group;
+  }
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point"+
+          "/soam-pm:on-demand-sessions/soam-pm:on-demand-session"+
+          "/metrics-stats/metric-stats/buckets/bucket" {
+    uses samples-group;
+  }
+
   
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point"+
-          "/soam-pm:proactive-sessions/soam-pm:proactive-session"+
-          "/soam-pm:current-stats/soam-pm:pm-type/soam-pm:lm" {
-    uses unaggregated-results-lm-group;
-  }
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point"+
-          "/soam-pm:proactive-sessions/soam-pm:proactive-session"+
-          "/soam-pm:history-stats/soam-pm:pm-type/soam-pm:lm" {
-    uses unaggregated-results-lm-group;
-  }
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point"+
-          "/soam-pm:proactive-sessions/soam-pm:proactive-session"+
-          "/soam-pm:current-stats/soam-pm:pm-type" +
-          "/soam-pm:dm" {
-    uses unaggregated-results-dm-group;
-  }
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point"+
-          "/soam-pm:proactive-sessions/soam-pm:proactive-session"+
-          "/soam-pm:history-stats/soam-pm:pm-type" +
-          "/soam-pm:dm" {
-    uses unaggregated-results-dm-group;
-  }
-
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point"+
-          "/soam-pm:on-demand-sessions/soam-pm:on-demand-session"+
-          "/soam-pm:current-stats/soam-pm:pm-type" +
-          "/soam-pm:lm" {
-    uses unaggregated-results-lm-group;
-  }
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point"+
-          "/soam-pm:on-demand-sessions/soam-pm:on-demand-session"+
-          "/soam-pm:history-stats/soam-pm:pm-type" +
-          "/soam-pm:lm" {
-    uses unaggregated-results-lm-group;
-  }
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point"+
-          "/soam-pm:on-demand-sessions/soam-pm:on-demand-session"+
-          "/soam-pm:current-stats/soam-pm:pm-type" +
-          "/soam-pm:dm" {
-    uses unaggregated-results-dm-group;
-  }
-  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
-          "/cfm:maintenance-association-end-point"+
-          "/soam-pm:on-demand-sessions/soam-pm:on-demand-session"+
-          "/soam-pm:history-stats/soam-pm:pm-type" +
-          "/soam-pm:dm" {
-    uses unaggregated-results-dm-group;
-  }
-
   /*
    * Deviations
    */
@@ -599,17 +579,17 @@ module cisco-xr-soam-pm {
             "/soam-pm:on-demand-sessions" +
             "/soam-pm:on-demand-session" +
             "/soam-pm:measured-stats" {
-    deviate not-supported;
     description
       "Measured statistics are not supported in XR";
+    deviate not-supported;
   }
   deviation "/cfm:maintenance-domain/cfm:maintenance-association" +
             "/cfm:maintenance-association-end-point" +
             "/soam-pm:proactive-sessions" +
             "/soam-pm:proactive-session" +
             "/soam-pm:measured-stats" {
-    deviate not-supported;
     description
       "Measured statistics are not supported in XR";
+    deviate not-supported;
   }
 }

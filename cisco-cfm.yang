@@ -1035,11 +1035,11 @@ module cisco-cfm {
       }
     }
   }
-  grouping maintenance-domain-reference {
+  grouping maintenance-domain-reference-group {
     description
       "This grouping uniquely identifies a maintenance domain.";
 
-    leaf maintenance-domain {
+    leaf md-id {
       type leafref {
         path "/cisco-cfm:maintenance-domain/cisco-cfm:id";
       }
@@ -1048,40 +1048,49 @@ module cisco-cfm {
     }
   }
 
-  grouping maintenance-association-reference {
+  grouping maintenance-association-reference-group {
     description
-      "This grouping uniquely identifies a maintenance association. It consists
-       of a maintence-domain-reference and a maintenance-association leafref";
+      "This grouping uniquely identifies a maintenance association.
+       It consists of a maintence-domain-reference and a
+       maintenance-association leafref";
 
-    uses maintenance-domain-reference;
+    uses maintenance-domain-reference-group;
 
-    leaf maintenance-association {
+    leaf ma-id {
       type leafref {
-        path "/cisco-cfm:maintenance-domain[cisco-cfm:id=current()/../maintenance-domain]/cisco-cfm:maintenance-association/cisco-cfm:id";
+        path "/cisco-cfm:maintenance-domain" +
+               "[cisco-cfm:id = current()/../md-id]/" +
+               "cisco-cfm:maintenance-association/cisco-cfm:id";
       }
      description
         "A reference to a specific Maintenance Association.";
     }
   }
 
-  grouping maintenance-association-end-point-reference {
+  grouping maintenance-association-end-point-reference-group {
     description
-      "This grouping uniquely identifies a maintenance association. It consists
-       of a maintence-association-reference and a maintenance-association-end-point
-       leafref";
+      "This grouping uniquely identifies a maintenance association
+       end point. It consists of a maintence-association-reference
+       and a maintenance-association-end-point leafref";
 
-    uses maintenance-association-reference;
+    uses maintenance-association-reference-group;
 
-    leaf maintenance-association-end-point {
+    leaf mep-id {
       type leafref {
-        path "/cisco-cfm:maintenance-domain[cisco-cfm:id=current()/../maintenance-domain]/cisco-cfm:maintenance-association[cisco-cfm:id=current()/../maintenance-association]/cisco-cfm:maintenance-association-end-point/cisco-cfm:mep-identifier";
+        path "/cisco-cfm:maintenance-domain" +
+               "[cisco-cfm:id = current()/../md-id]/" +
+               "cisco-cfm:maintenance-association" +
+               "[cisco-cfm:id = current()/../ma-id]/" +
+               "cisco-cfm:maintenance-association-end-point/" +
+               "cisco-cfm:mep-identifier";
       }
      description
-        "A reference to a specific Maintenance association End Point.";
+        "A reference to a specific Maintenance association End
+         Point.";
     }    
   }
 
-  grouping linktrace-reply {
+  grouping linktrace-reply-group {
     leaf reply-order {
       type uint32;
 
@@ -1149,19 +1158,19 @@ module cisco-cfm {
     leaf ltr-relay {
       type enumeration {
         enum hit {
-            description "Indicates the LTM reached an MP whose MAC
-                         address matches the target MAC address.";
-            value 1;
+          value 1;
+          description "Indicates the LTM reached an MP whose MAC
+                       address matches the target MAC address.";
         }
         enum filtering-database {
-            description "Indicates the Egress Port was determined by
-                         consulting the Filtering Database.";
-            value 2;
+          value 2;
+          description "Indicates the Egress Port was determined by
+                       consulting the Filtering Database.";
         }
         enum mip-ccm-database {
-            description "Indicates the Egress Port was determined by
-                         consulting the MIP CCM Database.";
-            value 3;
+          value 3;
+          description "Indicates the Egress Port was determined by
+                       consulting the MIP CCM Database.";
         }
       }
 
@@ -1178,27 +1187,27 @@ module cisco-cfm {
     leaf ingress-action {
       type enumeration {
         enum ok {
-            description "Indicates the target data frame would be
-                         passed through to the MAC Relay Entity.";
-            value 1;
+          value 1;
+          description "Indicates the target data frame would be
+                       passed through to the MAC Relay Entity.";
         }
         enum down {
-            description "Indicates the Bridge Ports MAC Operational
-                         parameter is false.";
-            value 2;
+          value 2;
+          description "Indicates the Bridge Ports MAC Operational
+                       parameter is false.";
         }
         enum blocked {
-            description "Indicates the target data frame would not
-                         be forwarded if received on this Port due
-                         to active topology enforement.";
-            value 3;
+          value 3;
+          description "Indicates the target data frame would not
+                       be forwarded if received on this Port due
+                       to active topology enforement.";
         }
         enum vid {
-            description "Indicates the ingress port is not in the 
-                         member set of the LTMs VID, and ingress
-                         filtering is enabled, so the target data
-                         frame would be filtered by ingress filtering.";
-            value 4;
+          value 4;
+          description "Indicates the ingress port is not in the 
+                       member set of the LTMs VID, and ingress
+                       filtering is enabled, so the target data
+                       frame would be filtered by ingress filtering.";
         }
       }
 
@@ -1234,30 +1243,30 @@ module cisco-cfm {
     leaf egress-action {
       type enumeration {
         enum ok {
+          value 1;
             description "Indicates the targeted data frame would be
                          forwarded.";
-            value 1;
         }
         enum down {
+          value 2;
             description "Indicates the Egress Port can be identified,
                          but that Bridge Ports MAC Operational
                          parameter is false.";
-            value 2;
         }
         enum blocked {
+          value 3;
             description "Indicates the Egress Port can be identified,
                          but the data frame would not pass through the
                          the Egress Port due to active topology 
                          management, i.e., the Bridge Port is not in the
                          Forwarding state.";
-            value 3;
         }
         enum vid {
+          value 4;
             description "Indicates the Egress Port can be identified,
                          but the Bridge Port is not in the LTMs VIDs
                          member set, so would be filtered by egress 
                          filtering.";
-            value 4;
         }
       }
  
@@ -1314,11 +1323,11 @@ module cisco-cfm {
     uses md-level-group;
 
     list default-md-level {
+      key "primary-vid component-id";
       description
         "Data definitions related to the default MD level associated with specific 
          VIDs";
 
-      key "primary-vid component-id";
       leaf primary-vid {
         type vlan-id-type;
 
@@ -1959,10 +1968,9 @@ module cisco-cfm {
         }
 
         container loopback {
+          config false;
           description
             "Data definitions related to the Loopback function.";
-
-          config false;
 
           leaf replies-received { 
             type yang:counter32; 
@@ -2010,10 +2018,9 @@ module cisco-cfm {
         }
 
         container linktrace {
+          config false;
           description
             "Data definitions related to the Linktrace function.";
-
-          config false;
 
           leaf unexpected-replies-received {
             type yang:counter32;
@@ -2054,25 +2061,23 @@ module cisco-cfm {
                 description
                   "The list of LTRs associated with a specific Linktrace 
                    transaction.";
-                uses linktrace-reply;
+                uses linktrace-reply-group;
               }
             }
           }
         }
 
         container remote-mep-database {
+          config false;
           description
             "The MEP CCM database";
 
-          config false;
-
           list remote-mep {
+            key remote-mep-id;
             description
               "The list of remote MEPs in the MEP CCM database";
             reference
               "[802.1q] 12.14.7.6";
-
-            key remote-mep-id;
 
             leaf remote-mep-id {
               type mep-id-type;
@@ -2157,44 +2162,6 @@ module cisco-cfm {
   // RPCs related to CFM
   //
 
-  grouping MEP-REFERENCE {
-    container local-mep {
-      leaf md-id {
-        type leafref {
-          path "/cisco-cfm:maintenance-domain/cisco-cfm:id";
-        }
-
-        description
-          "The ID of a configured Maintenance Domain";
-      }
-      leaf ma-id {
-        type leafref {
-          path "/cisco-cfm:maintenance-domain" +
-               "[cisco-cfm:id = current()/../md-id]/" +
-               "cisco-cfm:maintenance-association/cisco-cfm:id";
-        }
-    
-        description
-          "The ID of a configured Maintenance Association in the
-           above MD";
-      }
-      leaf mep-id {
-        type leafref {
-          path "/cisco-cfm:maintenance-domain" +
-               "[cisco-cfm:id = current()/../md-id]/" +
-               "cisco-cfm:maintenance-association" +
-               "[cisco-cfm:id = current()/../ma-id]/" +
-               "cisco-cfm:maintenance-association-end-point/" +
-               "cisco-cfm:mep-identifier";
-        }
-        mandatory true;
-    
-        description
-          "The ID of a configured MEP in the above MA.";
-      }
-    }
-  }
-
   rpc transmit-loopback {
     description
       "Start a loopback session on a specific MEP
@@ -2206,7 +2173,7 @@ module cisco-cfm {
       "[802.1q] 12.14.7.3";
   
     input {
-      uses MEP-REFERENCE {
+      uses maintenance-association-end-point-reference-group {
         description
           "The MEP on which a loopback session will be started";
       }
@@ -2221,7 +2188,7 @@ module cisco-cfm {
       "[MEF30] 8.2, R28";
 
     input { 
-      uses MEP-REFERENCE {
+      uses maintenance-association-end-point-reference-group {
         description
           "The MEP on which the loopback session should be
            administratively aborted";
@@ -2241,7 +2208,7 @@ module cisco-cfm {
       "[802.1q] 12.14.7.4";
 
     input {
-      uses MEP-REFERENCE {
+      uses maintenance-association-end-point-reference-group {
         description
           "The MEP on which a linktrace session will be started.";
       }
@@ -2273,7 +2240,7 @@ module cisco-cfm {
       description
         "Data definitions related to a persistent defect on a specific MEP.";
 
-      uses MEP-REFERENCE {
+      uses maintenance-association-end-point-reference-group {
         description
           "The MEP on which a persistent defect has been detected";
       }

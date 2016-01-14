@@ -251,11 +251,11 @@ module cisco-soam-fm {
            traffic is disrupted.";
         }
       }
-      default in-service;
 
       must "../is-generator = true" {
         error-message "The test-type parameter is only relevant for the generator side";
       }
+      default in-service;
 
       description
         "This attribute specifies the type of ETH-Test to perform, whether it is
@@ -287,12 +287,12 @@ module cisco-soam-fm {
         range "0..60000000";
       }
       units microseconds;
-      default 1000000;
 
       must "../is-generator = true" {
         error-message
          "The interval parameter is only relevant for the generator side";
       }
+      default 1000000;
 
       description 
         "This attribute specifies the ETH-Test transmission period between
@@ -402,11 +402,10 @@ module cisco-soam-fm {
 
     leaf drop-eligible {
       type boolean;
-      default false;
-
       must "../is-generator = true" {
         error-message "The drop-eligible parameter is only relevant for the generator side";
       }
+      default false;
 
       description
         "This attribute specifies the eligibility of frames with ETH-Test
@@ -424,11 +423,11 @@ module cisco-soam-fm {
         range "64..9600";
       }
       units bytes;
-      default 64;
 
       must "../is-generator = true" {
         error-message "The frame-size parameter is only relevant for the generator side";
       }
+      default 64;
 
       description
         "This attribute specifies the ETH-Test Ethernet frame size between 64
@@ -529,7 +528,7 @@ module cisco-soam-fm {
     }
   }
 
-  grouping ais-config {
+  grouping ais-config-group {
     leaf enabled {
       type boolean;
       default false;
@@ -738,8 +737,8 @@ module cisco-soam-fm {
       type uint32 {
         range "0..86400";
       }
-      default 0;
       units "seconds";
+      default 0;
 
       description
         "This attribute defines a period of time after which an instance in the
@@ -983,8 +982,8 @@ module cisco-soam-fm {
       type uint32 {
         range "0..60000";
       }
-      default 1000;
       units milliseconds;
+      default 1000;
 
       description
         "This attribute specifies the period between LBM transmissions in an LB
@@ -1037,10 +1036,10 @@ module cisco-soam-fm {
             description "Indicates the Data TLV contains all ones.";
                 }
       }
-      default zeroes;        
       must "not(../data-tlv)" {
         error-message "Specific data-pattern not allowed, pattern is based on data-tlv";
       }
+      default zeroes;        
 
       description
         "This attribute specifies the LBM data pattern included in a Data TLV
@@ -1052,10 +1051,10 @@ module cisco-soam-fm {
 
     leaf test-tlv-included {
       type boolean;
-      default false;  
       must "not(../data-tlv)" {
         error-message "Test-tlv-included does not apply when data-tlv exists";
       }
+      default false;  
       
       description
         "Indicates whether a Test TLV or Data TLV is included when the size of
@@ -1072,11 +1071,10 @@ module cisco-soam-fm {
 
     leaf test-tlv-pattern {
       type test-pattern-type;
-      default "null-signal-without-crc-32";  
-
       must "not(../data-tlv)" {
         error-message "Test-tlv-pattern does not apply when data-tlv exists";
       }
+      default "null-signal-without-crc-32";  
 
       description
         "This attribute specifies the type of test pattern to be sent in the LBM
@@ -1230,7 +1228,7 @@ module cisco-soam-fm {
       reference
         "[Y.1731] 7.4, [MEF30] 8.5";
 
-      uses ais-config;
+      uses ais-config-group;
 
       leaf transmit-status {
         type boolean;
@@ -1418,19 +1416,21 @@ module cisco-soam-fm {
 
       uses test-signal-parameters-group;
       container test-signal-stats-in {
-        description
-          "Data definitions related to received Test Signal PDUs statistics";
-
-        config false;
         must "../is-receiver = true";
+        config false;
+        description
+          "Data definitions related to received Test Signal PDUs
+           statistics";
+
         uses test-signal-stats-in-group;
       }
       container test-signal-stats-out {
-        description
-          "Data definitions related to transmitted Test Signal PDUs statistics";
-
-        config false;
         must "../is-generator = true";
+        config false;
+        description
+          "Data definitions related to transmitted Test Signal PDUs
+           statistics";
+
         uses test-signal-stats-out-group;
       }
     }
@@ -1450,8 +1450,8 @@ module cisco-soam-fm {
       type uint32 {
         range "0..60";
       }
-      default 5;
       units seconds;
+      default 5;
 
       description
         " A value indicating the shortest time interval in seconds between 
@@ -1481,7 +1481,7 @@ module cisco-soam-fm {
        will be updated throughout the session upon successful creation.";
 
     input {
-      uses cfm:MEP-REFERENCE {
+      uses cfm:maintenance-association-end-point-reference-group {
         description
           "A reference to the specific MEP on which a test session will be
            started.";
@@ -1496,7 +1496,7 @@ module cisco-soam-fm {
       "Administratively abort a test-signal session on a specific MEP";
 
     input {
-      uses cfm:MEP-REFERENCE {
+      uses cfm:maintenance-association-end-point-reference-group {
         description
           "A reference to the specific MEP on which the ETH Test session should
            be aborted.";
@@ -1523,7 +1523,7 @@ module cisco-soam-fm {
     reference
       "[MEF31] MEF-SOAM-FM-MIB.mefSoamMepDefectAlarm";
 
-    uses cfm:MEP-REFERENCE {
+    uses cfm:maintenance-association-end-point-reference-group {
       description
         "A reference to the specific MEP on which the persistent defect is
          present";
@@ -1610,7 +1610,7 @@ module cisco-soam-fm {
     reference
       "[MEF31] MEF-SOAM-FM-MIB.mefSoamMepOperStatusAlarm";
 
-    uses cfm:MEP-REFERENCE {
+    uses cfm:maintenance-association-end-point-reference-group {
       description
         "A reference to the specific MEP on which the operational-state
          changed";
@@ -1634,7 +1634,7 @@ module cisco-soam-fm {
     reference
       "[MEF31] MEF-SOAM-FM-MIB.mefSoamLckAlarm";
 
-    uses cfm:MEP-REFERENCE {
+    uses cfm:maintenance-association-end-point-reference-group {
       description
         "A reference to the specific MEP on which the lock alarm is present.";
     }
@@ -1665,7 +1665,7 @@ module cisco-soam-fm {
     reference
       "[MEF31] MEF-SOAM-FM-MIB.mefSoamAisAlarm";
 
-    uses cfm:MEP-REFERENCE {
+    uses cfm:maintenance-association-end-point-reference-group {
       description
         "A reference to the specific MEP on which the AIS alarm is present.";
     }

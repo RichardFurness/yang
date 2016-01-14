@@ -168,8 +168,8 @@ module cisco-xr-soam-fm {
         case ieee {
           leaf lowest-fault-priority-defect {
             type cfm:fault-alarm-defect-type;
-            default remote-mac-error;
             must "not(. == remote-rdi)";
+            default remote-mac-error;
 
             description
               "The lowest priority defect that will be reported.";
@@ -234,7 +234,7 @@ module cisco-xr-soam-fm {
     container alarm-indication-signal {
       description
         "AIS configuration applying to all MEPs in the service.";
-      uses soam-fm:ais-config;
+      uses soam-fm:ais-config-group;
     }
   }
   augment "/if:interfaces/if:interface" {
@@ -246,7 +246,7 @@ module cisco-xr-soam-fm {
           "Enables AIS transmission from the interface in the Up
            direction. This configuration has no effect if there are
            any Down MEPs configured on the interface.";
-        uses soam-fm:ais-config; 
+        uses soam-fm:ais-config-group; 
       }
     }
   }
@@ -257,9 +257,9 @@ module cisco-xr-soam-fm {
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
           "/cfm:remote-mep" {
     leaf mac-address {
+      type yang:mac-address;
       description
         "The MAC address of the remote MEP";
-      type yang:mac-address;
     }
   }
 
@@ -293,27 +293,24 @@ module cisco-xr-soam-fm {
   /*
    * Link-trace (inc. adding support for exploratory LT)
    */
-  grouping LT-PARAMETERS {
+  grouping lt-parameters-group {
     leaf explore {
+      type boolean;
+      default false;
       description
         "TRUE to initiate an exploratory traceroute, FALSE to
          initiate a standard traceroute.  For exploratory traceroute,
          the target must be the broadcast MAC address";
-      type boolean;
-      default false;
     }
 
     leaf starting-address {
+      type yang:mac-address;
       description
         "The MAC address to start exploring from. This may only be
          specified if 'explore' is TRUE.";
-      type yang:mac-address;
     }
 
     leaf elt-reply-filter {
-      description
-        "Specifies which ports responses should be handled from for
-         exploratory link-trace.";
       type enumeration {
         enum default {
           description
@@ -326,6 +323,9 @@ module cisco-xr-soam-fm {
         }
       }
       default default;
+      description
+        "Specifies which ports responses should be handled from for
+         exploratory link-trace.";
     }
   }
   augment "/cfm:transmit-linktrace/cfm:input" {
@@ -347,13 +347,13 @@ module cisco-xr-soam-fm {
          will use the value configured for the MEP.";
     }
 
-    uses LT-PARAMETERS;
+    uses lt-parameters-group;
   }
 
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
           "/cfm:maintenance-association-end-point/cfm:linktrace" +
           "/cfm:linktrace-database/cfm:linktrace" {
-    uses LT-PARAMETERS;
+    uses lt-parameters-group;
 
     list elt-reply {
       key reply-order;
@@ -364,75 +364,75 @@ module cisco-xr-soam-fm {
          defined for regular link-trace replies and as such their
          documentation should be read with ELM/ELR substituted for
          LTM/LTR.";
-      uses cfm:linktrace-reply;
+      uses cfm:linktrace-reply-group;
 
       leaf elr-relay {
         type enumeration {
           enum hit {
+            value 1;
             description
               "Indicates the ELM reached an MP whose MAC address
                matches the target MAC address.";
-            value 1;
           }
           enum filtering-database {
+            value 2;
             description
               "Indicates the Egress Port was determined by consulting
                the Filtering Database.";
-            value 2;
           }
           enum flood {
+            value 3;
             description
               "Indicates the ELM was flood-forwarded.";
-            value 3;
           }
           enum drop {
+            value 4;
             description
               "Indicates the ELM was dropped.";
-            value 4;
           }
         }
 
         description
           "An enumerated value indicating the value returned in the
            Relay Action field. Note that the ltr-replay leaf in the 
-           linktrace-reply grouping will not be populated for
+           linktrace-reply-group will not be populated for
            exploratory linktrace.";
       }
 
       leaf elr-egress-action {
         type enumeration {
           enum ok {
+            value 1;
             description
               "Indicates the targeted data frame would be
                forwarded.";
-            value 1;
           }
           enum down {
+            value 2;
             description
               "Indicates the Egress Port can be identified, but that
                Bridge Ports MAC Operational parameter is false.";
-            value 2;
           }
           enum blocked {
+            value 3;
             description
               "Indicates the Egress Port can be identified, but the
                data frame would not pass through the the Egress Port
                due to active topology management, i.e., the Bridge
                Port is not in the Forwarding state.";
-            value 3;
           }
           enum vid {
+            value 4;
             description
               "Indicates the Egress Port can be identified, but the
                Bridge Port is not in the ELMs VIDs member set, so
                would be filtered by egress filtering.";
-            value 4;
           }
           enum mac {
+            value 255;
             description
               "Indicates the Egress Port can be identified, but the
                ELM would be filtered by MAC pruning.";
-            value 255;
           }
         }
  
@@ -440,7 +440,7 @@ module cisco-xr-soam-fm {
           "An enumerated value indicating the value returned in the 
            Egress Action field. This leaf is not present if no value
            is returned in the ELR. Note that the egress-action leaf
-           in the linktrace-reply grouping will not be populated for
+           in the linktrace-reply-group will not be populated for
            exploratory linktrace.";
       }            
     }
@@ -454,9 +454,9 @@ module cisco-xr-soam-fm {
             "/cfm:maintenance-association-end-point" +
             "/cfm:continuity-check" +
             "/cfm:lowest-fault-priority-defect" {
-    deviate not-supported;
     description
       "Not supported as configuration is per-MA (and more flexible)";
+    deviate not-supported;
   }
   deviation "/cfm:maintenance-domain/cfm:maintenance-association" +
             "/cfm:maintenance-association-end-point" +
@@ -482,52 +482,52 @@ module cisco-xr-soam-fm {
     deviate not-supported;
   }
   deviation "/cfm:configuration-error-list" {
-    deviate not-supported;
     description
       "Not applicable to XR, but equivalent is provided by per-MA
        and per-MEP 'configuration-errors' lists.";
+    deviate not-supported;
   }
 
   deviation "/cfm:maintenance-domain/cfm:maintenance-association" +
             "/cfm:maintenance-association-end-point" +
             "/soam-fm:alarm-indication-signal" +
             "/soam-fm:enabled" {
+    description
+      "In XR, AIS configuration must be identical for all MEPs in
+       a MEG";
     deviate add {
       must "not(../../.." +
                "/cfm:maintenance-association-end-point" +
                "/soam-fm:alarm-indication-signal" +
                "/soam-fm:enabled[. = current()])";
     }
-    description
-      "In XR, AIS configuration must be identical for all MEPs in
-       a MEG";
   }
   deviation "/cfm:maintenance-domain/cfm:maintenance-association" +
             "/cfm:maintenance-association-end-point" +
             "/soam-fm:alarm-indication-signal" +
             "/soam-fm:interval" {
+    description
+      "In XR, AIS configuration must be identical for all MEPs in
+       a MEG";
     deviate add {
       must "not(../../.." +
                "/cfm:maintenance-association-end-point" +
                "/soam-fm:alarm-indication-signal" +
                "/soam-fm:interval[. = current()])";
     }
-    description
-      "In XR, AIS configuration must be identical for all MEPs in
-       a MEG";
   }
   deviation "/cfm:maintenance-domain/cfm:maintenance-association" +
             "/cfm:maintenance-association-end-point" +
             "/soam-fm:alarm-indication-signal" +
             "/soam-fm:priority" {
+    description
+      "In XR, AIS configuration must be identical for all MEPs in
+       a MEG";
     deviate add {
       must "not(../../.." +
                "/cfm:maintenance-association-end-point" +
                "/soam-fm:alarm-indication-signal" +
                "/soam-fm:priority[. = current()])";
     }
-    description
-      "In XR, AIS configuration must be identical for all MEPs in
-       a MEG";
   }
 }
