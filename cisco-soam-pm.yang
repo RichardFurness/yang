@@ -180,13 +180,23 @@ module cisco-soam-pm {
     base metric-type;
     description
       "Metric type for one-way Frame Loss Ratio in the forward
-       direction.";
+       direction.
+
+       The flr value is a ratio that is expressed as a percent with a
+       value of 0 (ratio 0.00) through 100000 (ratio 1.00).
+                 
+       Units are in milli-percent, where 1 indicates 0.001 percent.";
   }
   identity backward-flr {
     base metric-type;
     description
       "Metric type for one-way Frame Loss Ratio in the backward
-       direction.";
+       direction.
+
+       The flr value is a ratio that is expressed as a percent with a
+       value of 0 (ratio 0.00) through 100000 (ratio 1.00).
+                 
+       Units are in milli-percent, where 1 indicates 0.001 percent.";
   }
   identity forward-availability-flr {
     if-feature availability;
@@ -221,54 +231,105 @@ module cisco-soam-pm {
   identity two-way-frame-delay {
     base metric-type;
     description
-      "Metric type for two-way Frame Delay";
+      "Metric type for two-way Frame Delay.
+
+       This metric is not supported if measurement-type is
+       dm1-transmitted or dm1-received.
+
+       Units are microseconds.";
   }
   identity forward-frame-delay {
     base metric-type;
     description
-      "Metric type for one-way Frame Delay in the forward direction";
+      "Metric type for one-way Frame Delay in the forward direction.
+
+       The value of this metric may not be accurate in the absence of
+       sufficiently precise clock synchronization.
+
+       This metric is not supported if measurement-type is
+       dm1-transmitted.
+
+       Units are microseconds.";
   }
   identity backward-frame-delay {
     base metric-type;
     description
-      "Metric type for one-way Frame Delay in the backward direction";
+      "Metric type for one-way Frame Delay in the backward direction.
+
+       The value of this metric may not be accurate in the absence of
+       sufficiently precise clock synchronization.
+
+       This metric is not supported if measurement-type is
+       dm1-transmitted or dm1-received.
+
+       Units are microseconds.";
   }
   identity two-way-inter-frame-delay-variation {
     base metric-type;
     description
-      "Metric type for two-way Inter-frame Delay Variation";
+      "Metric type for two-way Inter-frame Delay Variation.
+
+       This metric is not supported if measurement-type is
+       dm1-transmitted or dm1-received.
+
+       Units are microseconds.";
   }
   identity forward-inter-frame-delay-variation {
     base metric-type;
     description
       "Metric type for one-way Inter-frame Delay Variation in the
-       forward direction";
+       forward direction.
+
+       This metric is not supported if measurement-type is
+       dm1-transmitted.
+
+       Units are microseconds.";
   }
   identity backward-inter-frame-delay-variation {
     base metric-type;
     description
       "Metric type for one-way Inter-frame Delay Variation in the
-       backward direction";
+       backward direction.
+
+       This metric is not supported if measurement-type is
+       dm1-transmitted or dm1-received.
+
+       Units are microseconds.";
   }
   identity two-way-frame-delay-range {
     if-feature frame-delay-range;
     base metric-type;
     description
-      "Metric type for two-way Frame Delay Range";
+      "Metric type for two-way Frame Delay Range.
+
+       This metric is not supported if measurement-type is
+       dm1-transmitted or dm1-received.
+
+       Units are microseconds.";
   }
   identity forward-frame-delay-range {
     if-feature frame-delay-range;
     base metric-type;
     description
       "Metric type for one-way Frame Delay Range in the forward
-       direction";
+       direction.
+
+       This metric is not supported if measurement-type is
+       dm1-transmitted.
+
+       Units are microseconds.";
   }
   identity backward-frame-delay-range {
     if-feature frame-delay-range;
     base metric-type;
     description
       "Metric type for one-way Frame Delay Range in the backward
-       direction";
+       direction.
+
+       This metric is not supported if measurement-type is
+       dm1-transmitted or dm1-received.
+
+       Units are microseconds.";
   }
 
   identity loss-counter-type {
