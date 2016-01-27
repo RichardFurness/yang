@@ -26,23 +26,24 @@ module cisco-soam-pm {
     "Richard Furness - rfurness@cisco.com";
 
   description 
-    "This YANG module contains the management data definitions for the
-     management of Ethernet Services Operations, Administration and
-     Maintenance for Performance Monitoring and extends the Connectivity
-     Fault Management (CFM) YANG modules.
+    "This YANG module contains the management data definitions for
+     the management of Ethernet Services Operations, Administration
+     and Maintenance for Performance Monitoring and extends the
+     Connectivity Fault Management (CFM) YANG modules.
 
-     This module is derived from the mef-soam-pm module defined in MEF 39.
-     However there are a number of differences from the mef-soam-fm model. The
-     key differences are:
-     - @@@
+     This module is derived from the mef-soam-pm module defined in
+     MEF 39. However there are a number of differences from the
+     mef-soam-fm model. The key differences are:
+     - @@@ add once model is more stable
      
      Reference Overview:
       A number of base documents have been used to create the
       SOAM PM YANG Module.
       The following are the abbreviations for the baseline documents:
-      [802.1q] refers to IEEE 802.1Q-2011 'IEEE Standard for Local and
-          metro-politan area networks --Media Access Control (MAC)
-          Bridges and Virtual Bridged Local Area Networks, August 2011
+      [802.1q] refers to IEEE 802.1Q-2011 'IEEE Standard for Local
+          and metropolitan area networks --Media Access Control (MAC)
+          Bridges and Virtual Bridged Local Area Networks, August
+          2011
       [MEF SOAM PM IA] refers to 'Service OAM Performance Monitoring
           Implementation Agreement', January 2012
       [MEF SOAM PM MIB] refers to 'Service OAM Performance Monitoring
@@ -74,19 +75,19 @@ module cisco-soam-pm {
   typedef suspect-status-type {
     type boolean;
     description 
-      "This boolean data type indicates whether the measurement interval
-       has been marked as suspect.
+      "This boolean data type indicates whether the measurement
+       interval has been marked as suspect.
              
        The object is set to false at the start of a measurement
-       interval. It is set to true when there is a discontinuity in the
-       performance measurements during the measurement interval.
+       interval. It is set to true when there is a discontinuity in
+       the performance measurements during the measurement interval.
        Conditions for a discontinuity include, but are not limited to
        the following:
              
          1 - The local time-of-day clock is adjusted by at least 10
              seconds
-         2 - The conducting of a performance measurement is halted before
-             the current measurement interval is completed
+         2 - The conducting of a performance measurement is halted
+             before the current measurement interval is completed
          3 - A local test, failure, or reconfiguration that disrupts
              service";
     reference
@@ -99,8 +100,8 @@ module cisco-soam-pm {
     }
     units ms;
     description
-      "This integer data type indicates the transmission time between the
-       SOAM PM frames for session, in ms.";
+      "This integer data type indicates the transmission time between
+       the SOAM PM frames for session, in ms.";
   }
   typedef test-pattern-type {
     type enumeration {
@@ -113,16 +114,18 @@ module cisco-soam-pm {
           "This test pattern is a Null signal with CRC-32.";
       }
       enum prbs-2311-without-crc-32 {
-        description "This test pattern is a PRBS 2^31-1 without CRC-32.";
+        description
+          "This test pattern is a PRBS 2^31-1 without CRC-32.";
       }
       enum prbs-2311-with-crc-32 {
-        description "This test pattern is a PRBS 2^31-1 with CRC-32.";
+        description
+          "This test pattern is a PRBS 2^31-1 with CRC-32.";
       }
     }
 
     description
-      "This enumeration data type indicates the type of test pattern to be sent
-       in an OAM PDU Data TLV.";
+      "This enumeration data type indicates the type of test pattern
+       to be sent in an OAM PDU Data TLV.";
     reference
       "MEF-SOAM-TC-MIB.MefSoamTcTestPatternType";
   }
@@ -140,7 +143,8 @@ module cisco-soam-pm {
     }
 
     description
-      "This enumeration data type defines the status of PM session of a MEP.";
+      "This enumeration data type defines the status of PM session of
+       a MEP.";
     reference
       "MEF-SOAM-TC-MIB.MefSoamTcStatusType";
   }
@@ -157,17 +161,17 @@ module cisco-soam-pm {
       }
       enum unknown {
         description
-          "Indicates the availability is not known, for instance because
-           insufficient time has passed to make an availability
-           calculation, the time has been excluded because of a
-           maintenance interval, or because availability measurement is
-           not enabled.";
+          "Indicates the availability is not known, for instance
+           because insufficient time has passed to make an
+           availability calculation, the time has been excluded
+           because of a maintenance interval, or because availability
+           measurement is not enabled.";
       }
     }
 
     description
-      "This enumeration data type defines the availability of a session,
-       measured by a loss measurement session.";
+      "This enumeration data type defines the availability of a
+       session, measured by a loss measurement session.";
     reference
       "MEF-SOAM-TC-MIB.MefSoamTcAvailabilityType";
   }
@@ -199,7 +203,8 @@ module cisco-soam-pm {
        Units are in milli-percent, where 1 indicates 0.001 percent.";
   }
   identity forward-availability-flr {
-    if-feature availability;
+    //@@@ yang 1.1
+    //if-feature availability;
     base metric-type;
     description
       "Metric type for one-way availability FLR in the forward
@@ -214,7 +219,8 @@ module cisco-soam-pm {
        Units are in milli-percent, where 1 indicates 0.001 percent.";
   }
   identity backward-availability-flr {
-    if-feature availability;
+    //@@@ yang 1.1
+    //if-feature availability;
     base metric-type;
     description
       "Metric type for one-way availability FLR in the backward
@@ -297,7 +303,8 @@ module cisco-soam-pm {
        Units are microseconds.";
   }
   identity two-way-frame-delay-range {
-    if-feature frame-delay-range;
+    //@@@ yang 1.1
+    //if-feature frame-delay-range;
     base metric-type;
     description
       "Metric type for two-way Frame Delay Range.
@@ -308,7 +315,8 @@ module cisco-soam-pm {
        Units are microseconds.";
   }
   identity forward-frame-delay-range {
-    if-feature frame-delay-range;
+    //@@@ yang 1.1
+    //if-feature frame-delay-range;
     base metric-type;
     description
       "Metric type for one-way Frame Delay Range in the forward
@@ -320,7 +328,8 @@ module cisco-soam-pm {
        Units are microseconds.";
   }
   identity backward-frame-delay-range {
-    if-feature frame-delay-range;
+    //@@@ yang 1.1
+    //if-feature frame-delay-range;
     base metric-type;
     description
       "Metric type for one-way Frame Delay Range in the backward
@@ -385,7 +394,8 @@ module cisco-soam-pm {
        MEF 10.2.1..";
   }
   identity available {
-    if-feature availability;
+    //@@@ yang 1.1
+    //if-feature availability;
     base loss-counter-type;
     description
       "The number of availability indicators during a small time
@@ -394,7 +404,8 @@ module cisco-soam-pm {
        Interval.";
   }
   identity unavailable {
-    if-feature availability;
+    //@@@ yang 1.1
+    //if-feature availability;
     base loss-counter-type;
     description
       "The number of availability indicators during a small time
@@ -445,15 +456,15 @@ module cisco-soam-pm {
       choice start-time {
         mandatory true;
         description
-          "Measurement session start time can be immediate, relative or
-           absolute.";
+          "Measurement session start time can be immediate, relative
+           or absolute.";
 
         container immediate {
           presence "Start the measurement session immediately.";
 
           description
-            "This object specifies the start time to be immediately at the time
-             of session creation.";
+            "This object specifies the start time to be immediately
+             at the time of session creation.";
         }
         leaf relative {
           type yang:timeticks;
@@ -587,10 +598,12 @@ module cisco-soam-pm {
 
   grouping loss-measurement-configuration-group {
     description
-      "This grouping includes configuration objects for the Frame Loss
-       Measurement function defined in [Y.1731] and [MEF SOAM PM IA].";
+      "This grouping includes configuration objects for the Frame
+       Loss Measurement function defined in [Y.1731] and [MEF SOAM PM
+       IA].";
     reference 
-      "MEF-SOAM-PM-MIB.mefSoamLmCfgTable, [Y.1731] and [MEF SOAM PM IA]";
+      "MEF-SOAM-PM-MIB.mefSoamLmCfgTable, [Y.1731] and [MEF SOAM PM
+       IA]";
 
     leaf availability-number-consecutive-flr-measurements {
       if-feature availability;
@@ -600,36 +613,37 @@ module cisco-soam-pm {
       default 10;
 
       description 
-        "This object specifies a configurable number of consecutive loss
-         measurement PDUs to be used in evaluating the
+        "This object specifies a configurable number of consecutive
+         loss measurement PDUs to be used in evaluating the
          availability/unavailability status of each availability
-         indicator per MEF 10.2.1.  Loss Measurement PDUs (LMMs, CCMs or
-         SLMs) are sent regularly with a period defined by
+         indicator per MEF 10.2.1.  Loss Measurement PDUs (LMMs, CCMs
+         or SLMs) are sent regularly with a period defined by
          message-period.  Therefore, this object, when multiplied by
-         message-period, is equivalent to the Availability parameter of
-         'delta_t' as specified by MEF 10.2.1.
+         message-period, is equivalent to the Availability parameter
+         of 'delta_t' as specified by MEF 10.2.1.
                  
-         If the measurement-type is lmm or ccm, this object defines the
-         number of LMM or CCM PDUs transmitted during each 'delta_t'
-         period.  The Availability flr for a given 'delta_t' can be
-         calculated based on the counters in the last LMM/R or CCM
-         during this 'delta_t' and the last LMM/R or CCM in the previous
-         'delta_t'.
+         If the measurement-type is lmm or ccm, this object defines
+         the number of LMM or CCM PDUs transmitted during each
+         'delta_t' period. The Availability flr for a given 'delta_t'
+         can be calculated based on the counters in the last LMM/R or
+         CCM during this 'delta_t' and the last LMM/R or CCM in the
+         previous 'delta_t'.
                  
-         If the measurement-type is slm, this object defines the number
-         of SLM PDUs transmitted during each 'delta_t' period.  The
-         Availability flr for a given 'delta_t' is calculated based on
-         the number of those SLM PDUs that are lost.
+         If the measurement-type is slm, this object defines the
+         number of SLM PDUs transmitted during each 'delta_t' period.
+         The Availability flr for a given 'delta_t' is calculated
+         based on the number of those SLM PDUs that are lost.
                 
          If the measurement-type is lmm or ccm, the number range of 1
          through 10 must be supported. The number range of 10 through
          1000000 may be supported, but is not mandatory.
                 
-         If the measurement-type is slm, the number range of 10 through
-         100 must be supported. The number range of 100 through 1000000
-         may be supported, but is not mandatory.";
+         If the measurement-type is slm, the number range of 10
+         through 100 must be supported. The number range of 100
+         through 1000000 may be supported, but is not mandatory.";
       reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgAvailabilityNumConsecutiveMeasPdus";
+        "MEF-SOAM-PM-MIB.
+         mefSoamLmCfgAvailabilityNumConsecutiveMeasPdus";
     }
 
     leaf availability-number-consecutive-intervals {
@@ -640,16 +654,18 @@ module cisco-soam-pm {
       default 10;
 
       description 
-        "This object specifies a configurable number of consecutive availability
-         indicators to be used to determine a change in the availability
-         status as indicated by MEF 10.2.1. This parameter is equivalent
-         to the Availability parameter of 'n' as specified by MEF
-         10.2.1.
+        "This object specifies a configurable number of consecutive
+         availability indicators to be used to determine a change in
+         the availability status as indicated by MEF 10.2.1. This
+         parameter is equivalent to the Availability parameter of 'n'
+         as specified by MEF 10.2.1.
                  
-         The number range of 1 through 10 must be supported. The number
-         range of 1 through 1000 may be supported, but is not mandatory.";
+         The number range of 1 through 10 must be supported. The
+         number range of 1 through 1000 may be supported, but is not
+         mandatory.";
       reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgAvailabilityNumConsecutiveIntervals";
+        "MEF-SOAM-PM-MIB.
+         mefSoamLmCfgAvailabilityNumConsecutiveIntervals";
     }
 
     leaf availability-number-consecutive-high-flr {
@@ -660,20 +676,22 @@ module cisco-soam-pm {
       default 5;
 
       description 
-        "This object specifies a configurable number of consecutive availability
-         indicators to be used for assessing CHLI.  This parameter is
-         equivalent to the Resilency parameter of 'p' as specified by
-         MEF 10.2.1.
+        "This object specifies a configurable number of consecutive
+         availability indicators to be used for assessing CHLI. This
+         parameter is equivalent to the Resilency parameter of 'p' as
+         specified by MEF 10.2.1.
                  
          Availability-consecutive-high-flr must be strictly less than
-         availability-number-consecutive-intervals. If not, the count of
-         high loss intervals over time, and the count of consecutive
-         high loss levels, is disabled.
+         availability-number-consecutive-intervals. If not, the count
+         of high loss intervals over time, and the count of
+         consecutive high loss levels, is disabled.
                  
-         The number range of 1 through 10 must be supported. The number
-         range of 1 through 1000 may be supported, but is not mandatory.";
+         The number range of 1 through 10 must be supported. The
+         number range of 1 through 1000 may be supported, but is not
+         mandatory.";
       reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgAvailabilityNumConsecutiveHighFlr";
+        "MEF-SOAM-PM-MIB.
+         mefSoamLmCfgAvailabilityNumConsecutiveHighFlr";
     }
 
     container loss-counters {
@@ -705,16 +723,19 @@ module cisco-soam-pm {
 
   grouping delay-measurement-configuration-group {
     description
-      "This grouping includes configuration objects for the Delay Measurement
-       function defined in [Y.1731] and [MEF SOAM PM IA].";
+      "This grouping includes configuration objects for the Delay
+       Measurement function defined in [Y.1731] and
+       [MEF SOAM PM IA].";
     reference 
-      "MEF-SOAM-PM-MIB.mefSoamDmCfgTable, [Y.1731], and [MEF SOAM PM IA].";
+      "MEF-SOAM-PM-MIB.mefSoamDmCfgTable, [Y.1731], and
+       [MEF SOAM PM IA].";
 
     leaf source-mac-address {
       type yang:mac-address;
 
       description 
-        "The Source MAC Address Field of the received SOAM DM session PDUs.
+        "The Source MAC Address Field of the received SOAM DM session
+         PDUs.
                      
          If measurement-type is dm1-received this object indicates
          the source address of the dm1-transmitted DM session.
@@ -731,18 +752,20 @@ module cisco-soam-pm {
       default 1;
 
       description 
-        "This object specifies the selection offset for Inter-Frame Delay
-         Variation measurements.  If this value is set to n, then the
-         IFDV is calculated by taking the difference in frame delay
-         between frame F and frame (F+n).";
+        "This object specifies the selection offset for Inter-Frame
+         Delay Variation measurements.  If this value is set to n,
+         then the IFDV is calculated by taking the difference in
+         frame delay between frame F and frame (F+n).";
       reference
-        "MEF-SOAM-PM-MIB.mefSoamDmCfgInterFrameDelayVariationSelectionOffset";
+        "MEF-SOAM-PM-MIB.
+         mefSoamDmCfgInterFrameDelayVariationSelectionOffset";
     }
   }
 
   grouping configuration-group {
     description
-      "This grouping includes configuration objects for PM sessions.";
+      "This grouping includes configuration objects for PM
+       sessions.";
 
     leaf measurement-type {
       type identityref {
@@ -782,8 +805,8 @@ module cisco-soam-pm {
 
       description
         "This object specifies the interval between OAM packet
-         transmission. For Loss Measurement monitoring applications the
-         default value is 1 sec. For Delay Measurement monitoring
+         transmission. For Loss Measurement monitoring applications
+         the default value is 1 sec. For Delay Measurement monitoring
          applications, the default value is 100ms.
                  
          This object is not applicable if measurement-type is set to
@@ -795,8 +818,8 @@ module cisco-soam-pm {
       mandatory true;
 
       description 
-        "This object specifies the priority of frames with Performance
-         Monitoring OAM message information.";
+        "This object specifies the priority of frames with
+         Performance Monitoring OAM message information.";
     }
 
     leaf frame-size {
@@ -807,19 +830,17 @@ module cisco-soam-pm {
       default 64;
 
       description 
-        "This object specifies the Loss Measurement frame size between 64 bytes
+        "This object specifies the frame size between 64 bytes
          and the maximum transmission unit of the EVC.
                  
-         The range of frame sizes from 64 through 2000 octets need to be
-         supported, and the range of frame sizes from 2001 through 9600
-         octets is suggested be supported.
+         The range of frame sizes from 64 through 2000 octets need to
+         be supported, and the range of frame sizes from 2001 through
+         9600 octets is suggested be supported.
                  
-         The adjustment to the frame size of the standard frame size is
-         accomplished by the addition of a Data or Test TLV. A Data or
-         Test TLV is only added to the frame if the frame size is greater
-         than 64 bytes.";
-      reference
-        "MEF-SOAM-PM-MIB.mefSoamLmCfgFrameSize";
+         The adjustment to the frame size of the standard frame size
+         is accomplished by the addition of a Data or Test TLV. A
+         Data or Test TLV is only added to the frame if the frame
+         size is greater than 64 bytes.";
     }
 
     leaf data-pattern {
@@ -829,12 +850,13 @@ module cisco-soam-pm {
       default zeroes;
 
       description 
-        "This object specifies the data pattern included in a Data TLV when
-         the size of the frame is determined by the frame-size object
-         and test-tlv-included is 'false'.
+        "This object specifies the data pattern included in a Data
+         TLV when the size of the frame is determined by the
+         frame-size object and test-tlv-included is 'false'.
                  
          If the frame size object does not define the frame size or
-         test-tlv-included is 'true' the value of this object is ignored.";
+         test-tlv-included is 'true' the value of this object is
+         ignored.";
     }
 
     leaf test-tlv-included {
@@ -842,12 +864,13 @@ module cisco-soam-pm {
       default false;
 
       description 
-        "This object indicates whether a Test TLV or Data TLV is included when
-         the size of the frame is determined by the frame-size object.
+        "This object indicates whether a Test TLV or Data TLV is
+         included when the size of the frame is determined by the
+         frame-size object.
                  
          A value of 'true' indicates that the Test TLV is to be
-         included. A value of 'false' indicates that the Data TLV is to
-         be included.
+         included. A value of 'false' indicates that the Data TLV is
+         to be included.
                  
          If the frame-size object does not define the frame size the
          value of this object is ignored.";
@@ -858,10 +881,10 @@ module cisco-soam-pm {
       default null-signal-without-crc-32;
 
       description 
-        "This object specifies the type of test pattern to be sent in the
-         frame Test TLV when the size of the PDU is determined by the
-         frame-size object and test-tlv-included is 'true'. If the frame
-         size object does not define the frame size or
+        "This object specifies the type of test pattern to be sent in
+         the frame Test TLV when the size of the PDU is determined by
+         the frame-size object and test-tlv-included is 'true'. If
+         the frame size object does not define the frame size or
          test-tlv-included is 'false' the value of this object is
          ignored.";
     }
@@ -886,11 +909,12 @@ module cisco-soam-pm {
       }
       default 32;
       description 
-        "This object specifies the number of completed measurement intervals to
-         store in the history statistic table.
+        "This object specifies the number of completed measurement
+         intervals to store in the history statistic table.
                  
          At least 32 completed measurement intervals are to be
-         stored. 96 measurement intervals are recommended to be stored.";
+         stored. 96 measurement intervals are recommended to be
+         stored.";
     }
 
     leaf align-measurement-intervals {
@@ -958,14 +982,14 @@ module cisco-soam-pm {
         "This object specifies a configurable repetition time between
          Measurement Intervals in a Measurement session in seconds.
                  
-         If the value is less than or equal to one Measurement Interval
-         there is no time gap between the end of one Measurement
-         Interval and the start of a new Measurement Interval. This is
-         the normal usage case.
+         If the value is less than or equal to one Measurement
+         Interval there is no time gap between the end of one
+         Measurement Interval and the start of a new Measurement
+         Interval. This is the normal usage case.
                  
-         If the value is greater than one Measurement Interval there is
-         time gap between the end of one Measurement Interval and the
-         start of the next Measurement Interval.";
+         If the value is greater than one Measurement Interval there
+         is time gap between the end of one Measurement Interval and
+         the start of the next Measurement Interval.";
       reference
         "[MEF SOAM PM IA] R18, D3, R19, R20";
     }
@@ -1032,20 +1056,21 @@ module cisco-soam-pm {
                preceding measurement bin.
 
                For delay metrics:
-               - The units are miliseconds.
-               - By default, the next bin is set to 5000us larger
-                 than the lower bin boundary.
+               - The units are milliseconds.
+               - By default, each bin boundary is set to 5ms more
+                 than the previous bin boundary.
 
                For loss metrics:
                - For Synthetic Loss, the units are percentage points.
                - For Data Loss, the units are tenths of a percent
-               - @@@ defaults?
+               - By default, each bin boundary is set to 1% more
+                 than the previous bin boundary.
 
                The values in a bin boundary object represents the
                range used to segregate data into the appropriate
                statistical data bin. 
 
-               The first bin boundary (number set to 1) always
+               The first bin boundary (index set to 1) always
                contains the value of 0. Attempting to write a
                non-zero value to this bin will result in an error.";
           }
@@ -1121,7 +1146,8 @@ module cisco-soam-pm {
                  
          The object is set to false at the start of a measurement
          interval. It is set to true when there is a discontinuity in
-         the performance measurements during the Measurement Interval.
+         the performance measurements during the Measurement
+         Interval.
          Conditions for a discontinuity include, but are not limited
          to the following:
                  
@@ -1139,8 +1165,8 @@ module cisco-soam-pm {
         "This object contains the count of the number of SOAM PDUs
          sent during this Measurement Interval.
                  
-         This object is undefined if measurement-type is dm1-received.
-         It indicates the number of SOAM frames transmitted.";
+         This object is undefined if measurement-type is
+         dm1-received.";
     }
 
     leaf soam-pdus-received {
@@ -1151,8 +1177,7 @@ module cisco-soam-pm {
          PDUs received in this Measurement Interval.
                  
          This object is undefined if measurement-type is
-         dm1-transmitted. It indicates the number of SOAM frames
-         received.";
+         dm1-transmitted.";
     }
   }
 
@@ -1179,37 +1204,27 @@ module cisco-soam-pm {
          Measurement Interval.";
     }
 
-    choice pm-type {
+    container loss-counters {
       description
-        "Statistics only valid for a specific PM type (LM/DM)";
-      case lm {
-        when "'derived-from(../measurement-type, lm-packet-type)'" {
+        "List of LM-specific counter types. This list is only
+         populated for loss measurement sessions.";
+      list counter {
+        key type;
+        description
+          "A specific LM counter value";
+
+        leaf type {
+          type identityref {
+            base loss-counter-type;
+          }
           description
-            "Statistics only valid for loss measurement";
+            "The type of loss counter";
         }
 
-        container loss-counters {
+        leaf value {
+          type uint32;
           description
-            "List of LM-specific counter types";
-          list counter {
-            key type;
-            description
-              "A specific LM counter value";
-
-            leaf type {
-              type identityref {
-                base loss-counter-type;
-              }
-              description
-                "The type of loss counter";
-            }
-
-            leaf value {
-              type uint32;
-              description
-                "The value of the loss counter";
-            }
-          }
+            "The value of the loss counter";
         }
       }
     }
@@ -1235,7 +1250,9 @@ module cisco-soam-pm {
           type uint32;
 
           description 
-            "@@@ copy from config once finalized";
+            "The lower boundary for this measurement bin. The upper
+             boundary is defined by the next bin value or infinite
+             for the last bin defined.";
         }
 
         leaf counter {
@@ -1290,29 +1307,30 @@ module cisco-soam-pm {
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
           "/cfm:maintenance-association-end-point" {
     description
-      "This set of data definitions extends the MEG End Point (as described in
-       Y.1731) or Maintenance End Point (as described in 802.1q) defined
-       in the MEF CFM module (MEF-CFM), specifically with regards to the
-       role of the MEP in PM tests.";
+      "This set of data definitions extends the MEG End Point (as
+       described in Y.1731) or Maintenance End Point (as described in
+       802.1q) defined in the MEF CFM module (MEF-CFM), specifically
+       with regards to the role of the MEP in PM tests.";
 
     leaf loss-single-ended-responder {
       type boolean;
       default true;
 
       description 
-        "This object specifies whether the Loss Measurement (LMM) single-ended
-         Responder is enabled.
+        "This object specifies whether the Loss Measurement (LMM)
+         single-ended Responder is enabled.
                  
          The value 'true' indicates the single-ended Loss Measurement
          Responder is enabled and if a LMM message is received a LMR
          will be sent in re-ply.
                  
-         The value 'false' indicates the single-ended Loss Measurement
-         Responder is disabled. If a LMM message is received no
-         response will be sent and the message will be discarded.
+         The value 'false' indicates the single-ended Loss
+         Measurement Responder is disabled. If a LMM message is
+         received no response will be sent and the message will be
+         discarded.
                  
-         This object needs to be persistent upon reboot or restart of a
-         device.
+         This object needs to be persistent upon reboot or restart of
+         a device.
                  
          A MEP can be both a single-ended Responder and Controller
          simultaneously.";
@@ -1325,19 +1343,19 @@ module cisco-soam-pm {
       default true;
 
       description 
-        "This object specifies whether the Synthetic Loss Measurement (SLM)
-         single-ended Responder is enabled.
+        "This object specifies whether the Synthetic Loss Measurement
+         (SLM) single-ended Responder is enabled.
                  
          The value 'true' indicates the single-ended SLM Responder is
-         enabled and if a SLM message is received a SLR will be sent in
-         reply.
+         enabled and if a SLM message is received a SLR will be sent
+         in reply.
                  
-         The value 'false' indicates the single-ended SLM Responder is
-         disabled.  If a SLM message is received no response
+         The value 'false' indicates the single-ended SLM Responder
+         is disabled.  If a SLM message is received no response
          will be sent and the message will be discarded.
                  
-         This object needs to be persistent upon reboot or restart of a
-         device.
+         This object needs to be persistent upon reboot or restart of
+         a device.
                  
          A MEP can be both a single-ended Responder and Controller
          simultaneously.";
@@ -1350,19 +1368,20 @@ module cisco-soam-pm {
       default true;
 
       description 
-        "This object specifies whether the Delay Measurement (DMM) single ended
-         Responder is enabled.
+        "This object specifies whether the Delay Measurement (DMM)
+         single ended Responder is enabled.
                  
-         The value 'true' indicates the single-ended Delay Measurement
-         Responder is enabled and if a DMM message is received a DMR
-         will be sent in re-ply.
+         The value 'true' indicates the single-ended Delay
+         Measurement Responder is enabled and if a DMM message is
+         received a DMR will be sent in reply.
                  
-         The value 'false' indicates the single-ended Delay Measurement
-         Responder is disabled. If a DMM message is received no
-         response will be sent and the message will be discarded.
+         The value 'false' indicates the single-ended Delay
+         Measurement Responder is disabled. If a DMM message is
+         received no response will be sent and the message will be
+         discarded.
                  
-         This object needs to be persistent upon reboot or restart of a
-         device.
+         This object needs to be persistent upon reboot or restart of
+         a device.
                  
          A MEP can be both a single-ended Responder and Controller
          simultaneously.";
@@ -1380,9 +1399,9 @@ module cisco-soam-pm {
       config false;
 
       description 
-        "This object uniquely identifies a scheduled PM session. It is
-         automatically generated by the server on creation of a new
-         session.";
+        "This object uniquely identifies a scheduled PM session. It
+         is automatically generated by the server on creation of a
+         new session.";
     }
 
     leaf session-status {
@@ -1390,13 +1409,13 @@ module cisco-soam-pm {
       config false;
 
       description 
-        "This object indicates the current status of the PM session. A value
-         of 'active' indicates the current PM session is active,
-         i.e. the current time lies between the start time and the
-         stop time, and enabled is true. A value of 'not-active'
-         indicates the current PM session is not active, i.e. it has
-         not started yet, has stopped upon reaching the stop time,
-         or is disabled.";
+        "This object indicates the current status of the PM session.
+         A value of 'active' indicates the current PM session is
+         active, i.e. the current time lies between the start time
+         and the stop time, and enabled is true. A value of
+         'not-active' indicates the current PM session is not active,
+         i.e. it has not started yet, has stopped upon reaching the
+         stop time, or is disabled.";
     }
 
     container measured-stats {
@@ -1409,7 +1428,7 @@ module cisco-soam-pm {
         description
           "Statistics only valid for a specific PM type (LM/DM)";
         case lm {
-          when "'derived-from(../measurement-type," +
+          when "'derived-from(../../measurement-type," +
                "lm-packet-type)'" {
             description
               "Statistics only valid for loss measurement";
@@ -1492,8 +1511,8 @@ module cisco-soam-pm {
     container current-stats {
       config false;
       description 
-        "This container contains the results for the current Measurement
-         Interval in a SOAM PM session gathered during
+        "This container contains the results for the current
+         Measurement Interval in a SOAM PM session gathered during
          the interval indicated by measurement-interval.";
 
       uses common-stats-group;
@@ -1515,16 +1534,16 @@ module cisco-soam-pm {
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
           "/cfm:maintenance-association-end-point" {
     description
-      "This set of data definitions extends the MEG End Point (as described
-       Y.1731) or Maintenance End Point (as described in 802.1q) defined
-       in the MEF CFM module (MEF-CFM), specifically with regards to
-       Performance Monitoring sessions.";
+      "This set of data definitions extends the MEG End Point (as
+       described Y.1731) or Maintenance End Point (as described in
+       802.1q) defined in the MEF CFM module (MEF-CFM), specifically
+       with regards to Performance Monitoring sessions.";
 
     container on-demand-sessions {
       description
         "Contains a list of on-demand session information. New
-         sessions must be created using the 'create-session-on-demand'
-         RPC.";
+         sessions must be created using the
+         'create-session-on-demand' RPC.";
 
       list on-demand-session {
         key session-id;
@@ -1588,7 +1607,7 @@ module cisco-soam-pm {
        session identifier will be returned in the output parameter.";
 
     input {
-      uses cfm:MEP-REFERENCE {
+      uses cfm:maintenance-association-end-point-reference-group {
         description
           "The MEP on which the session will be started";
       }
@@ -1618,7 +1637,7 @@ module cisco-soam-pm {
       "Abort a currently running or scheduled on-demand PM session.";
 
     input {
-      uses cfm:MEP-REFERENCE {
+      uses cfm:maintenance-association-end-point-reference-group {
         description
           "The MEP on which the session should be stopped";
       }
@@ -1639,7 +1658,7 @@ module cisco-soam-pm {
        specific on-demand PM session. All instance data is deleted.";
 
     input {
-      uses cfm:MEP-REFERENCE {
+      uses cfm:maintenance-association-end-point-reference-group {
         description
           "The MEP on which the history stats should be cleared";
       }
@@ -1662,7 +1681,7 @@ module cisco-soam-pm {
        specific proactive PM session. All instance data is deleted.";
 
     input {
-      uses cfm:MEP-REFERENCE {
+      uses cfm:maintenance-association-end-point-reference-group {
         description
           "The MEP on which the historical stats should be cleared";
       }
@@ -1689,17 +1708,17 @@ module cisco-soam-pm {
   notification availability-change-alarm {
     if-feature availability;
     description 
-      "An availability-change-alarm notification is sent when the state of
-       measured-availability-forward-status or
-       measured-availability-backward-status associated with a specific
-       loss-measurement session changes.";
+      "An availability-change-alarm notification is sent when the
+       state of measured-availability-forward-status or
+       measured-availability-backward-status associated with a
+       specific loss-measurement session changes.";
     reference
       "MEF-SOAM-PM-MIB.mefSoamAvailabilityChangeAlarm";
 
-    uses cfm:MEP-REFERENCE {
+    uses cfm:maintenance-association-end-point-reference-group {
       description
-        "A reference to the specific MEP on which the availability change alarm
-         is present";
+        "A reference to the specific MEP on which the availability
+         change alarm is present";
     }
 
     leaf session-id {
@@ -1707,40 +1726,40 @@ module cisco-soam-pm {
       mandatory true;
 
       description
-        "A reference to the loss-measurement session in which the availability
-         change alarm occurred.";
+        "A reference to the loss-measurement session in which the
+         availability change alarm occurred.";
     }
 
     leaf measured-availability-forward-status {
       type availability-type;
 
       description 
-        "The current value of measured-availability-forward-status of the
-         referenced loss-measurement session.";
+        "The current value of measured-availability-forward-status of
+         the referenced loss-measurement session.";
     }
 
     leaf measured-availability-backward-status {
       type availability-type;
 
       description 
-        "The current value of measured-availability-backward-status of the
-         referenced loss-measurement session.";
+        "The current value of measured-availability-backward-status
+         of the referenced loss-measurement session.";
     }
 
     leaf measured-forward-last-transition-time {
       type yang:date-and-time;
 
       description 
-        "The current value of measured-forward-last-transition-time of the
-         referenced loss-measurement session.";
+        "The current value of measured-forward-last-transition-time
+         of the referenced loss-measurement session.";
     }
 
     leaf measured-backward-last-transition-time {
       type yang:date-and-time;
 
       description 
-        "The current value of measured-backward-last-transition-time of the
-         referenced loss-measurement session.";
+        "The current value of measured-backward-last-transition-time
+         of the referenced loss-measurement session.";
     }
 
     leaf forward-available {
@@ -1781,7 +1800,7 @@ module cisco-soam-pm {
       "A session-start-stop-alarm notification is sent when the state
        of session-status changes for a specific PM session.";
 
-    uses cfm:MEP-REFERENCE {
+    uses cfm:maintenance-association-end-point-reference-group {
       description
         "A reference to the specific MEP on which the session state
          change alarm occurred.";

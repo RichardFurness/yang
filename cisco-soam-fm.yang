@@ -25,30 +25,32 @@ module cisco-soam-fm {
     "Richard Furness - rfurness@cisco.com";
 
   description 
-    "This YANG module contains the management data definitions for the
-     management of Ethernet Services Operations, Administration and
-     Maintenance for Fault Management and extends the Connectivity Fault
-     Management (CFM) YANG module.
+    "This YANG module contains the management data definitions for
+     the management of Ethernet Services Operations, Administration
+     and Maintenance for Fault Management and extends the
+     Connectivity Fault Management (CFM) YANG module.
 
-     This module is derived from the mef-soam-fm module defined in MEF 38.
-     However there are a number of differences from the mef-soam-fm model. The
-     key differences are:
-     - @@@
+     This module is derived from the mef-soam-fm module defined in
+     MEF 38. However there are a number of differences from the
+     mef-soam-fm model. The key differences are:
+     - @@@ add once model is more stable
 
      Reference Overview:
-      A number of base documents have been used to create the SOAM FM YANG. The
-      following are the abbreviations for the baseline documents:
-      [802.1q] refers to IEEE 802.1Q-2011 'IEEE Standard for Local and metropolitan
-          area networks --Media Access Control (MAC) Bridges and Virtual
-          Bridged Local Area Networks, August 2011
-      [MEF7.1] refers to MEF 7.1 'Phase 2 EMS-NMS Information Model', 
+      A number of base documents have been used to create the SOAM FM
+      YANG model. The following are the abbreviations for the
+      baseline documents:
+      [802.1q] refers to IEEE 802.1Q-2011 'IEEE Standard for Local
+          and metropolitan area networks --Media Access Control (MAC)
+          Bridges and Virtual Bridged Local Area Networks, August
+          2011
+      [MEF7.1] refers to MEF 7.1 'Phase 2 EMS-NMS Information Model',
           October 2009
-      [MEF30] refers to MEF 30 'Service OAM Fault Management Implementation
-          Agreement', January 2011
-      [MEF31] refers to MEF 31 'Service OAM Fault Management Definition of Managed
-          Objects', January 2011
-      [Y.1731] refers to ITU-T Y.1731 'OAM functions and mechanisms for Ethernet 
-          based networks', July 2011";
+      [MEF30] refers to MEF 30 'Service OAM Fault Management
+          Implementation Agreement', January 2011
+      [MEF31] refers to MEF 31 'Service OAM Fault Management
+          Definition of Managed Objects', January 2011
+      [Y.1731] refers to ITU-T Y.1731 'OAM functions and mechanisms
+          for Ethernet based networks', July 2011";
 
 
   revision "2015-09-29" {
@@ -87,8 +89,8 @@ module cisco-soam-fm {
 }
 
     description
-      "This enumeration data type defines the AIS/LCK interval (transmission
-       period for a frame)";
+      "This enumeration data type defines the AIS/LCK interval
+       (transmission period for a frame)";
     reference
       "[Y.1731] sections 7.4, 7.6; [MEF7.1] III.2";
   }
@@ -97,20 +99,20 @@ module cisco-soam-fm {
     type enumeration {
       enum enabled {
         description
-          "The MEP is able to provide OAM capabilities and has been set to
-           active via the 'administrative-state' leaf.";
+          "The MEP is able to provide OAM capabilities and has been
+           set to active via the 'administrative-state' leaf.";
       }
       enum disabled {
         description
-          "The MEP is not able to provide OAM capabilities, for example
-           because it has been disabled via the administrative-state leaf,
-           has detected an operational failure condition, or has failed an
-           internal test.";
+          "The MEP is not able to provide OAM capabilities, for
+           example because it has been disabled via the
+           administrative-state leaf, has detected an operational
+           failure condition, or has failed an internal test.";
       }
       enum testing {
         description
-          "The MEP has been placed into a test mode, either a troubleshooting
-           mode or ETH-Test 'Out-of-service' mode.";
+          "The MEP has been placed into a test mode, either a
+           troubleshooting mode or ETH-Test 'Out-of-service' mode.";
       }
       enum unknown {
         description
@@ -118,8 +120,8 @@ module cisco-soam-fm {
       }
     }
     description
-      "This attribute indicates the operational state (current capability) of
-       a MEP.";
+      "This attribute indicates the operational state (current
+       capability) of a MEP.";
     reference
       "[MEF7.1] 9.2.5";
   }
@@ -145,8 +147,8 @@ module cisco-soam-fm {
     }
     
     description
-      "This enumeration data type indicates the type of test pattern to be
-       sent in an OAM PDU Data TLV";
+      "This enumeration data type indicates the type of test pattern
+       to be sent in an OAM PDU Data TLV";
     reference
       "[Y.1731]";
   }
@@ -157,26 +159,29 @@ module cisco-soam-fm {
   
   grouping locked-signal-parameters-group {
     description
-      "Data definitions related to the administrative locking state of the MEP";
+      "Data definitions related to the administrative locking state
+       of the MEP";
 
     leaf state {
       type enumeration {
         enum lock {
         description
-          "Indicates the resource is administratively prohibited from use.";
+          "Indicates the resource is administratively prohibited from
+           use.";
         }
         enum unlock {
         description
-          "Indicates the resource is not administratively prohibited from use.";
+          "Indicates the resource is not administratively prohibited
+           from use.";
         }
       }
 
 
       description
-        "This attribute specifies the locking state. If state is 'lock',the
-         MEP will be administratively locked. If state is 'unlock',
-         the MEP will be administratively unlocked if previously
-         locked.";
+        "This attribute specifies the locking state. If state is
+         'lock',the MEP will be administratively locked. If state is
+         'unlock', the MEP will be administratively unlocked if
+         previously locked.";
       reference
         "[MEF7.1] 9.3.4.2";
     }
@@ -186,8 +191,8 @@ module cisco-soam-fm {
       default one-second;
 
       description
-        "This attribute specifies the ETH-LCK transmission period. The default
-         value is 1 frame per second.";        
+        "This attribute specifies the ETH-LCK transmission period.
+         The default value is 1 frame per second.";        
       reference
         "[MEF7.1] 9.3.4.2";
     }
@@ -206,8 +211,8 @@ module cisco-soam-fm {
       type cfm:md-level-type;
 
       description
-        "The MEG/Maintenance Domain Level of the Client LCK PDU (transmitted
-         level).";
+        "The MEG/Maintenance Domain Level of the Client LCK PDU
+         (transmitted level).";
       reference
         "[Y.1731] 7.6";
     }
@@ -215,8 +220,8 @@ module cisco-soam-fm {
 
   grouping test-signal-parameters-group {
     description
-      "Data definitions related to generating and receiving test signals
-       (ETH-Test) frames";
+      "Data definitions related to generating and receiving test
+       signals (ETH-Test) frames";
 
     leaf is-receiver {
       type boolean;
@@ -242,28 +247,30 @@ module cisco-soam-fm {
       type enumeration {
         enum in-service {
         description
-          "Indicates the ETH-Test is in-service and normal client service traffic 
-           is not interrupted.";
+          "Indicates the ETH-Test is in-service and normal client
+           service traffic is not interrupted.";
         }
         enum out-of-service {
         description
-          "Indicates the ETH-Test is out-of-service and normal client service 
-           traffic is disrupted.";
+          "Indicates the ETH-Test is out-of-service and normal client
+           service traffic is disrupted.";
         }
       }
 
       must "../is-generator = true" {
-        error-message "The test-type parameter is only relevant for the generator side";
+        error-message
+          "The test-type parameter is only relevant for
+           the generator side";
       }
       default in-service;
 
       description
-        "This attribute specifies the type of ETH-Test to perform, whether it is
-         service interrupting or not. An 'in-service' value indicates
-         that the ETH-Test is in service and normal client service
-         traffic is not interrupted. A 'out-of-service' value indicates
-         that the ETH-Test is out of service and normal client service
-         traffic is disrupted.";
+        "This attribute specifies the type of ETH-Test to perform,
+         whether it is service interrupting or not. An 'in-service'
+         value indicates that the ETH-Test is in service and normal
+         client service traffic is not interrupted. An
+         'out-of-service' value indicates that the ETH-Test is out of
+         service and normal client service traffic is disrupted.";
 
       reference "[Y.1731] 7.7";
     }
@@ -272,12 +279,15 @@ module cisco-soam-fm {
       uses cfm:target-address-group;
 
       must "../is-generator = true" {
-        error-message "The target-address parameter is only relevant for the generator side";
+        error-message
+          "The target-address parameter is only relevant
+           for the generator side";
       }
 
       description
-        "Unicast MAC address or MEPID of the peer MEP for which ETH-Test is
-         intended. This information is configurable per operation.";
+        "Unicast MAC address or MEPID of the peer MEP for which
+         ETH-Test is intended. This information is configurable per
+         operation.";
       reference
         "[Y.1731] 7.7";
     }
@@ -290,15 +300,16 @@ module cisco-soam-fm {
 
       must "../is-generator = true" {
         error-message
-         "The interval parameter is only relevant for the generator side";
+          "The interval parameter is only relevant for the generator
+           side";
       }
       default 1000000;
 
       description 
-        "This attribute specifies the ETH-Test transmission period between
-        consecutive transmitted frames in microseconds. A value of '0'
-        indicates that the Test TLVs are sent as quickly as possible
-        across the interface.";
+        "This attribute specifies the ETH-Test transmission period
+         between consecutive transmitted frames in microseconds. A
+         value of '0' indicates that the Test TLVs are sent as
+         quickly as possible across the interface.";
 
       reference "[MEF7.1] 9.3.4.3";
     }
@@ -307,12 +318,14 @@ module cisco-soam-fm {
       type cfm:priority-type;
 
       must "../is-generator = true" {
-        error-message "The priority parameter is only relevant for the generator side";
+        error-message
+          "The priority parameter is only relevant for the generator
+           side";
       }
 
       description
-        "This attribute specifies the priority of frames with ETH-Test
-         information";
+        "This attribute specifies the priority of frames with
+         ETH-Test information";
 
       reference "[MEF7.1] 9.3.4.3";
     }
@@ -327,29 +340,30 @@ module cisco-soam-fm {
         description
           "On-demand measurements can be scheduled using absolute
            time or relative time
-            - absolute-time specifies absolute start and stop, date and time
-            - relative-time specifies an offset from current system time and
-             a duration";
+            - absolute-time specifies absolute start and stop, date
+              and time
+            - relative-time specifies an offset from current system
+              time and a duration";
 
         case absolute-time {
           leaf start-time {
             type yang:date-and-time;
           
             description
-              "This attribute specifies the scheduled start date/time to perform the
-               on-demand ETH-Test operations. The default value for this
-               attribute is the current system date and time which
-               represents an immediate time.";
+              "This attribute specifies the scheduled start date/time
+               to perform the on-demand ETH-Test operations. The
+               default value for this attribute is the current system
+               date and time which represents an immediate time.";
           }
         
           leaf stop-time {
             type yang:date-and-time;
           
             description
-              "This attribute specifies the scheduled stop date/time to perform
-               on-demand ETH-Test operations. The stop date/time value
-               should be greater than or equal to the scheduled start
-               date/time value.";
+              "This attribute specifies the scheduled stop date/time
+               to perform on-demand ETH-Test operations. The stop
+               date/time value should be greater than or equal to the
+               scheduled start date/time value.";
           }
         }
 
@@ -362,11 +376,11 @@ module cisco-soam-fm {
                 mandatory true;
                 
                 description
-                  "This attribute specifies the relative start time, from the current
-                   system time, to perform on-demand ETH-Test. The
-                   default value for this attribute is zero, indicating
-                   the current system time, which represents an
-                   immediate start time.";
+                  "This attribute specifies the relative start time,
+                   from the current system time, to perform on-demand
+                   ETH-Test. The default value for this attribute is
+                   zero, indicating the current system time, which
+                   represents an immediate start time.";
               }
             }
             case absolute-start-time {
@@ -374,10 +388,11 @@ module cisco-soam-fm {
                 type yang:date-and-time;
                 
                 description
-                  "This attribute specifies the scheduled start date/time to 
-                   perform the on-demand ETH-Test operations. The default value 
-                   for this attribute is the current system date and time
-                   which represents an immediate time.";
+                  "This attribute specifies the scheduled start date/
+                   time to perform the on-demand ETH-Test operations.
+                   The default value for this attribute is the
+                   current system date and time which represents an
+                   immediate time.";
               }
             }
           }
@@ -388,13 +403,13 @@ module cisco-soam-fm {
             mandatory true;
           
             description
-              "This attribute specifies the duration of the Locking. The duration time
-               can be specified as forever (represented by a zero value)
-               or as relative time (e.g., a given number of hours,
-               minutes, and seconds from the start time). If the
-               duration time is relative time, then the duration time
-               should be equal to or greater than the frame transmission
-               period.";
+              "This attribute specifies the duration of the Locking.
+               The duration time can be specified as forever
+               (represented by a zero value) or as relative time
+               (e.g., a given number of hours, minutes, and seconds
+               from the start time). If the duration time is relative
+               time, then the duration time should be equal to or
+               greater than the frame transmission period.";
           }
         }
       }
@@ -403,17 +418,20 @@ module cisco-soam-fm {
     leaf drop-eligible {
       type boolean;
       must "../is-generator = true" {
-        error-message "The drop-eligible parameter is only relevant for the generator side";
+        error-message
+          "The drop-eligible parameter is only relevant for the
+           generator side";
       }
       default false;
 
       description
-        "This attribute specifies the eligibility of frames with ETH-Test
-         information to be discarded when congestion conditions are
-         encountered. The value 'true' indicates frames are eligible to
-         be discarded. The value 'false' indicates frames are not
-         eligible to be discarded. This attribute may be constrained to
-         read-only in some implementations.";
+        "This attribute specifies the eligibility of frames with
+         ETH-Test information to be discarded when congestion
+         conditions are encountered. The value 'true' indicates
+         frames are eligible to be discarded. The value 'false'
+         indicates frames are not eligible to be discarded. This
+         attribute may be constrained to read-only in some
+         implementations.";
 
       reference "[Y.1731] 7.7";
     }
@@ -425,15 +443,17 @@ module cisco-soam-fm {
       units bytes;
 
       must "../is-generator = true" {
-        error-message "The frame-size parameter is only relevant for the generator side";
+        error-message
+          "The frame-size parameter is only relevant for the
+           generator side";
       }
       default 64;
 
       description
-        "This attribute specifies the ETH-Test Ethernet frame size between 64
-         bytes and the maximum transmission unit of the EVC. The
-         adjustment to the frame size of the standard Test PDU size is
-         accomplished by the addition of a Test TLV.";
+        "This attribute specifies the ETH-Test Ethernet frame size
+         between 64 bytes and the maximum transmission unit of the
+         EVC. The adjustment to the frame size of the standard Test
+         PDU size is accomplished by the addition of a Test TLV.";
 
       reference "[MEF7.1] 9.3.4.3";
     }
@@ -442,10 +462,10 @@ module cisco-soam-fm {
       type test-pattern-type;
 
       description
-        "This attribute specifies an arbitrary element to include in the Data
-         TLV, if the Data TLV is selected to be sent, whose length and
-         contents are configurable at the MEP. The contents can be a
-         test pattern and an optional checksum.";
+        "This attribute specifies an arbitrary element to include in
+         the Data TLV, if the Data TLV is selected to be sent, whose
+         length and contents are configurable at the MEP. The
+         contents can be a test pattern and an optional checksum.";
     }
     reference "[Y.1731] Figure 9.3-4";
   }
@@ -458,10 +478,10 @@ module cisco-soam-fm {
       type yang:zero-based-counter64;
 
       description
-        "This attribute contains the count of the total number of TST frames
-         received. The count is incremented when a message is received
-         with or without errors. This attribute is only applicable to the
-         MEP receiving ETH TST frames.";
+        "This attribute contains the count of the total number of TST
+         frames received. The count is incremented when a message is
+         received with or without errors. This attribute is only
+         applicable to the MEP receiving ETH TST frames.";
       reference
         "[MEF7.1] 9.3.4.4";
     }
@@ -470,11 +490,12 @@ module cisco-soam-fm {
       type yang:zero-based-counter64;
 
       description
-        "This attribute contains the count of the total number of valid,
-         out-of-order TST frameTST frames received. The count is incremented when
-         the sequence number in the TST frame received does not match
-         the expected sequence number. This attribute is only applicable
-         to the MEP receiving ETH-TST frames.";
+        "This attribute contains the count of the total number of
+         valid, out-of-order TST frameTST frames received. The count
+         is incremented when the sequence number in the TST frame
+         received does not match the expected sequence number. This
+         attribute is only applicable to the MEP receiving ETH-TST
+         frames.";
       reference
         "[MEF7.1] 9.3.4.4";
     }
@@ -483,13 +504,15 @@ module cisco-soam-fm {
       type yang:zero-based-counter64;
 
       description
-        "This attribute contains the count of the total number of TST frames
-         received with CRC errors. This attribute is only applicable to
-         the MEP receiving ETH-Test messages that include the test TLV with
-         test pattern of null CRC 32 or PBRS CRC 32.
+        "This attribute contains the count of the total number of TST
+         frames received with CRC errors. This attribute is only
+         applicable to the MEP receiving ETH-Test messages that
+         include the test TLV with test pattern of null CRC 32 or
+         PBRS CRC 32.
 
-        The CRC is dependent upon the Test TLV only and is independent of BER
-        errors, which is used to indicate a pattern error.";
+         The CRC is dependent upon the Test TLV only and is
+         independent of BER errors, which is used to indicate a
+         pattern error.";
       reference
         "[MEF7.1] 9.3.4.4";
     }
@@ -498,15 +521,15 @@ module cisco-soam-fm {
       type yang:zero-based-counter64;
 
       description
-        "This attribute contains the count of the total number of TST frames
-         received with BER or data errors. The count is incremented when the bit
-         pattern in the received TST frame does not match the expected bit
-         pattern. This attribute is only applicable to the MEP receiving ETH-Test 
-         messages.
+        "This attribute contains the count of the total number of TST
+         frames received with BER or data errors. The count is
+         incremented when the bit pattern in the received TST frame
+         does not match the expected bit pattern. This attribute is
+         only applicable to the MEP receiving ETH-Test messages.
 
-         The BER error count is independent of the CRC error count and is used to
-         indicate a data pattern error, while the CRC error is used to  indicate
-         a TLV CRC error.";
+         The BER error count is independent of the CRC error count
+         and is used to indicate a data pattern error, while the CRC
+         error is used to indicate a TLV CRC error.";
       reference
         "[MEF7.1] 9.3.4.4";
     }
@@ -520,9 +543,9 @@ module cisco-soam-fm {
       type yang:zero-based-counter64;
     
       description
-        "This attribute contains the count of the total number of TST frames
-         transmitted. This attribute is only applicable to the MEP sending
-         ETH-TST frames. (i.e. The MEP under Test)";
+        "This attribute contains the count of the total number of TST
+         frames transmitted. This attribute is only applicable to the
+         MEP sending ETH-TST frames. (i.e. The MEP under Test)";
       reference
         "[MEF7.1] 9.3.4.4";
     }
@@ -534,9 +557,10 @@ module cisco-soam-fm {
       default false;
 
       description
-        "This attribute specifies whether ETH-AIS transmission is enabled. The
-         value 'true' indicates ETH-AIS transmission is enabled. The
-         value 'false' indicates ETH-AIS transmission is disabled.";
+        "This attribute specifies whether ETH-AIS transmission is
+         enabled. The value 'true' indicates ETH-AIS transmission is
+         enabled. The value 'false' indicates ETH-AIS transmission is
+         disabled.";
       reference
         "[MEF7.1] 9.3.4.1, [MEF30] 8.4";
     }
@@ -568,8 +592,8 @@ module cisco-soam-fm {
       default 0;
 
       description
-        "The MEG/Maintenance Domain Level of the Client ETH-AIS PDU (transmitted
-         level).";
+        "The MEG/Maintenance Domain Level of the Client ETH-AIS PDU
+         (transmitted level).";
       reference
         "[Y.1731] 7.4";
     }
@@ -579,9 +603,9 @@ module cisco-soam-fm {
       default false;
 
       description
-        "This attribute specifies the eligibility of frames with ETH-AIS
-         information to be discarded when congestion conditions are
-         encountered.
+        "This attribute specifies the eligibility of frames with
+         ETH-AIS information to be discarded when congestion
+         conditions are encountered.
 
          The value 'true' indicates frames are eligible to be
          discarded.
@@ -599,28 +623,31 @@ module cisco-soam-fm {
   //
   augment "/cfm:maintenance-domain/cfm:maintenance-association" {
     description
-      "This set of data definitions represents the Maintenance Entity Group (Y.1731) 
-       configuration that is unique from the Maintenance Association.";
+      "This set of data definitions represents the Maintenance Entity
+       Group (Y.1731) configuration that is unique from the
+       Maintenance Association.";
 
     leaf y1731-compliant {
       type boolean;
       description
-        "A boolean flag to indicate whether the MEG ID/MAID for this MEG operates
-         in conformance with 802.1q (if false) or Y.1731 (if true).
+        "A boolean flag to indicate whether the MEG ID/MAID for this
+         MEG operates in conformance with 802.1q (if false) or Y.1731
+         (if true).
          When set to false:
-          - The format of the MAID (Maintenance Association ID) is controlled
-            by the name-type and name in the maintenance-association instance,
-            and the name-type and name in the maintenance-domain instance.
+          - The format of the MAID (Maintenance Association ID) is
+            controlled by the name-type and name in the
+            maintenance-association instance, and the name-type and
+            name in the maintenance-domain instance.
           - The meg-id-format and meg-level leafs are ignored.
           - The level is controlled by the md-level leaf.
          When set to true:
-          - The MEG shall be in a maintenance-domain where name-type has the value
-            none(1).
+          - The MEG shall be in a maintenance-domain where name-type
+            has the value none(1).
           - The format of the MEG ID is as defined by meg-id-format.
           - The name-type in the maintenance-association is ignored.
-          - The name leaf contains the MEG ID value unless the meg-id-format
-            is set to 'icc-based' in which case it contains the value of the
-            'icc-name-value' leaf
+          - The name leaf contains the MEG ID value unless the
+            meg-id-format is set to 'icc-based' in which case it
+            contains the value of the 'icc-name-value' leaf
           - The md-level leaf is ignored, and the level is controlled
             by the meg-level leaf.";
       reference
@@ -632,17 +659,19 @@ module cisco-soam-fm {
         enum primary-vid {
           value 1;
           description
-            "Primary VLAN ID. 12 bits represented in a 2-octet integer:
-              - 4 least significant bits of the first byte contains the
-                4 most significant bits of the 12 bits primary VID
-              - second byte contains the 8 least significant bits of the
-                primary VID";
+            "Primary VLAN ID. 12 bits represented in a 2-octet
+             integer:
+              - 4 least significant bits of the first byte contains
+                the 4 most significant bits of the 12 bits primary
+                VID
+              - second byte contains the 8 least significant bits of
+                the primary VID";
         }
         enum char-string {
           value 2;
           description
-            "RFC2579 DisplayString, except that the character codes 0-31 (decimal)
-             are not used. (1..45) octets";
+            "RFC2579 DisplayString, except that the character codes
+             0-31 (decimal) are not used. (1..45) octets";
         }
         enum unsigned-int16 {
           value 3;
@@ -652,9 +681,9 @@ module cisco-soam-fm {
         enum rfc2865-vpn-id {
           value 4;
           description
-            "RFC 2685 VPN ID 3 octet VPN authority Organizationally Unique Identifier
-             followed by 4 octet VPN index identifying VPN according to
-             the OUI";
+            "RFC 2685 VPN ID 3 octet VPN authority Organizationally
+             Unique Identifier followed by 4 octet VPN index
+             identifying VPN according to the OUI";
         }
         enum icc-based {
           value 32;
@@ -669,8 +698,8 @@ module cisco-soam-fm {
         "This enumeration indicates the format of the MEG ID that is
          sent in the OAM PDUs. The primary-vid, char-string,
          unsigned-int16, and rfc2865-vpn-id types are more fully
-         explained in [802.1q] 17.5. The icc-based type is from [Y.1731]
-         Annex A.";
+         explained in [802.1q] 17.5. The icc-based type is from
+         [Y.1731] Annex A.";
       reference
         "[Y.1731] Table A-1, [802.1q] 17.5, 21.6.5.1";
     }
@@ -683,13 +712,13 @@ module cisco-soam-fm {
       must "../meg-id-format = icc-based";
       
       description
-        "ICC-based MEG ID Format, thirteen octet field. It consists of two
-         subfields: the ITU Carrier Code (ICC) followed by a unique MEG
-         ID code (UMC). The ITU Carrier Code consists of 1-6
-         left-justified characters, alphabetic, or leading alphabetic
-         with trailing numeric. The UMC code immediately follows the ICC
-         and shall consist of 7-12 characters, with trailing NULLs,
-         completing the 13-character MEG ID Value.";
+        "ICC-based MEG ID Format, thirteen octet field. It consists
+         of two subfields: the ITU Carrier Code (ICC) followed by a
+         unique MEG ID code (UMC). The ITU Carrier Code consists of
+         1-6 left-justified characters, alphabetic, or leading
+         alphabetic with trailing numeric. The UMC code immediately
+         follows the ICC and shall consist of 7-12 characters, with
+         trailing NULLs, completing the 13-character MEG ID Value.";
       reference
         "[Y.1731] Annex A";
     }
@@ -722,13 +751,15 @@ module cisco-soam-fm {
       units "milliseconds";
 
       description
-        " This attribute specifies a configurable time interval to  detect a
-         change in Connectivity Status. This is the timer timeout value that
-         is used by the Remote Maintenance Endpoint (MEP) state machine.
+        "This attribute specifies a configurable time interval to
+         detect a change in Connectivity Status. This is the timer
+         timeout value that is used by the Remote Maintenance
+         Endpoint (MEP) state machine.
 
 
-         This attribute overrides the standard CCM loss of connectivity
-         time interval which is 3.5 times the CCM interval.";
+         This attribute overrides the standard CCM loss of
+         connectivity time interval which is 3.5 times the CCM
+         interval.";
       reference
         "[MEF17] R2c, [802.1q] 20.1";
     }
@@ -741,12 +772,13 @@ module cisco-soam-fm {
       default 0;
 
       description
-        "This attribute defines a period of time after which an instance in the
-         remote-mep-database is removed if a valid CCM has not been
-         received by the local MEP, i.e. remote-mep-state is set to
-         'failed' for the period of time indicated by this parameter.
+        "This attribute defines a period of time after which an
+         instance in the remote-mep-database is removed if a valid
+         CCM has not been received by the local MEP, i.e.
+         remote-mep-state is set to 'failed' for the period of time
+         indicated by this parameter.
 
-        A value of zero indicates no aging will occur.";
+         A value of zero indicates no aging will occur.";
       reference
         "[MEF17] R5a and R5b, [802.1q] 20.19, 20.20";
     }
@@ -756,9 +788,9 @@ module cisco-soam-fm {
 
       description
         "Indicates whether a Port Status TLV is included in CCM frame
-         transmission. A value of 'true' indicates that the Port Status
-         TLV is to be included. A value of 'false' indicates that the
-         Port Status TLV is not to be included.";
+         transmission. A value of 'true' indicates that the Port
+         Status TLV is to be included. A value of 'false' indicates
+         that the Port Status TLV is not to be included.";
       reference
         "[MEF7.1] 9.2.2";
     }
@@ -768,20 +800,23 @@ module cisco-soam-fm {
       default true;
 
       description
-        "Indicates whether a Interface Status TLV is included in CCM frame
-         transmission. A value of 'true' indicates that the Interface Status TLV
-         is to be included. A value of 'false' indicates that the Interface
-         Status TLV is not to be included.";
+        "Indicates whether a Interface Status TLV is included in CCM
+         frame transmission. A value of 'true' indicates that the
+         Interface Status TLV is to be included. A value of 'false'
+         indicates that the Interface Status TLV is not to be
+         included.";
       reference
         "[MEF7.1] 9.2.2";
     }
   }
 
-  augment "/cfm:maintenance-domain/cfm:maintenance-association/cfm:maintenance-association-end-point" {
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point" {
     description
-      "This set of data definitions extends the MEG End Point (as described in
-       Y.1731) or Maintenance association End Point (as described in 802.1q)
-       defined in the MEF CFM module (cisco-cfm)";
+      "This set of data definitions extends the MEG End Point (as
+       described in Y.1731) or Maintenance association End Point (as
+       described in 802.1q) defined in the MEF CFM module
+       (cisco-cfm)";
     reference
       "[MEF7.1] 9.2.2";
 
@@ -791,8 +826,8 @@ module cisco-soam-fm {
       config false;
 
       description
-        "This attribute indicates the operational state (current capability) of
-         the MEP.";
+        "This attribute indicates the operational state (current
+         capability) of the MEP.";
       reference
         "[MEF7.1] 9.2.5";
     }
@@ -801,31 +836,31 @@ module cisco-soam-fm {
       type enumeration {
         enum active {
         description
-          "Refers to the ability to exchange SOAM PDU frames among all the UNIs 
-           of an EVC.";
+          "Refers to the ability to exchange SOAM PDU frames among
+           all the UNIs of an EVC.";
         }
         enum partially-active {
         description
-          "Refers to the ability to exchange SOAM PDU frames among some but not
-           all the UNIs of an EVC.";
+          "Refers to the ability to exchange SOAM PDU frames among
+           some but not all the UNIs of an EVC.";
         }
         enum inactive {
         description
-          "Refers to the ability to exchange SOAM PDU frames among any of the UNIs
-           of an EVC.";
+          "Refers to the ability to exchange SOAM PDU frames among
+           any of the UNIs of an EVC.";
         }
       }
       config false;
 
       description
-        "This attribute indicates the connectivity status for a MEP in an EVC
-         MEs. An 'active' MEP Connectivity Status refers to the ability
-         to exchange SOAM PDU frames among all the UNIs of an EVC. A
-         'partially-active' MEP Connectivity Status refers to the
-         ability to exchange SOAM PDU frames among some but not all the
-         UNIs of an EVC. An 'inactive' MEP Connectivity Status refers to
-         the inability to exchange SOAM PDU frames among any of the UNIs
-         of an EVC.";
+        "This attribute indicates the connectivity status for a MEP
+         in an EVC MEs. An 'active' MEP Connectivity Status refers to
+         the ability to exchange SOAM PDU frames among all the UNIs
+         of an EVC. A 'partially-active' MEP Connectivity Status
+         refers to the ability to exchange SOAM PDU frames among some
+         but not all the UNIs of an EVC. An 'inactive' MEP
+         Connectivity Status refers to the inability to exchange SOAM
+         PDU frames among any of the UNIs of an EVC.";
       reference
         "[MEF7.1] 9.2.5";
     }
@@ -835,9 +870,10 @@ module cisco-soam-fm {
       config false;
 
       description
-        "An enumerated value of the Port status TLV sent in the last CCM from the
-         local MEP or the default value psNoPortStateTLV indicating no
-         CCM has been sent or no Port Status TLV has been sent.";
+        "An enumerated value of the Port status TLV sent in the last
+         CCM from the local MEP or the default value psNoPortStateTLV
+         indicating no CCM has been sent or no Port Status TLV has
+         been sent.";
       reference
         "[802.1q] 17.5";
     }
@@ -847,10 +883,10 @@ module cisco-soam-fm {
       config false;
 
       description
-        "An enumerated value of the Interface status TLV sent in the last CCM
-         from the local MEP or the default value no-status-tlv
-         indicating no CCM has been sent or no Interface Status TLV has
-         been sent.";
+        "An enumerated value of the Interface status TLV sent in the
+         last CCM from the local MEP or the default value
+         no-status-tlv indicating no CCM has been sent or no
+         Interface Status TLV has been sent.";
       reference
         "[802.1q] 17.5";
     }
@@ -860,17 +896,18 @@ module cisco-soam-fm {
       config false;
 
       description
-        "This attribute indicates the state of the previous MEP defects,
-         that was sent with the previous
+        "This attribute indicates the state of the previous MEP
+         defects, that was sent with the previous
          mep-defect-alarm notification. It is always some *previous*
-         value of cfm:active-defects. Once an mep-defect-alarm is sent
-         the mep-defect-alarm that was sent in the notification
+         value of cfm:active-defects. Once an mep-defect-alarm is
+         sent the mep-defect-alarm that was sent in the notification
          updates the contents of this leaf.
 
-         If no mep-defect-alarm notification has been sent the value of
-         this leaf is '0'.";
+         If no mep-defect-alarm notification has been sent the value
+         of this leaf is '0'.";
       reference
-        "[MEF31] MEF-SOAM-FM-MIB.mefSoamMepStatusLastDefectSentStatus";
+        "[MEF31]
+         MEF-SOAM-FM-MIB.mefSoamMepStatusLastDefectSentStatus";
     }
 
     leaf rdi-transmit-status {
@@ -878,12 +915,12 @@ module cisco-soam-fm {
       config false;
 
       description
-        "Indicates whether the local MEP is generating a RDI bit in the CCM that
-         it transmits. A value of 'true' indicates that a RDI bit was
-         set in the last CCM that the MEP transmitted. A value of
-         'false' indicates that the last CCM transmitted by the MEP did
-         not set the RDI bit or that a CCM has never been transmitted by
-         the MEP.";
+        "Indicates whether the local MEP is generating a RDI bit in
+         the CCM that it transmits. A value of 'true' indicates that
+         a RDI bit was set in the last CCM that the MEP transmitted.
+         A value of 'false' indicates that the last CCM transmitted
+         by the MEP did not set the RDI bit or that a CCM has never
+         been transmitted by the MEP.";
       reference
         "[MEF7.1] 9.2.2";
     }
@@ -893,28 +930,30 @@ module cisco-soam-fm {
       config false;
 
       description
-        "This attribute indicates the count of incoming OAM frames discarded at
-         the MEP. This count includes frames discarded because they have
-         an unknown OpCode, and frames (other than CCMs) discarded
-         because they have a level below the level of the MEP.  In other
-         words, this attribute counts frames discarded by the MEP Equal
-         OpCode Demultiplexer and the MEP Low OpCode Demultiplexer
-         described in IEEE 802.1q Sn 19.2.7, Table 19-1 and Figure
-         19-2.  This count does not include frames that are malformed,
-         or that contain OpCode-specific errors (such as CCM defects or
-         LBRs with bad data).";
+        "This attribute indicates the count of incoming OAM frames
+         discarded at the MEP. This count includes frames discarded
+         because they have an unknown OpCode, and frames (other than
+         CCMs) discarded because they have a level below the level of
+         the MEP. In other words, this attribute counts frames
+         discarded by the MEP Equal OpCode Demultiplexer and the MEP
+         Low OpCode Demultiplexer described in IEEE 802.1q Sn 19.2.7,
+         Table 19-1 and Figure 19-2.  This count does not include
+         frames that are malformed, or that contain OpCode-specific
+         errors (such as CCM defects or LBRs with bad data).";
       reference
         "[802.1q] 19.2.7, [MEF31]
         MEF-SOAM-FM-MIB.mefSoamMepFmStatsInOamFramesDiscarded";
     }
   }
 
-  augment "/cfm:maintenance-domain/cfm:maintenance-association/cfm:maintenance-association-end-point/cfm:continuity-check" {
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point" +
+          "/cfm:continuity-check" {
     description
-      "This set of data definitions extends the proactive Ethernet OAM Fault
-       Management and Performance Monitoring Continuity Check function
-       (ETH-CC) as described in Y.1731 and 802.1q and defined in
-       cisco-cfm";
+      "This set of data definitions extends the proactive Ethernet
+       OAM Fault Management and Performance Monitoring Continuity
+       Check function (ETH-CC) as described in Y.1731 and 802.1q and
+       defined in cisco-cfm";
     reference
       "[MEF7.1] 9.3.1";
 
@@ -923,11 +962,12 @@ module cisco-soam-fm {
       default false;
 
       description
-        "This attribute specifies the eligibility of frames with ETH-CC and
-         ETH-RDI information to be discarded when congestion conditions
-         are encountered.
+        "This attribute specifies the eligibility of frames with
+         ETH-CC and ETH-RDI information to be discarded when
+         congestion conditions are encountered.
 
-         The value 'true' indicates frames are eligible to be discarded.
+         The value 'true' indicates frames are eligible to be
+         discarded.
 
          The value 'false' indicates frames are not eligible to be
          discarded.";
@@ -940,23 +980,25 @@ module cisco-soam-fm {
       config false;
 
       description
-        "This attribute indicates the count of the total number of valid (not
-         malformed) CCMs received by the MEP.  In other words, it counts
-         the frames received by the MEP Continuity Check Receiver
-         described in IEEE 802.1q Sn 19.2.8 and Figure 19-2.  This
-         includes CCMs at a lower level, CCMs with defects, CCMs from an
-         unexpected peer MEP and out-of-sequence CCMs.  It does not
-         include CCMs at a higher level than the MEP.";
+        "This attribute indicates the count of the total number of
+         valid (not malformed) CCMs received by the MEP.  In other
+         words, it counts the frames received by the MEP Continuity
+         Check Receiver described in IEEE 802.1q Sn 19.2.8 and Figure
+         19-2.  This includes CCMs at a lower level, CCMs with
+         defects, CCMs from an unexpected peer MEP and
+         out-of-sequence CCMs.  It does not include CCMs at a higher
+         level than the MEP.";
       reference
-        "[802.1q] 19.2.8, [MEF31] MEF-SOAM-FM-MIB.mefSoamMepFmStatsInCcmTotal";
+        "[802.1q] 19.2.8,
+         [MEF31] MEF-SOAM-FM-MIB.mefSoamMepFmStatsInCcmTotal";
     }
   }
 
   augment "/cfm:transmit-loopback/cfm:input" {
     description
-      "This set of data definitions extends on-demand Ethernet OAM Fault
-       Management Loopback function (ETH-LB) as defined in Y.1731 and
-       802.1q and defined in cisco-cfm";
+      "This set of data definitions extends on-demand Ethernet OAM
+       Fault Management Loopback function (ETH-LB) as defined in
+       Y.1731 and 802.1q and defined in cisco-cfm";
     reference
       "[MEF7.1] 9.3.2";
 
@@ -965,11 +1007,11 @@ module cisco-soam-fm {
       default false;
 
       description
-        "This attribute specifies whether a MEP uses unicast or multicast
-         to send the ETH-LB messages (LBM). The 802.1ag standard only allows
-         unicast LBM. ITU-T Y.1731 allows LBM to be multicast. This attribute
-         allows the MEP to send either multicast or unicast LBM on a per MEP
-         basis.
+        "This attribute specifies whether a MEP uses unicast or
+         multicast to send the ETH-LB messages (LBM). The 802.1ag
+         standard only allows unicast LBM. ITU-T Y.1731 allows LBM to
+         be multicast. This attribute allows the MEP to send either
+         multicast or unicast LBM on a per MEP basis.
 
          The value 'true' indicates multicast is enabled.
 
@@ -986,17 +1028,17 @@ module cisco-soam-fm {
       default 1000;
 
       description
-        "This attribute specifies the period between LBM transmissions in an LB
-         Session. For an LB Session, the period for LBM transmission
-         is configurable in the range 0 and sixty seconds (60 s). Granularity
-         of 100ms is required. 
+        "This attribute specifies the period between LBM
+         transmissions in an LB Session. For an LB Session, the
+         period for LBM transmission is configurable in the range 0
+         and sixty seconds (60 s). Granularity of 100ms is required. 
 
          The transmission of the next LBM is not dependent upon the
          reception the first LBR. The next LBM is sent out based upon
          the interval count.
 
-         An interval count of '0' indicates that the subsequent LBM is sent
-         out with the minimum possible delay.";
+         An interval count of '0' indicates that the subsequent LBM
+         is sent out with the minimum possible delay.";
       reference
         "[MEF7.1] 9.3.2.1";
     }
@@ -1008,21 +1050,25 @@ module cisco-soam-fm {
       units "bytes";
 
       must "not(../data-tlv)" {
-        error-message "Specific frame-size not allowed, frame size is based on data-tlv";
+        error-message
+          "Specific frame-size not allowed, frame size is based on
+           data-tlv";
       }
 
       description
-        "This attribute specifies the LBM frame size. For an LB Session, the size
-         of the LBM frame is configurable to any Ethernet frame size
-         between 64 Bytes and the maximum transmission unit of the
-         EVC.
+        "This attribute specifies the LBM frame size. For an LB
+         Session, the size of the LBM frame is configurable to any
+         Ethernet frame size between 64 Bytes and the maximum
+         transmission unit of the EVC.
 
-         The range of frame sizes from 64 through 2000 octets, in 4 octet increments,
-         MUST be supported, and the range of frame sizes from 2004 through 9600
-         octets, in 4 octet increments, SHOULD be supported.
+         The range of frame sizes from 64 through 2000 octets, in 4
+         octet increments, MUST be supported, and the range of frame
+         sizes from 2004 through 9600 octets, in 4 octet increments,
+         SHOULD be supported.
 
-         The adjustment to the frame size of the standard LBM PDU size is accomplished
-         by the addition of a Data TLV or a Test TLV.";
+         The adjustment to the frame size of the standard LBM PDU
+         size is accomplished by the addition of a Data TLV or a Test
+         TLV.";
       reference
         "[MEF7.1] 9.3.2.1";
     }
@@ -1037,14 +1083,16 @@ module cisco-soam-fm {
                 }
       }
       must "not(../data-tlv)" {
-        error-message "Specific data-pattern not allowed, pattern is based on data-tlv";
+        error-message
+          "Specific data-pattern not allowed, pattern is based on
+           data-tlv";
       }
       default zeroes;        
 
       description
-        "This attribute specifies the LBM data pattern included in a Data TLV
-         when the size of the LBM frame is determined by the frame-size
-         leaf and test-tlv-included is 'false'.";
+        "This attribute specifies the LBM data pattern included in a
+         Data TLV when the size of the LBM frame is determined by the
+         frame-size leaf and test-tlv-included is 'false'.";
       reference
         "[MEF31] MEF-SOAM-FM-MIB.mefSoamLbCfgDataPattern";
     }
@@ -1052,13 +1100,15 @@ module cisco-soam-fm {
     leaf test-tlv-included {
       type boolean;
       must "not(../data-tlv)" {
-        error-message "Test-tlv-included does not apply when data-tlv exists";
+        error-message
+          "Test-tlv-included does not apply when data-tlv exists";
       }
       default false;  
       
       description
-        "Indicates whether a Test TLV or Data TLV is included when the size of
-         the LBM frame is determined by the frame-size leaf.
+        "Indicates whether a Test TLV or Data TLV is included when
+         the size of the LBM frame is determined by the frame-size
+         leaf.
 
          A value of 'true' indicates that the Test TLV is to be
          included.
@@ -1066,22 +1116,26 @@ module cisco-soam-fm {
          A value of 'false' indicates that the Data TLV is to be
          included.";
       reference
-        "[Y.1731] 9.3, [MEF31] MEF-SOAM-FM-MIB.mefSoamLbCfgDataPattern";
+        "[Y.1731] 9.3,
+         [MEF31] MEF-SOAM-FM-MIB.mefSoamLbCfgDataPattern";
     }  
 
     leaf test-tlv-pattern {
       type test-pattern-type;
       must "not(../data-tlv)" {
-        error-message "Test-tlv-pattern does not apply when data-tlv exists";
+        error-message
+          "Test-tlv-pattern does not apply when data-tlv exists";
       }
       default "null-signal-without-crc-32";  
 
       description
-        "This attribute specifies the type of test pattern to be sent in the LBM
-         frame Test TLV when the size of LBM PDU is determined by the
-         frame-size leaf and test-tlv-included is 'true'.";
+        "This attribute specifies the type of test pattern to be sent
+         in the LBM frame Test TLV when the size of LBM PDU is
+         determined by the frame-size leaf and test-tlv-included is
+         'true'.";
       reference
-        "[MEF7.1] 9.3.2.1, [MEF31] MEF-SOAM-FM-MIB.mefSoamLbCfgTestTlvPattern";
+        "[MEF7.1] 9.3.2.1,
+         [MEF31] MEF-SOAM-FM-MIB.mefSoamLbCfgTestTlvPattern";
     }
     
     leaf timeout {
@@ -1091,19 +1145,20 @@ module cisco-soam-fm {
       default 5000;
 
       description
-        "This attribute specifies the maximum amount of time to receive an LBR in
-         response to a LBM. If a LBR is not received within the timeout
-         value it is considered lost.";
+        "This attribute specifies the maximum amount of time to
+         receive an LBR in response to a LBM. If a LBR is not
+         received within the timeout value it is considered lost.";
       reference
         "[MEF31] MEF-SOAM-FM-MIB.mefSoamLbCfgTimeout";
     }
   }
 
-  augment "/cfm:maintenance-domain/cfm:maintenance-association/cfm:maintenance-association-end-point/cfm:loopback" {
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/cfm:loopback" {
     description
-      "This set of data definitions extends on-demand Ethernet OAM Fault
-       Management Loopback function (ETH-LB) as defined in Y.1731 and
-       802.1q and defined in cisco-cfm";
+      "This set of data definitions extends on-demand Ethernet OAM
+       Fault Management Loopback function (ETH-LB) as defined in
+       Y.1731 and 802.1q and defined in cisco-cfm";
     reference
       "[MEF7.1] 9.3.2";
     leaf crc-errors-in {
@@ -1111,10 +1166,10 @@ module cisco-soam-fm {
       config false;
 
       description
-        "This attribute contains the count of the total number of LBR messages
-         received with CRC errors. This is only applicable when the
-         ETH-LB includes the test TLV with a test pattern of null-crc-32
-         or pbrs-crc-32.";
+        "This attribute contains the count of the total number of LBR
+         messages received with CRC errors. This is only applicable
+         when the ETH-LB includes the test TLV with a test pattern of
+         null-crc-32 or pbrs-crc-32.";
       reference
         "[MEF7.1] 9.3.2.2";
     }
@@ -1132,8 +1187,9 @@ module cisco-soam-fm {
         type cfm:lbm-transaction-id-type;
 
         description
-          "Loopback transaction identifier returned by a previous loopback message
-           command, indicating which loopback request is returned.";
+          "Loopback transaction identifier returned by a previous
+           loopback message command, indicating which loopback
+           request is returned.";
         reference
           "[MEF31] MEF-SOAM-FM-MIB.mefSoamLbrMulticastTransId";
       }
@@ -1143,10 +1199,10 @@ module cisco-soam-fm {
         }
           
         description
-          "An index to distinguish among multiple LBRs with the same LBR
-           Transaction Identifier field value. Value is assigned
-           sequentially from 1, in the order that the Loopback Initiator
-           received the LBR";
+          "An index to distinguish among multiple LBRs with the same
+           LBR Transaction Identifier field value. Value is assigned
+           sequentially from 1, in the order that the Loopback
+           Initiator received the LBR";
         reference
           "[MEF31] MEF-SOAM-FM-MIB.mefSoamLbrMulticastReceiveOrder";
       }
@@ -1163,7 +1219,8 @@ module cisco-soam-fm {
     }
   }
 
-  augment "/cfm:maintenance-domain/cfm:maintenance-association/cfm:maintenance-association-end-point/cfm:linktrace" {
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point/cfm:linktrace" {
     description
       "Augments to support the enhanced CFM Linktrace functionality";
     reference
@@ -1174,8 +1231,8 @@ module cisco-soam-fm {
       config false;
 
       description
-        "This attribute contains the count of the total number of LTM messages
-         transmitted by the MEP";
+        "This attribute contains the count of the total number of LTM
+         messages transmitted by the MEP";
       reference
         "[MEF31] MEF-SOAM-FM-MIB.mefSoamLtLtmTransmitted";
     }
@@ -1185,8 +1242,8 @@ module cisco-soam-fm {
       config false;
 
       description
-        "This attribute contains the count of the total number of LTR messages
-         received by the MEP";
+        "This attribute contains the count of the total number of LTR
+         messages received by the MEP";
       reference
         "[MEF31] MEF-SOAM-FM-MIB.mefSoamLtLtrReceived";
     }
@@ -1196,8 +1253,8 @@ module cisco-soam-fm {
       config false;
 
       description
-        "This attribute contains the count of the total number of LTM messages
-         received by the MEP";
+        "This attribute contains the count of the total number of LTM
+         messages received by the MEP";
       reference
         "[MEF31] MEF-SOAM-FM-MIB.mefSoamLtLtmReceived";
     }
@@ -1207,14 +1264,15 @@ module cisco-soam-fm {
       config false;
 
       description
-        "This attribute contains the count of the total number of LTR messages
-         transmitted by the MEP";
+        "This attribute contains the count of the total number of LTR
+         messages transmitted by the MEP";
       reference
         "[MEF31] MEF-SOAM-FM-MIB.mefSoamLtLtrTransmitted";
     }
   }
 
-  augment "/cfm:maintenance-domain/cfm:maintenance-association/cfm:maintenance-association-end-point" {
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point" {
     description
       "Augments to support the AIS functionality";
     reference
@@ -1222,9 +1280,9 @@ module cisco-soam-fm {
 
     container alarm-indication-signal {
       description
-        "This set of data definitions covers the proactive Ethernet OAM Fault
-         Management Alarm Indication Signal function (ETH-AIS) as
-         defined in Y.1731 and extended in MEF30";
+        "This set of data definitions covers the proactive Ethernet
+         OAM Fault Management Alarm Indication Signal function
+         (ETH-AIS) as defined in Y.1731 and extended in MEF30";
       reference
         "[Y.1731] 7.4, [MEF30] 8.5";
 
@@ -1235,8 +1293,8 @@ module cisco-soam-fm {
         config false;
 
         description
-          "This attribute specifies the current AIS transmission status of the
-           MEP.
+          "This attribute specifies the current AIS transmission
+           status of the MEP.
 
            The value 'true' indicates AIS frames are currently being
            transmitted by the MEP.
@@ -1252,10 +1310,10 @@ module cisco-soam-fm {
         config false;
 
         description
-          "This attribute specifies the current AIS receive status of the
-           MEP. The value 'true' indicates an AIS PDU has been received 
-           and 3.5 times the interval defined in the PDU has not yet 
-           passed, otherwise it is 'false'.";
+          "This attribute specifies the current AIS receive status of
+           the MEP. The value 'true' indicates an AIS PDU has been
+           received and 3.5 times the interval defined in the PDU has
+           not yet passed, otherwise it is 'false'.";
         reference
           "[Y.1731] 7.4";
       }
@@ -1265,9 +1323,9 @@ module cisco-soam-fm {
         config false;
 
         description
-          "This attribute contains the count of the total number of AIS messages
-           sent by the MEP. The count is incremented every time an AIS
-           PDU is transmitted by the MEP.";
+          "This attribute contains the count of the total number of
+           AIS messages sent by the MEP. The count is incremented
+           every time an AIS PDU is transmitted by the MEP.";
         reference
           "[MEF7.1] 9.3.2.2";        
       }
@@ -1277,9 +1335,9 @@ module cisco-soam-fm {
         config false;
 
         description
-          "This attribute contains the count of the total number of AIS messages
-           received by the MEP. The count is incremented every time an
-           AIS PDU is received by the MEP.";
+          "This attribute contains the count of the total number of
+           AIS messages received by the MEP. The count is incremented
+           every time an AIS PDU is received by the MEP.";
         reference
           "[MEF7.1] 9.3.2.2";
       }
@@ -1289,16 +1347,17 @@ module cisco-soam-fm {
         config false;
 
         description
-          "The source MAC Address Field of last AIS received by the MEP.
-           If no AIS PDU has been received by the NE the MAC address is 
-           set to all zeros.";
+          "The source MAC Address Field of last AIS received by the
+           MEP. If no AIS PDU has been received by the NE the MAC
+           address is set to all zeros.";
         reference
           "[Y.1731] 7.7";
       }
     }
   }
 
-  augment "/cfm:maintenance-domain/cfm:maintenance-association/cfm:maintenance-association-end-point" {
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point" {
     if-feature locked-signal;
     description
       "Augments to support the Locked Signal functionality";
@@ -1307,9 +1366,9 @@ module cisco-soam-fm {
 
     container locked-signal {
       description
-        "This set of data definitions covers the on-demand Ethernet OAM Fault
-         Management Locked Signal function (ETH-LCK) as defined in
-         Y.1731.";
+        "This set of data definitions covers the on-demand Ethernet
+         OAM Fault Management Locked Signal function (ETH-LCK) as
+         defined in Y.1731.";
       reference
         "[Y.1731] 8.6, [MEF7.1] 9.3.4.2";
 
@@ -1320,7 +1379,8 @@ module cisco-soam-fm {
         config false;
 
         description
-          "This attribute specifies the current LCK receive status of the MEP.
+          "This attribute specifies the current LCK receive status of
+           the MEP.
 
            The value 'true' indicates LCK frames are currently being
            received by the MEP.
@@ -1329,10 +1389,10 @@ module cisco-soam-fm {
            being received by the MEP at the specified interval in the
            LCK PDU.
 
-           If no LCK frames are received within an interval of 3.5 times
-           the LCK transmission period indicated in the last LCK frame
-           received, the MEP clears the LCK condition by setting
-           mefSoamLckInStatus to 'false'.";
+           If no LCK frames are received within an interval of 3.5
+           times the LCK transmission period indicated in the last
+           LCK frame received, the MEP clears the LCK condition by
+           setting mefSoamLckInStatus to 'false'.";
         reference
           "[Y.1731] 7.6";
       }
@@ -1342,13 +1402,12 @@ module cisco-soam-fm {
         config false;
 
         description
-          "This attribute contains the count of the total number of LCK messages
-           received. The count is incremented when a ETH-LCK message is
-           received.  This attribute is only applicable to the MEP
-           receiving ETH-LCK messages.
+          "This attribute contains the count of the total number of
+           LCK messages received. The count is incremented when a
+           ETH-LCK message is received.  This attribute is only
+           applicable to the MEP receiving ETH-LCK messages.
 
-           The initial value of this leaf is
-           zero.";
+           The initial value of this leaf is zero.";
         reference
           "[Y.1731] 7.6";
       }
@@ -1358,13 +1417,14 @@ module cisco-soam-fm {
         config false;
 
         description
-          "This attribute specifies the current LCK transmission status of the MEP.
+          "This attribute specifies the current LCK transmission
+           status of the MEP.
 
            The value 'true' indicates LCK frames are currently being
            transmitted by the MEP.
 
-           The value 'false' indicates LCK frames are not currently being
-           transmitted by the MEP.";
+           The value 'false' indicates LCK frames are not currently
+           being transmitted by the MEP.";
         reference
           "[Y.1731] 7.6";
       }
@@ -1374,9 +1434,9 @@ module cisco-soam-fm {
         config false;
 
         description
-          "This attribute contains the count of the total number of LCK messages
-           transmitted. This attribute is only applicable to the MEP
-           sending ETH-LCK messages.
+          "This attribute contains the count of the total number of
+           LCK messages transmitted. This attribute is only
+           applicable to the MEP sending ETH-LCK messages.
 
            The initial value of this leaf is zero.";
         reference
@@ -1385,7 +1445,8 @@ module cisco-soam-fm {
     }
   }
 
-  augment "/cfm:maintenance-domain/cfm:maintenance-association/cfm:maintenance-association-end-point" {
+  augment "/cfm:maintenance-domain/cfm:maintenance-association" +
+          "/cfm:maintenance-association-end-point" {
     if-feature test-signal;
     description
       "Augments to support the Test Signal functionality";
@@ -1394,8 +1455,9 @@ module cisco-soam-fm {
 
     container test-signal {
       description
-        "This container augments cfm:maintenance-association-end-point with data 
-         definitions related to the on-demand OAM Fault Management Test function
+        "This container augments
+         cfm:maintenance-association-end-point with data definitions
+         related to the on-demand OAM Fault Management Test function
          (ETH-Test) defined in [Y.1731].";
       reference
         "[Y.1731] 7.7, [MEF7.1] 9.3.4.3";
@@ -1405,7 +1467,7 @@ module cisco-soam-fm {
         default false;
 
         description
-          " This attribute specifies the enabling of the ETH-Test 
+          "This attribute specifies the enabling of the ETH-Test 
            transmit function. A value of 'true' indicates that the 
            ETH-Test transmit function is enabled. A value of of 
            'false' indicates that ETH-Test transmit function is 
@@ -1454,14 +1516,15 @@ module cisco-soam-fm {
       default 5;
 
       description
-        " A value indicating the shortest time interval in seconds between 
-         the generation of the same notification type per MEP to the list of
-         notification destinations. A server shall generate the first
-         notification of given type for a given MEP immediately. A server shall
-         not generate a second specific notification of the same type for the
-         same MEP until the time interval has expired. A value of zero
-         indicates that all notifications are sent immediately upon detection
-         of the condition.";
+        "A value indicating the shortest time interval in seconds
+         between the generation of the same notification type per MEP
+         to the list of notification destinations. A server shall
+         generate the first notification of given type for a given
+         MEP immediately. A server shall not generate a second
+         specific notification of the same type for the same MEP
+         until the time interval has expired. A value of zero
+         indicates that all notifications are sent immediately upon
+         detection of the condition.";
       reference
         "[MEF31] MEF-SOAM-FM-MIB.mefSoamAlarmInterval";
     }
@@ -1478,13 +1541,14 @@ module cisco-soam-fm {
        content of the test signal parameters.
 
        The content of the test-signal container in the associated MEP
-       will be updated throughout the session upon successful creation.";
+       will be updated throughout the session upon successful
+       creation.";
 
     input {
       uses cfm:maintenance-association-end-point-reference-group {
         description
-          "A reference to the specific MEP on which a test session will be
-           started.";
+          "A reference to the specific MEP on which a test session
+           will be started.";
       }
       uses test-signal-parameters-group;
     }
@@ -1493,13 +1557,14 @@ module cisco-soam-fm {
   rpc abort-test-signal {
     if-feature test-signal;
     description
-      "Administratively abort a test-signal session on a specific MEP";
+      "Administratively abort a test-signal session on a specific
+       MEP";
 
     input {
       uses cfm:maintenance-association-end-point-reference-group {
         description
-          "A reference to the specific MEP on which the ETH Test session should
-           be aborted.";
+          "A reference to the specific MEP on which the ETH Test
+           session should be aborted.";
       }
     }
   }
@@ -1525,8 +1590,8 @@ module cisco-soam-fm {
 
     uses cfm:maintenance-association-end-point-reference-group {
       description
-        "A reference to the specific MEP on which the persistent defect is
-         present";
+        "A reference to the specific MEP on which the persistent
+         defect is present";
     }
 
     leaf last-defect-sent {
@@ -1553,10 +1618,10 @@ module cisco-soam-fm {
   
   notification configuration-error-assert {
     description
-      "A configuration-error-assert notification is generated when an entry is
-       added to the configuration-error-list. The vlan-identifier and interface
-       pair uniquely identifies the configuration-error-list entry that was
-       added.";
+      "A configuration-error-assert notification is generated when an
+       entry is added to the configuration-error-list. The
+       vlan-identifier and interface pair uniquely identifies the
+       configuration-error-list entry that was added.";
     reference
       "[MEF31] MEF-SOAM-FM-MIB.mefSoamConfigErrorAssertAlarm";
 
@@ -1565,23 +1630,25 @@ module cisco-soam-fm {
         path "/cfm:configuration-error-list/cfm:vlan-identifier";
       }
       description
-        "Reference to a specific vlan-identifier in the configuration-error-list";
+        "Reference to a specific vlan-identifier in the
+         configuration-error-list";
     }
     leaf interface {
       type leafref {
         path "/cfm:configuration-error-list/cfm:interface";
       }
       description
-        "Reference to a specific interface in the configuration-error-list";
+        "Reference to a specific interface in the
+         configuration-error-list";
     }
   }
 
   notification configuration-error-clear {
     description
-      "A configuration-error-clear notification is generated when an entry is
-       removed to the configuration-error-list. The vlan-identifier and interface
-       pair uniquely identifies the configuration-error-list entry that was
-       removed.";
+      "A configuration-error-clear notification is generated when an
+       entry is removed to the configuration-error-list. The
+       vlan-identifier and interface pair uniquely identifies the
+       configuration-error-list entry that was removed.";
     reference
       "[MEF31] MEF-SOAM-FM-MIB.mefSoamConfigErrorClearAlarm";
 
@@ -1590,30 +1657,32 @@ module cisco-soam-fm {
         path "/cfm:configuration-error-list/cfm:vlan-identifier";
       }
       description
-        "Reference to a specific vlan-identifier in the configuration-error-list";
+        "Reference to a specific vlan-identifier in the
+         configuration-error-list";
     }
     leaf interface {
       type leafref {
         path "/cfm:configuration-error-list/cfm:interface";
       }
       description
-        "Reference to a specific interface in the configuration-error-list";
+        "Reference to a specific interface in the
+         configuration-error-list";
     }
   }
 
   notification mep-operational-state-changed {
     description
-      "A mep-operational-state-changed notification is sent when the value of a
-       MEP's operational-state changes. It indicates an operational
-       state change in the MEP. This notification is sent whenever the
-       operational status of the MEP changes.";
+      "A mep-operational-state-changed notification is sent when the
+       value of a MEP's operational-state changes. It indicates an
+       operational state change in the MEP. This notification is sent
+       whenever the operational status of the MEP changes.";
     reference
       "[MEF31] MEF-SOAM-FM-MIB.mefSoamMepOperStatusAlarm";
 
     uses cfm:maintenance-association-end-point-reference-group {
       description
-        "A reference to the specific MEP on which the operational-state
-         changed";
+        "A reference to the specific MEP on which the
+         operational-state changed";
     }
 
     leaf operational-state {
@@ -1627,47 +1696,51 @@ module cisco-soam-fm {
   notification lock-alarm {
     if-feature locked-signal;
     description
-      "A lock-alarm notification is sent when either receive-status or
-       transmit-status changes. Reception of the LCK PDU causes the MEP
-       to enter Lock State.  This notification is sent whenever the
-       operational lock status of the MEP changes.";
+      "A lock-alarm notification is sent when either receive-status
+       or transmit-status changes. Reception of the LCK PDU causes
+       the MEP to enter Lock State.  This notification is sent
+       whenever the operational lock status of the MEP changes.";
     reference
       "[MEF31] MEF-SOAM-FM-MIB.mefSoamLckAlarm";
 
     uses cfm:maintenance-association-end-point-reference-group {
       description
-        "A reference to the specific MEP on which the lock alarm is present.";
+        "A reference to the specific MEP on which the lock alarm is
+         present.";
     }
 
     leaf receive-status {
       type boolean;
 
       description
-        "The value of the locked signal receive-status of the affected MEP";
+        "The value of the locked signal receive-status of the
+         affected MEP";
     }    
 
     leaf transmit-status {
       type boolean;
 
       description
-        "The value of the locked signal transmit-status of the affected MEP";
+        "The value of the locked signal transmit-status of the
+         affected MEP";
     }    
   }
 
   notification ais-alarm {
     description
       "An ais-alarm notification is sent when the state of either
-       transmit-status or receive-status changes. Transmit-status is set
-       to 'true' when AIS frames are sent by the MEP and set to 'false'
-       when the MEP stops sending AIS frames. Receive-status is set to
-       'true' when AIS PDUs are received and is set to 'false' when AIS
-       PDUs stop being received.";
+       transmit-status or receive-status changes. Transmit-status is
+       set to 'true' when AIS frames are sent by the MEP and set to
+       'false' when the MEP stops sending AIS frames. Receive-status
+       is set to 'true' when AIS PDUs are received and is set to
+       'false' when AIS PDUs stop being received.";
     reference
       "[MEF31] MEF-SOAM-FM-MIB.mefSoamAisAlarm";
 
     uses cfm:maintenance-association-end-point-reference-group {
       description
-        "A reference to the specific MEP on which the AIS alarm is present.";
+        "A reference to the specific MEP on which the AIS alarm is
+         present.";
     }
 
     leaf receive-status {
