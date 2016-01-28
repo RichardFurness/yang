@@ -34,9 +34,10 @@ module cisco-cfm {
 
      This module is derived from the mef-cfm module defined in MEF
      38. However there are a number of differences from the mef-cfm
-     model, including bug fixes and structural changes. The key
-     differences are:
-     - @@@ add once model is more stable
+     model, which fall into the following categories:
+     - Bug fixes
+     - Change to improve extensibility and maintainability (e.g.
+       use of identities not enums, structural changes)
 
      Reference Overview:
       A number of base documents have been used to create the CFM
@@ -2251,6 +2252,17 @@ module cisco-cfm {
       }
       uses loopback-parameters-group;
     }
+
+    output {
+      leaf transaction-id {
+        type lbm-transaction-id-type;
+        description
+          "The transaction identifier of the newly created loopback
+           session.";
+        reference
+          "[802.1q] 21.7.3";
+      }
+    }
   }
 
   rpc abort-loopback {
@@ -2265,6 +2277,15 @@ module cisco-cfm {
         description
           "The MEP on which the loopback session should be
            administratively aborted";
+      }
+
+      leaf transaction-id {
+        type lbm-transaction-id-type;
+        description
+          "The transaction identifier of the loopback session to
+           stop.";
+        reference
+          "[802.1q] 21.7.3";
       }
     }
   }
@@ -2325,6 +2346,91 @@ module cisco-cfm {
         description
           "The currently active defects on the specific MEP.";
       }
+    }
+  }
+
+  notification loopback-complete {
+    description
+      "A notification that a loopback operation has completed.";
+    reference
+      "[802.1q] 12.14.7.3";
+    
+    uses maintenance-association-end-point-reference-group {
+      description
+        "The MEP on which a loopback operation has completed";
+    }
+
+    uses loopback-parameters-group;
+
+    leaf transaction-id {
+      type lbm-transaction-id-type;
+      description
+        "The transaction identifier of the loopback session that has
+         completed.";
+      reference
+        "[802.1q] 21.7.3";
+    }
+
+    /*
+     * Result information
+     */
+    leaf responses-total {
+      type uint32;
+      description
+        "The number of responses received";
+    }
+    leaf responses-out-of-order {
+      type uint32;
+      description
+        "The number of responses received out-of-order";
+    }
+    leaf responses-corrupt {
+      type uint32;
+      description
+        "The number of responses received with corrupted padding
+         data.";
+    }
+    leaf round-trip-min {
+      type uint32;
+      description
+        "The minimum round-trip time (in milliseconds)";
+    }
+    leaf round-trip-max {
+      type uint32;
+      description
+        "The maximum round-trip time (in milliseconds)";
+    }
+    leaf round-trip-average {
+      type uint32;
+      description
+        "The average round-trip time (in milliseconds)";
+    }
+    leaf duration {
+      type uint32;
+      description
+        "The time between the first and last responses being
+         received (in milliseconds)";
+    }
+  }
+
+  notification linktrace-complete {
+    description
+      "A notification that a linktrace operation has completed.";
+    reference
+      "[802.1q] 12.14.7.4";
+    
+    uses maintenance-association-end-point-reference-group {
+      description
+        "The MEP on which a linktrace operation has completed";
+    }
+    leaf transaction-id {
+      type ltm-transaction-id-type;
+      description
+        "The transaction identifier of the linktrace operation that
+         has completed. Results of the linktrace operation can be
+         found in the linktrace-database for the source MEP.";
+      reference
+        "[802.1q] 12.14.7.4.3:b";
     }
   }
 }

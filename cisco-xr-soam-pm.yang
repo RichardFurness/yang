@@ -35,42 +35,11 @@ module cisco-xr-soam-pm {
   }
 
   /*
-   * Per-metric bucket sizes and bin counts/widths
-   */
-  grouping per-metric-config-group {
-    leaf probes-per-bucket {
-      type uint32;
-      default 1;
-      description
-        "This value acts as a multiplier to increase the Measurement
-         Interval duration to a multiple of the duration defined by
-         'repetition-period' in the base model. This has no impact on
-         the scheduling of the SOAM PDUs, but simply causes PM
-         statistics to be aggregated over a longer period of time.";
-    }
-    leaf bin-width {
-      type uint32 {
-        range "1..10000";
-      }
-
-      description 
-        "This object specifies the width of each bin for this
-         particular metric.
-                 
-         For Delay and IFDV, the units are milliseconds.
-         For Synthetic Loss, the units are percentage points (and the
-         maximum value is 100).
-         For Data Loss, the units are tenths of a percent (and the
-         maximum value is 1000)";
-    }
-  }
-
-  /*
-   * Burst config
+   * Burst config typedefs
    */
   typedef burst-interval-units {
     type enumeration {
-      enum Houts {
+      enum Hours {
         description
           "Send bursts within a probe with an interval unit of
            hours.";
@@ -96,41 +65,8 @@ module cisco-xr-soam-pm {
        value.";
   }
 
-  grouping burst-config-group {
-    leaf burst-interval {
-      type uint32 {
-        range "1 .. 3600";
-      }
-      description
-        "Interval between bursts. This must be specified if, and only
-         if, the burst-enabled is True and burst-interval-unit is not
-         'once'.";
-    }
-    leaf burst-interval-unit {
-      type burst-interval-units;
-      description
-        "Time unit associated with the burst-interval.  This must be
-         specified if, and only if, burst-enabled is True.";
-    }
-    leaf burst-packet-count {
-      type uint32 {
-        range "2 .. 1200";
-      }
-      description
-        "The number of packets in each burst.  This must be specified
-         if, and only if, burst-enabled is True.";
-    }
-    leaf burst-enabled {
-      type boolean;
-      description
-        "Whether or not packets should be sent in bursts. If True,
-         both burst-packet-count and burst-interval-unit must be
-         specified.";
-    }
-  }
-
   /*
-   * Schedule config
+   * Schedule config typedefs
    */
   typedef probe-duration-units {
     type enumeration {
@@ -207,7 +143,72 @@ module cisco-xr-soam-pm {
     description "Probe interval day enum";
   }
 
-  grouping schedule-config-group {
+  /*
+   * Arbitrary hex values for Data TLV
+   */
+  identity hex-4-bytes {
+    base soam-pm:data-tlv-pattern;
+    description
+      "Indicates the Data TLV contains a 4-byte pattern repeated as
+       necessary to the end of the TLV.";
+  }
+  
+  /*
+   * Per-operation configuration to be augmented
+   */
+  grouping per-operation-config-group {
+    /*
+     * Burst configuration
+     */
+    leaf burst-interval {
+      type uint32 {
+        range "1 .. 3600";
+      }
+      description
+        "Interval between bursts. This must be specified if, and only
+         if, the burst-enabled is True and burst-interval-unit is not
+         'once'.";
+    }
+    leaf burst-interval-unit {
+      type burst-interval-units;
+      description
+        "Time unit associated with the burst-interval.  This must be
+         specified if, and only if, burst-enabled is True.";
+    }
+    leaf burst-packet-count {
+      type uint32 {
+        range "2 .. 1200";
+      }
+      description
+        "The number of packets in each burst.  This must be specified
+         if, and only if, burst-enabled is True.";
+    }
+    leaf burst-enabled {
+      type boolean;
+      description
+        "Whether or not packets should be sent in bursts. If True,
+         both burst-packet-count and burst-interval-unit must be
+         specified.";
+    }
+
+    /*
+     * Arbitrary hex values for Data TLV
+     */
+    leaf data-pattern-hex {
+      type uint32;
+      must "../data-pattern = 'hex-4-bytes'";
+      description
+        "If data-pattern is 'hex-4-bytes', this leaf contains a
+         4-byte arbitrary data pattern, represented as the 32-bit
+         unsigned integer that would take this form when in
+         big-endian format. The data TLV is filled with as many
+         repetitions of this pattern as are required to pad the
+         packet to the specified size.";
+    }
+
+    /*
+     * Schedule configuration
+     */
     leaf probe-interval {
       type uint32 {
         range "1..90";
@@ -268,37 +269,49 @@ module cisco-xr-soam-pm {
         "Time unit associated with the probe-duration.";
     }
   }
-  
+
   /*
-   * Arbitrary hex values for Data TLV
+   * Per-metric configuration to be augmented
    */
-  identity hex-4-bytes {
-    base soam-pm:data-tlv-pattern;
-    description
-      "Indicates the Data TLV contains a 4-byte pattern repeated as
-       necessary to the end of the TLV.";
-  }
-  grouping data-tlv-config-group {
-    leaf data-pattern-hex {
+  grouping per-metric-config-group {
+    leaf probes-per-bucket {
       type uint32;
-      must "../data-pattern = 'hex-4-bytes'";
+      default 1;
       description
-        "If data-pattern is 'hex-4-bytes', this leaf contains a
-         4-byte arbitrary data pattern, represented as the 32-bit
-         unsigned integer that would take this form when in
-         big-endian format. The data TLV is filled with as many
-         repetitions of this pattern as are required to pad the
-         packet to the specified size.";
+        "This value acts as a multiplier to increase the Measurement
+         Interval duration to a multiple of the duration defined by
+         'repetition-period' in the base model. This has no impact on
+         the scheduling of the SOAM PDUs, but simply causes PM
+         statistics to be aggregated over a longer period of time.";
     }
-  }
-  
-  /*
-   * Combined config group
-   */
-  grouping config-group {
-    uses burst-config-group;
-    uses data-tlv-config-group;
-    uses schedule-config-group;
+    leaf bin-width {
+      type uint32 {
+        range "1..10000";
+      }
+
+      description 
+        "This object specifies the width of each bin for this
+         particular metric.
+                 
+         For Delay and IFDV, the units are milliseconds.
+         For Synthetic Loss, the units are percentage points (and the
+         maximum value is 100).
+         For Data Loss, the units are tenths of a percent (and the
+         maximum value is 1000)";
+    }
+    leaf number-intervals-stored {
+      type uint32 {
+        range "2..1000";
+      }
+      default 32;
+      description 
+        "This object specifies the number of completed measurement
+         intervals to store in the history statistic table.
+                 
+         At least 32 completed measurement intervals are to be
+         stored. 96 measurement intervals are recommended to be
+         stored.";
+    }
   }
 
   /*
@@ -306,7 +319,7 @@ module cisco-xr-soam-pm {
    * options
    */
   augment "/soam-pm:create-session-on-demand/soam-pm:input" {
-    uses config-group;
+    uses per-operation-config-group;
   }
   augment "/soam-pm:create-session-on-demand/soam-pm:input"+
           "/soam-pm:metrics/soam-pm:metric" {
@@ -314,7 +327,7 @@ module cisco-xr-soam-pm {
   }
 
   /*
-   * PM Profiles
+   * New top-level list for PM Profile configuration
    */
   container pm-profiles {
     description
@@ -336,7 +349,7 @@ module cisco-xr-soam-pm {
           uses per-metric-config-group;
         }
       }
-      uses config-group;
+      uses per-operation-config-group;
     }
   }
 
@@ -357,7 +370,7 @@ module cisco-xr-soam-pm {
          session.";
     }
 
-    uses config-group;
+    uses per-operation-config-group;
   }
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
           "/cfm:maintenance-association-end-point"+
@@ -384,7 +397,7 @@ module cisco-xr-soam-pm {
           "/cfm:maintenance-association-end-point"+
           "/soam-pm:on-demand-sessions" +
           "/soam-pm:on-demand-session" {
-    uses config-group;
+    uses per-operation-config-group;
   }
   augment "/cfm:maintenance-domain/cfm:maintenance-association" +
           "/cfm:maintenance-association-end-point"+

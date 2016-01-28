@@ -32,8 +32,10 @@ module cisco-soam-fm {
 
      This module is derived from the mef-soam-fm module defined in
      MEF 38. However there are a number of differences from the
-     mef-soam-fm model. The key differences are:
-     - @@@ add once model is more stable
+     mef-soam-fm model, which fall into the following categories:
+     - Bug fixes
+     - Change to improve extensibility and maintainability (e.g.
+       use of identities not enums, structural changes)
 
      Reference Overview:
       A number of base documents have been used to create the SOAM FM

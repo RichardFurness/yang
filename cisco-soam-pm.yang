@@ -33,8 +33,10 @@ module cisco-soam-pm {
 
      This module is derived from the mef-soam-pm module defined in
      MEF 39. However there are a number of differences from the
-     mef-soam-fm model. The key differences are:
-     - @@@ add once model is more stable
+     mef-soam-fm model, which fall into the following categories:
+     - Bug fixes
+     - Change to improve extensibility and maintainability (e.g.
+       use of identities not enums, structural changes)
      
      Reference Overview:
       A number of base documents have been used to create the
@@ -700,7 +702,9 @@ module cisco-soam-pm {
       list counter {
         key type;
         description
-          "List of LM-specific counter types";
+          "List of LM-specific counter types. A counter type will be
+           measured/reported if and only if it is present in this
+           list.";
 
         leaf type {
           type identityref {
@@ -708,14 +712,6 @@ module cisco-soam-pm {
           }
           description
             "The type of loss counter";
-        }
-
-        leaf enable {
-          type boolean;
-          default false;
-          description
-            "Whether measurement/reporting of this loss counter is
-             enabled.";
         }
       }
     }
@@ -1000,7 +996,9 @@ module cisco-soam-pm {
       list metric {
         key metric-type;
         description
-          "Configuration for a specific metric type";
+          "Configuration for a specific metric type. Metrics will be
+           measured/reported if and only if they are present in this
+           list.";
 
         leaf metric-type {
           type identityref {
@@ -1009,13 +1007,6 @@ module cisco-soam-pm {
           description
             "The specific metric type that this list entry defines
              the configuration for";
-        }
-
-        leaf enable {
-          type boolean;
-          default false;
-          description
-            "Enable measurement/reporting of this metric type.";
         }
 
         leaf bin-count {
